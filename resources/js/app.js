@@ -1,0 +1,356 @@
+require('./bootstrap');
+
+window.Vue = require('vue');
+
+import VueRouter from 'vue-router';
+Vue.use(VueRouter);
+
+import VueAxios from 'vue-axios';
+import axios from 'axios';
+
+import App from './App.vue';
+Vue.use(VueAxios, axios);
+
+import Form from './utilities/Form';
+window.Form = Form;
+
+import select2 from 'select2';
+window.select2 = select2;
+
+import swal from 'sweetalert';
+window.swal = swal;
+
+import moment from 'moment';
+import 'moment-timezone';
+window.moment = moment;
+
+import datePicker from 'vue-bootstrap-datetimepicker';
+Vue.use(datePicker);
+
+import { PaginationPlugin } from 'bootstrap-vue'
+Vue.use(PaginationPlugin)
+
+
+import HomeComponent from './components/HomeComponent.vue';
+import Brand from './views/brand.vue';
+import BrandForm from './views/brandForm.vue';
+import Category from './views/category.vue';
+import CategoryForm from './views/categoryForm.vue';
+import Uom from './views/uom.vue';
+import UomForm from './views/uomForm.vue';
+import Product from './views/product.vue';
+import ProductForm from './views/ProductForm.vue';
+import Customer from './views/customer.vue';
+import CustomerForm from './views/customerForm.vue';
+import MainWarehouse from './views/mainWarehouse.vue';
+import MainWarehouseForm from './views/mainWarehouseForm.vue';
+import Transfer from './views/transfer.vue';
+import TransferForm from './views/transferForm.vue';
+import Receive from './views/receive.vue';
+import TransferDetail from './views/transferDetail.vue';
+import Sale from './views/sale.vue';
+import SaleForm from './views/saleForm.vue';
+import Collection from './views/collection.vue';
+import CollectionForm from './views/collectionForm.vue';
+import DailySaleProductRpt from './views/dailySaleProductRpt.vue';
+import DailySaleRpt from './views/dailySaleRpt.vue';
+import InventoryRpt from './views/inventoryRpt.vue';
+import SOProductRpt from './views/saleOrderProductRpt.vue';
+import SaleComparisonRpt from './views/saleComparisonRpt.vue';
+import PendingApprovalRpt from './views/pendingApprovalRpt.vue';
+import UomImport from './views/uomImport.vue';
+import BrandImport from './views/brandImport.vue';
+import CategoryImport from './views/categoryImport.vue';
+import WarehouseImport from './views/warehouseImport.vue';
+import ProductImport from './views/productImport.vue';
+import ProductMinQtyImport from './views/productMinQtyImport.vue';
+import StateImport from './views/stateImport.vue';
+import TownshipImport from './views/townshipImport.vue';
+import CustomerTypeImport from './views/customerTypeImport.vue';
+import CustomerImport from './views/customerImport.vue';
+import Order from './views/order.vue';
+import OrderForm from './views/orderForm.vue';
+import OrderApproval from './views/orderApproval.vue';
+import User from './views/user.vue';
+import UserForm from './views/userForm.vue';
+import Delivery from './views/delivery.vue';
+import Branch from './views/branch.vue';
+import BranchForm from './views/branchForm.vue';
+import Warehouse from './views/warehouse.vue';
+import WarehouseForm from './views/warehouseForm.vue';
+import SupplierForm from "./views/SupplierForm";
+import Supplier  from "./views/Supplier.Vue";
+
+const routes = [
+    {
+      name: 'home',
+      path: '/home',
+      component: HomeComponent
+    },
+    {
+      path: '/product',
+      component: Product
+    },
+    {
+      path: '/product/edit/:id',
+      component: ProductForm
+    },
+    {
+      name: 'product_form',
+      path: '/product/new',
+      component: ProductForm
+    },
+
+    {
+      path: '/brand',
+      component: Brand
+    },
+    {
+      path: '/brand/edit/:id',
+      component: BrandForm
+    },
+    {
+      path: '/brand/new',
+      component: BrandForm
+    },
+
+    {
+      path: '/category',
+      component: Category
+    },
+    {
+      path: '/category/edit/:id',
+      component: CategoryForm
+    },
+    {
+      path: '/category/new',
+      component: CategoryForm
+    },
+
+    {
+      path: '/uom',
+      component: Uom
+    },
+    {
+      path: '/uom/edit/:id',
+      component: UomForm
+    },
+    {
+      path: '/uom/new',
+      component: UomForm
+    },
+
+    {
+      path: '/customer',
+      component: Customer
+    },
+    {
+      path: '/customer/edit/:id',
+      component: CustomerForm
+    },
+    {
+      path: '/customer/new',
+      component: CustomerForm
+    },
+
+    {
+      path: '/inventory/main-warehouse',
+      component: MainWarehouse
+    },
+    {
+      path: '/inventory/main-warehouse/new',
+      component: MainWarehouseForm
+    },
+    {
+      path: '/inventory/main-warehouse/edit/:id',
+      component: MainWarehouseForm
+    },
+    {
+      path: '/inventory/transfer',
+      component: Transfer
+    },
+    {
+      path: '/inventory/transfer/new',
+      component: TransferForm
+    },
+    {
+      path: '/inventory/transfer/edit/:id',
+      component: TransferForm
+    },
+    {
+      path: '/inventory/receive/:id',
+      component: TransferDetail
+    },
+    {
+      path: '/inventory/receive',
+      component: Receive
+    },
+    {
+      path: '/sale/:sale_type',
+      component: Sale
+    },
+    {
+      path: '/sale/:sale_type/new',
+      component: SaleForm
+    },
+    {
+      path: '/sale/:sale_type/edit/:id',
+      component: SaleForm
+    },
+    {
+      path: '/collection',
+      component: Collection
+    },
+    {
+      path: '/collection/new',
+      component: CollectionForm
+    },
+    {
+      path: '/collection/edit/:id',
+      component: CollectionForm
+    },
+    {
+      path: '/order',
+      component: Order
+    },
+    {
+      path: '/order/new',
+      component: OrderForm
+    },
+    {
+      path: '/order/edit/:id',
+      component: OrderForm
+    },
+    {
+      path: '/order_approval',
+      component: OrderApproval
+    },
+    {
+      path: '/delivery',
+      component: Delivery
+    },
+    {
+      path: '/users',
+      component: User
+    },
+    {
+      path: '/user/new',
+      component: UserForm
+    },
+    {
+      path: '/user/edit/:id',
+      component: UserForm
+    },
+    {
+      path: '/branch',
+      component: Branch
+    },
+    {
+      path: '/branch/new',
+      component: BranchForm
+    },
+    {
+      path: '/branch/edit/:id',
+      component: BranchForm
+    },
+    {
+      path: '/warehouse',
+      component: Warehouse
+    },
+    {
+      path: '/warehouse/new',
+      component: WarehouseForm
+    },
+    {
+      path: '/warehouse/edit/:id',
+      component: WarehouseForm
+    },
+    {
+      path: '/report/daily-sale-rpt',
+      component: DailySaleRpt
+    },
+    {
+      path: '/report/daily-sale-product-rpt',
+      component: DailySaleProductRpt
+    },
+    {
+      path: '/report/inventory-rpt',
+      component: InventoryRpt
+    },
+    {
+      path: '/report/so-product-rpt',
+      component: SOProductRpt
+    },
+    {
+      path: '/report/sale-comparison-rpt',
+      component: SaleComparisonRpt
+    },
+    {
+      path: '/report/pending-approval-rpt',
+      component: PendingApprovalRpt
+    },
+    {
+      path: '/import/uom',
+      component: UomImport
+    },
+    {
+      path: '/import/brand',
+      component: BrandImport
+    },
+    {
+      path: '/import/category',
+      component: CategoryImport
+    },
+    {
+      path: '/import/warehouse',
+      component: WarehouseImport
+    },
+    {
+      path: '/import/state',
+      component: StateImport
+    },
+    {
+      path: '/import/township',
+      component: TownshipImport
+    },
+    {
+      path: '/import/customer_type',
+      component: CustomerTypeImport
+    },
+    {
+      path: '/import/customer',
+      component: CustomerImport
+    },
+    {
+      path: '/import/product',
+      component: ProductImport
+    },
+    {
+      path: '/import/product_qty',
+      component: ProductMinQtyImport
+    },
+    {
+        path: '/supplier',
+        component: Supplier
+    },
+    {
+        path: '/supplier/new',
+        component: SupplierForm
+    },
+    {
+        path: '/supplier/edit/:id',
+        component: SupplierForm
+    },
+
+];
+
+const router = new VueRouter({routes: routes});
+//const app = new Vue(Vue.util.extend({ router }, App)).$mount('#app');
+/*export default new VueRouter({
+    routes,
+    linkActiveClass : 'active'
+});*/
+const app = new Vue({
+    el: '#app',
+    router
+});

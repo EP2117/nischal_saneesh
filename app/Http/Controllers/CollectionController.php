@@ -1,0 +1,271 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
+use App\Sale;
+use App\Collection;
+use Carbon\Carbon;
+use DB;
+use Session;
+
+class CollectionController extends Controller
+{
+
+	public function index(Request $request)
+    {
+        $login_year = Session::get('loginYear');
+
+        $data = Collection::with('customer','branch');
+
+        if($request->collection_no != "") {
+            $data->where('collection_no',  $request->collection_no);
+        }
+
+        //for Country Head and Admin roles (can access multiple branch)
+        if(Auth::user()->role->id == 6 || Auth::user()->role->id == 2) {
+            if(Auth::user()->role->id != 1) { //system can access all branches
+                $branches = Auth::user()->branches;
+                $branch_arr = array();
+                foreach($branches as $branch) {
+                    array_push($branch_arr, $branch->id);
+                }
+                $data->whereIn('branch_id',$branch_arr);
+            }
+        } else {
+            //other roles can access only one branch
+            if(Auth::user()->role->id != 1) { //system can access all branches
+                $branch = Auth::user()->branch_id;
+                $data->where('branch_id',$branch);
+            }
+        }
+
+        if($request->branch_id != "") {
+            $data->where('branch_id',  $request->branch_id);
+        }
+
+        if($request->from_date != '' && $request->to_date != '')
+        {            
+            $data->whereBetween('collection_date', array($request->from_date, $request->to_date));
+        } else if($request->from_date != '') {
+            $data->whereDate('collection_date', '>=', $request->from_date);
+
+        }else if($request->to_date != '') {
+             $data->whereDate('collection_date', '<=', $request->to_date);
+        } else {
+            $data->whereBetween('collection_date', array($login_year.'-01-01', $login_year.'-12-31'));
+        }
+
+        if($request->customer_id != "") {
+            $data->where('customer_id', $request->customer_id);
+        }
+
+        $data = $data->orderBy('id', 'DESC')->get(); 
+        return response(compact('data'), 200);
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $collection = new Collection;
+
+        //auto generate collection no;
+        $max_id = Collection::max('id');
+        if($max_id) {
+            $max_id = $max_id + 1;
+        } else {
+            $max_id = 1;
+        }
+        $collection_no = "C".str_pad($max_id,5,"0",STR_PAD_LEFT);
+
+        $collection->collection_no 		= $collection_no;
+        $collection->collection_date 	= $request->collection_date;
+        $collection->customer_id		= $request->customer_id;
+        $collection->branch_id = $request->branch_id;
+        if($request->is_auto == true) {
+        	$collection->auto_payment	= 1;
+        	$collection->total_paid_amount	= $request->pay_amount;
+        } else {
+        	$collection->auto_payment	= 0;
+        	$collection->total_paid_amount	= $request->total_pay;
+        }
+
+        $collection->created_by = Auth::user()->id;
+        //$collection->updated_by = Auth::user()->id;        
+        $collection->save();
+
+        for($i=0; $i<count($request->invoices); $i++) {
+        	//add invoices into pivot table
+        	$pivot = $collection->sales()->attach($request->invoices[$i],['paid_amount' => $request->payments[$i], 'discount' => $request->discounts[$i]]);
+
+        	//Get all collection amount and update collection_amount in each sale invoice
+
+        	$collect_qry = DB::table("collection_sale")
+		      						->select(DB::raw("SUM(paid_amount)  as total_paid, SUM(discount)  as total_discount"))
+		      						->where('sale_id', $request->invoices[$i])
+		      						->groupBy('sale_id')
+		   							->first(); 
+    		if($collect_qry) { 
+    			$collection_amount = $collect_qry->total_paid + $collect_qry->total_discount;	        	
+	        } else {
+	        	$collection_amount = 0;
+	        }
+	        $sale = Sale::find($request->invoices[$i]);
+	        $sale->collection_amount = $collection_amount;
+	        $sale->save();
+        }
+
+        $status = "success";
+        $collection_id = $collection->id;
+        return compact('status','collection_id');
+
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+
+        $collection = Collection::find($id);
+        $collection->collection_date 	= $request->collection_date;
+        if($request->is_auto == true) {
+        	$collection->auto_payment	= 1;
+        	$collection->total_paid_amount	= $request->pay_amount;
+        } else {
+        	$collection->auto_payment	= 0;
+        	$collection->total_paid_amount	= $request->total_pay;
+        }
+
+        $collection->branch_id = $request->branch_id;
+
+        $collection->updated_at = time();
+        $collection->updated_by = Auth::user()->id;          
+        $collection->save();
+        
+        //update collection amount for removed sales
+    	foreach($request->remove_pivot_id as $key => $val) {
+    		//get paid amount and discount value before delete
+    		$relation = DB::table('collection_sale')
+                            ->select('sale_id','collection_id','paid_amount','discount')
+                            ->where('id',$val)
+                            ->first();
+            if($relation->discount == NULL) {
+            	$discount = 0;
+            } else {
+            	$discount = $relation->discount;
+            }
+
+            $sale_col_amt = $relation->paid_amount + $discount;
+
+            //update collection amount in sale
+            $sale = Sale::find($relation->sale_id);
+            $collection_amount = $sale->collection_amount - $sale_col_amt;
+        	$sale->collection_amount = $collection_amount;
+        	$sale->save();
+        }
+
+        $collection->sales()->detach();
+
+        for($i=0; $i<count($request->invoices); $i++) {
+        	//add invoices into pivot table
+        	$pivot = $collection->sales()->attach($request->invoices[$i],['paid_amount' => $request->payments[$i], 'discount' => $request->discounts[$i]]);
+
+        	//Get all collection amount and update collection_amount in each sale invoice
+        	$collect_qry = DB::table("collection_sale")
+		      						->select(DB::raw("SUM(paid_amount)  as total_paid, SUM(discount)  as total_discount"))
+		      						->where('sale_id', $request->invoices[$i])
+		      						->groupBy('sale_id')
+		   							->first(); 
+    		if($collect_qry) { 
+    			$collection_amount = $collect_qry->total_paid + $collect_qry->total_discount;	       	        	
+	        } else {
+	        	$collection_amount = 0;	
+	        }
+	        $sale = Sale::find($request->invoices[$i]);
+        	$sale->collection_amount = $collection_amount;
+        	$sale->save();
+	        
+        }
+
+        $status = "success";
+        $collection_id = $collection->id;
+        return compact('status','collection_id');
+
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        $collection = Collection::with('sales','customer','branch')->find($id);
+        $customer_id = $collection->customer_id;
+        $branch_id = $collection->branch_id;
+        $col_sales = array();
+        foreach($collection->sales as $sale) {
+        	array_push($col_sales, $sale->id);
+        }
+
+        $cus_invoices = Sale::orderBy('invoice_date', 'ASC')
+                ->where('customer_id',$customer_id)
+                ->where('branch_id', $branch_id)
+                ->where('payment_type', 'credit')
+                ->where(function ($query) use ($col_sales){
+	    				$query->whereRaw('(total_amount-(pay_amount + collection_amount)) > 0')
+	          				  ->orWhereIn('id', $col_sales);
+						})
+        		->get();
+        return compact('collection','cus_invoices');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $collection = Collection::with('sales')->find($id);
+        foreach($collection->sales as $sale) {
+        	$relation = DB::table('collection_sale')
+                            ->select('sale_id','collection_id','paid_amount','discount')
+                            ->where('id',$sale->pivot->id)
+                            ->first();
+            if($relation->discount == NULL) {
+            	$discount = 0;
+            } else {
+            	$discount = $relation->discount;
+            }
+
+            $sale_col_amt = $relation->paid_amount + $discount;
+
+            //update collection amount in sale
+            $sale = Sale::find($relation->sale_id);
+            $collection_amount = $sale->collection_amount - $sale_col_amt;
+        	$sale->collection_amount = $collection_amount;
+        	$sale->save();
+        }
+
+        $collection->sales()->detach();
+
+        $collection->delete();
+        
+        return response(['message' => 'delete successful']);
+    }
+}
