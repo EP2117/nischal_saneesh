@@ -31,7 +31,7 @@ class ProductController extends Controller
                   'brands.brand_name',
                   'categories.category_name'
                 ]);
-        
+
         $data->leftjoin('uoms', 'uoms.id','products.uom_id');
         $data->leftjoin('brands', 'brands.id','products.brand_id');
         $data->leftjoin('categories', 'categories.id','products.category_id');
@@ -79,7 +79,7 @@ class ProductController extends Controller
             }
             else {}
         } else {
-            $data = $data->orderBy('products.id', 'DESC');  
+            $data = $data->orderBy('products.id', 'DESC');
         }
         $data->with('selling_uoms');
         $data = $data->paginate($limit);
@@ -105,12 +105,12 @@ class ProductController extends Controller
 
                             $join->on("pt.product_id","=","products.id");
 
-                        }) 
+                        })
 
                 ->leftjoin('uoms', 'uoms.id', '=', 'products.uom_id')
 
                 ->where('products.is_active', 1)
-        
+
                 ->orderBy("products.product_name")
 
                 ->get();
@@ -138,14 +138,20 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+//        dd($request->all());
+
     	try {
 	        $this->validate($request, [
-	            'product_code' => 'required|max:255|unique:products',
+	            'product_code' => 'max:255|unique:products',
 	        ]);
-
-	       	$product = new Product;
+//	        dd($request->all());
+            $latest = Product::orderBy('id','desc')->first();
+            $random_code = "P".str_pad((int)$latest->id + 1,8,"0",STR_PAD_LEFT);
+            $product_code=$request->product_code_type=='manual' ? $request->product_code: $random_code ;
+            $product = new Product;
 	        $product->product_name      = $request->product_name;
-	        $product->product_code      = $request->product_code;
+            $product->product_code      = $product_code;
+            $product->product_code_type = $request->product_code_type;
 	        $product->brand_id          = $request->brand_id;
 	        $product->category_id       = $request->category_id;
 	        $product->uom_id            = $request->uom_id;
@@ -154,7 +160,7 @@ class ProductController extends Controller
             $product->retail1_price     = $request->retail1_price;
             $product->retail2_price     = $request->retail2_price;
             $product->wholesale_price   = $request->wholesale_price;
-
+            $product->purchase_price    = $request->purchase_price;
             $product->minimum_qty       = $request->min_qty;
             //$product->percentage_qty    = $request->percentage_qty;
             $product->is_active = 1;
@@ -169,14 +175,14 @@ class ProductController extends Controller
             $retail1_price_arr = $request->uom_retail1_prices;
             $retail2_price_arr = $request->uom_retail2_prices;
             $wholesale_price_arr = $request->uom_wholesale_prices;
+            $purchase_price_arr = $request->uom_purchase_prices;
 
 	        for($i=0; $i<count($request->selected_selling_uom); $i++) {
 	           	$key = $request->selected_selling_uom[$i];
 	           	$relation = $relation_arr[$key];
                 $selling_price = $price_arr[$key];
                 $uom_per_price = $per_price_arr[$key];
-
-	            $product->selling_uoms()->attach($request->selected_selling_uom[$i],['relation' => $relation, 'retail1_price' => $retail1_price_arr[$key],  'retail2_price' => $retail2_price_arr[$key], 'wholesale_price' => $wholesale_price_arr[$key]]);
+	            $product->selling_uoms()->attach($request->selected_selling_uom[$i],['relation' => $relation, 'retail1_price' => $retail1_price_arr[$key],  'retail2_price' => $retail2_price_arr[$key], 'wholesale_price' => $wholesale_price_arr[$key],'warehouse_uom_purchase_price' => $purchase_price_arr[$key]]);
 	        }
 
 	        $status = "success";
@@ -202,22 +208,23 @@ class ProductController extends Controller
     {
         try {
             $this->validate($request, [
-                'product_code' => 'required|max:255|unique:products,product_code,'.$id,
+                'product_code' => 'max:255|unique:products,product_code,'.$id,
             ]);
-
+            $latest = Product::orderBy('id','desc')->first();
+            $random_code = "P".str_pad((int)$latest->id + 1,8,"0",STR_PAD_LEFT);
+            $product_code=$request->product_code_type=='manual' ? $request->product_code: $random_code;
             $product = Product::find($id);
             $product->product_name      = $request->product_name;
-            $product->product_code      = $request->product_code;
+            $product->product_code_type      = $request->product_code_type;
+            $product->product_code      = $product_code;
             $product->brand_id          = $request->brand_id;
             $product->uom_id            = $request->uom_id;
             $product->category_id       = $request->category_id;
             $product->minimum_qty       = $request->min_qty;
-            //$product->percentage_qty    = $request->percentage_qty;
-            $product->product_price     = $request->product_price;
-
             $product->retail1_price     = $request->retail1_price;
             $product->retail2_price     = $request->retail2_price;
             $product->wholesale_price   = $request->wholesale_price;
+            $product->purchase_price    = $request->purchase_price;
 
             //$product->uom_id = $request->uom_id;
             $product->updated_at = time();
@@ -233,16 +240,15 @@ class ProductController extends Controller
             $retail1_price_arr = $request->uom_retail1_prices;
             $retail2_price_arr = $request->uom_retail2_prices;
             $wholesale_price_arr = $request->uom_wholesale_prices;
-
+            $purchase_price_arr = $request->uom_purchase_prices;
             for($i=0; $i<count($request->selected_selling_uom); $i++) {
                 $key = $request->selected_selling_uom[$i];
                 $relation = $relation_arr[$key];
                 $selling_price = $price_arr[$key];
                 $uom_per_price = $per_price_arr[$key];
 
-                $product->selling_uoms()->attach($request->selected_selling_uom[$i],['relation' => $relation, 'retail1_price' => $retail1_price_arr[$key],  'retail2_price' => $retail2_price_arr[$key], 'wholesale_price' => $wholesale_price_arr[$key]]);
+                $product->selling_uoms()->attach($request->selected_selling_uom[$i],['relation' => $relation, 'retail1_price' => $retail1_price_arr[$key],  'retail2_price' => $retail2_price_arr[$key], 'wholesale_price' => $wholesale_price_arr[$key],'warehouse_uom_purchase_price' => $purchase_price_arr[$key]]);
             }
-
             $status = "success";
             return compact('status');
         }
@@ -290,10 +296,10 @@ class ProductController extends Controller
         return response(['message' => 'delete successful']);
     }
 
-    public function import() 
+    public function import()
     {
-        $path1 = request()->file('file')->store('temp'); 
-        $path=storage_path('app').'/'.$path1; 
+        $path1 = request()->file('file')->store('temp');
+        $path=storage_path('app').'/'.$path1;
 
         $import = new ProductImport();
         Excel::import($import,$path);
@@ -301,10 +307,10 @@ class ProductController extends Controller
         return ["message" => "success"];
     }
 
-    public function qtyImport() 
+    public function qtyImport()
     {
-        $path1 = request()->file('file')->store('temp'); 
-        $path=storage_path('app').'/'.$path1; 
+        $path1 = request()->file('file')->store('temp');
+        $path=storage_path('app').'/'.$path1;
 
         $import = new ProductMinQtyImport();
         Excel::import($import,$path);

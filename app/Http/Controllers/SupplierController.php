@@ -46,7 +46,6 @@ class SupplierController extends Controller
           $result = 1;
         }
         $supplier_code = "S".str_pad($result,5,"0",STR_PAD_LEFT);
-//        dd($request->all());
         Supplier::create([
             'name'=>$request->supplier_name,
             'supplier_code'=>$supplier_code,

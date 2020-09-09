@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Product extends Model
 {
     use SoftDeletes;
-    
+
     public function selling_uoms()
     {
-        return $this->belongsToMany('App\Uom', 'product_selling_uom')->withPivot('relation','product_price','retail1_price','retail2_price','wholesale_price','per_warehouse_uom_price');
+        return $this->belongsToMany('App\Uom', 'product_selling_uom')->withPivot('relation','product_price','retail1_price','retail2_price','wholesale_price','per_warehouse_uom_price','warehouse_uom_purchase_price');
     }
 
 	//relationship for warehouse uom

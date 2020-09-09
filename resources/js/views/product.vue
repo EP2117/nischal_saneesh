@@ -27,12 +27,12 @@
             </div>
             <div class="card-body">
 
-                <div class="row">                   
+                <div class="row">
 
                     <div class="form-group col-md-4 col-lg-3 mm-txt">
                         <label for="brand_id">Brand</label>
                         <select id="brand_id" class="form-control form-control-alternative"
-                            name="brand_id" v-model="search.brand_id" style="width:100%" 
+                            name="brand_id" v-model="search.brand_id" style="width:100%"
                         >
                             <option value="">Select One</option>
                             <option v-for="brand in brands" :value="brand.id">{{brand.brand_name}}</option>
@@ -47,7 +47,7 @@
                             <option value="">Select One</option>
                             <option v-for="cat in categories" :value="cat.id">{{cat.category_name}}</option>
                         </select>
-                    </div> 
+                    </div>
 
                     <div class="form-group col-md-4 col-lg-3">
                         <label for="product_code">Product Code</label>
@@ -102,8 +102,8 @@
                             <option value="uom">Warehouse UOM</option>
                         </select>
                     </div>
-                    <div> 
-                        
+                    <div>
+
                         <!--<div class="float-left ml-3 pl-3">&nbsp;&nbsp;</div>
                         <div class="form-group ml-3 pl-3">
                             <label for="order">&nbsp;</label>
@@ -114,7 +114,7 @@
                                 <option value="ASC">Ascending</option>
                                 <option value="DESC">Descending</option>
                             </select>
-                        </div> -->              
+                        </div> -->
                         <div class="form-group float-left">
                             <select id="order" class="form-control mt-2"
                                 name="order" v-model="search.order" style="width:150px; margin-left:10px;" @change="getProducts(1)"
@@ -129,7 +129,7 @@
                             <button class="btn btn-primary btn-icon btn-sm" @click="exportExcel()"><i class="fas fa-file-excel"></i> &nbsp;Export to Excel</button>
                         </div>
                     </div>
-                    
+
                     <!-- end sort by -->
                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                         <thead>
@@ -188,10 +188,10 @@
                                             <i class="fas fa-edit"></i>
                                         </a>&nbsp;
                                     </router-link>
-                                        
+
                                     <!--<a href="#" title="Delete" class="text-danger" @click="deleteProduct(product.id)">
                                         <i class="fas fa-trash"></i>
-                                    </a> --> 
+                                    </a> -->
                                     <a class="badge badge-primary text-white"  @click="changeStatus(product.id,'inactive')" v-if="product.is_active == 1">Inactive</a>
                                     <a class="badge badge-primary text-white" @click="changeStatus(product.id,'active')" v-else>Active</a>
 
@@ -206,7 +206,7 @@
             </div>
 
             <div class="card-footer text-center">
-          
+
               <!-- pagination start -->
               <div class="row" style="overflow:auto">
                 <div class="col-12">
@@ -257,6 +257,7 @@
                     category_id: '',
                     product_code: '',
                     product_name: '',
+                    product_code_type: '',
                     sort_by: '',
                     order: '',
                     status: '',
@@ -289,20 +290,20 @@
             this.site_path = document.querySelector("meta[name='site-path']").getAttribute('content');
             //this.site_path = this.site_path.substring(this.site_path.lastIndexOf('/')+1);
             this.storage_path = document.querySelector("meta[name='storage-path']").getAttribute('content');
-            
+
             if(this.user_role != "admin" && this.user_role != "system" && this.user_role != "office_user") {
                 var url =  window.location.origin;
                 window.location.replace(url);
             }
 
-            this.getProducts();    
+            this.getProducts();
         },
 
         mounted() {
             //$("#loading").hide();
             let app = this;
             console.log('Component mounted.');
-            app.initBrands();         
+            app.initBrands();
             app.initCategories();
 
             $("#brand_id").select2();
@@ -357,7 +358,7 @@
                             icon: "success"
                           });
                         });
-                        
+
                     } else {
                         if(active == "active") {
                             $(obj).prop("checked",false);
@@ -391,9 +392,9 @@
                             icon: "success"
                           });
                         });
-                        
+
                     } else {
-                       
+
                     }
                 });
             },
@@ -407,7 +408,7 @@
                    if($(this).val() !== "") {
                         empty = false;
                    }
-                    
+
                 });
 
                 if(!empty) {
@@ -492,10 +493,10 @@
                     console.log(app.products);
                     $("#loading").hide();
                 });*/
-                
+
             },
 
-            exportExcel() {    
+            exportExcel() {
 
                 let app = this;
 

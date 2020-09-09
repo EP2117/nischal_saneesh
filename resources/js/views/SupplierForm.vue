@@ -80,7 +80,6 @@
                                 <textarea class="form-control" id="billing_address" name="billing_address"
                                           v-model="form.billing_address" rows='3' required></textarea>
                             </div>
-
                             <div class="form-group col-md-4">
                                 <label for="shipping_address">Shipping Address</label>
                                 <textarea class="form-control" id="shipping_address" name="shipping_address"

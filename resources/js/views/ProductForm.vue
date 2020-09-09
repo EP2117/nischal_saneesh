@@ -35,7 +35,18 @@
                                     v-model="form.product_name" required >
                             </div>
                         </div>
-
+                        <div class="form-group row">
+                            <label class="col-lg-3 text-right col-form-label form-control-label">Product Code Type</label>
+                            <div class="col-lg-6">
+                                <select id="product_code_type_id" class="form-control form-control-alternative"
+                                         v-model="form.product_code_type" style="width:100%" @change="codeType()">
+                                    <option value="">Select One</option>
+                                    <option value="manual">Manual</option>
+                                    <option value="automatic">Automatic</option>
+<!--                                    <option v-for="brand in brands" :value="brand.id">{{brand.brand_name}}</option>-->
+                                </select>
+                            </div>
+                        </div>
                         <div class="form-group row">
                             <label class="col-lg-3 col-form-label text-right form-control-label">Product Code</label>
                             <div class="col-lg-6">
@@ -44,31 +55,27 @@
                                     v-model="form.product_code" required >
                             </div>
                         </div>
-
                         <div class="form-group row">
                             <label class="col-lg-3 text-right col-form-label form-control-label">Brand</label>
                             <div class="col-lg-6">
                                 <select id="brand_id" class="form-control form-control-alternative"
-                                    name="brand_id" v-model="form.brand_id" style="width:100%" 
+                                    name="brand_id" v-model="form.brand_id" style="width:100%"
                                 >
                                     <option value="">Select One</option>
                                     <option v-for="brand in brands" :value="brand.id">{{brand.brand_name}}</option>
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-group row">
                             <label class="col-lg-3 text-right col-form-label form-control-label">Category</label>
                             <div class="col-lg-6">
                                 <select id="category_id" class="form-control"
-                                    name="category_id" v-model="form.category_id" style="width:100%"
-                                >
+                                    name="category_id" v-model="form.category_id" style="width:100%">
                                     <option value="">Select One</option>
                                     <option v-for="cat in categories" :value="cat.id">{{cat.category_name}}</option>
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-group row">
                             <label class="col-lg-3 text-right col-form-label form-control-label">Warehouse UOM</label>
                             <div class="col-lg-6">
@@ -80,7 +87,6 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-group row mb-0 pb-0">
                             <label class="col-lg-3 text-right col-form-label form-control-label">Warehouse UOM Selling Price</label>
                             <div class="col-lg-9">
@@ -104,7 +110,13 @@
                                 </div>
                             </div>
                         </div>
-
+                        <div class="form-group row" >
+                            <label class="col-lg-3 col-form-label text-right form-control-label">Warehouse UMO Purchase Price</label>
+                            <div class="col-lg-6">
+                                <input class="form-control" type="text"
+                                       v-model="form.purchase_price" required >
+                            </div>
+                        </div>
                         <div class="form-group row">
                             <label class="col-lg-3 text-right col-form-label form-control-label">Selling UOM</label>
                             <div class="col-lg-6">
@@ -117,13 +129,11 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-group row">
                             <label class="col-lg-3 col-form-label text-right form-control-label">Relation</label>
-                            <div class="col-lg-9 relation">                                
+                            <div class="col-lg-9 relation">
                             </div>
                         </div>
-
                         <div class="form-group row">
                             <label class="col-lg-3 col-form-label text-right form-control-label">Minimum QTY</label>
                             <div class="col-lg-6">
@@ -151,8 +161,8 @@
                             </div>
                         </div>
 
-                    </form>                    
-                <!-- form end -->  
+                    </form>
+                <!-- form end -->
                 </div>
 
             </div>
@@ -163,6 +173,8 @@
 </template>
 
 <script>
+    import warehouse from "./warehouse";
+
     export default {
         data() {
             return {
@@ -173,6 +185,7 @@
                 retail1_price: "",
                 retail2_price: "",
                 wholesale_price: "",
+                  purchase_price:'',
                 brand_id: "",
                 category_id: "",
                 uom_id: "",
@@ -182,10 +195,12 @@
                 uom_prices: [],
                 uom_retail1_prices: [],
                 uom_retail2_prices: [],
-                uom_wholesale_prices: [],
+                  uom_wholesale_prices: [],
+                  uom_purchase_prices: [],
                 uom_per_prices: [],
                 min_qty: '',
                 percentage_qty: '',
+                  product_code_type:'',
               }),
               brands: [],
               uoms: [],
@@ -198,6 +213,7 @@
               user_role: '',
               site_path: '',
               storage_path: '',
+                check_disable:true,
             };
         },
 
@@ -207,12 +223,10 @@
             this.site_path = document.querySelector("meta[name='site-path']").getAttribute('content');
             //this.site_path = this.site_path.substring(this.site_path.lastIndexOf('/')+1);
             this.storage_path = document.querySelector("meta[name='storage-path']").getAttribute('content');
-            
             if(this.user_role != "admin" && this.user_role != "system" && this.user_role != "office_user") {
                 var url =  window.location.origin;
                 window.location.replace(url);
             }
-
             if(this.$route.params.id) {
                 this.isEdit = true;
                 this.product_id = this.$route.params.id;
@@ -223,7 +237,7 @@
 
             //console.log(this.isEdit);
         },
-        
+
         mounted() {
            // console.log(this.$route);
             $("#loading").hide();
@@ -242,7 +256,7 @@
             });
 
             $("#uom_id").on("select2:select", function(e) {
-                if(app.isEdit) {                    
+                if(app.isEdit) {
                     var data = e.params.data;
                     app.checkUOM(data,app.form.uom_id,app.product_id);
                     //app.form.uom_id = data.id;
@@ -253,18 +267,16 @@
                     $(".wh_uom").text(data.text);
                 }
             });
-
             $("#category_id").select2();
             $("#category_id").on("select2:select", function(e) {
                 var data = e.params.data;
                 app.form.category_id = data.id;
             });
-
             $(".selling_uom_id").select2();
 
             app.initBrands();
-            app.initUoms();            
-            
+            app.initUoms();
+
             $(".selling_uom_id").on("select2:select", function(e) {
                 var data = e.params.data;
 
@@ -273,11 +285,11 @@
                 if (index > -1) {
                     add_rel = false;
                 }
-
+                // console.log(index);
                 //app.isRequired = true;
-                app.temp_selling_uom.push(data.id);  
+                app.temp_selling_uom.push(data.id);
                 var unique_selling_uom = app.temp_selling_uom.filter((a, b) => app.temp_selling_uom.indexOf(a) === b);
-                app.temp_selling_uom = unique_selling_uom;           
+                app.temp_selling_uom = unique_selling_uom;
                 $('.selling_uom_id').val(app.temp_selling_uom).trigger('change');
 
                 var uom = e.target.options[e.target.options.selectedIndex].dataset.uom;
@@ -286,16 +298,16 @@
                 if (typeof wh_uom === 'undefined') {
                     wh_uom = '';
                 }
-                
+
                 var rel_div = $(".relation").html();
                /*** var rel_div_add = "<div id='rel_"+data.id+"'>1 "+ data.text +" = <input class='form-control decimal_no price_txtbox' type='text' style='display:inline-block;' id='rel_txt_"+data.id+"' required > <span class='wh_uom'>"+wh_uom+"</span>&nbsp; <br /> <br /> Selling Price <input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_price_txt_"+data.id+"' required >&nbsp;  Per Warehouse UOM Price <input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_per_price_txt_"+data.id+"' required > <br /><br/>"; ***/
 
-               var rel_div_add = "<div id='rel_"+data.id+"'>1 "+ data.text +" = <input class='form-control decimal_no price_txtbox' type='text' style='display:inline-block;' id='rel_txt_"+data.id+"' required > <span class='wh_uom'>"+wh_uom+"</span>&nbsp; <br /> <br /> <div class='float-left mt-2'>Retail 1 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='width:90px;' id='rel_retail1_price_txt_"+data.id+"' required ></div><div class='float-left mt-2'>&nbsp; Retail 2 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='width:90px;' id='rel_retail2_price_txt_"+data.id+"' required ></div><div class='float-left mt-2'>&nbsp; Wholesale &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;width:90px;' id='rel_wholesale_price_txt_"+data.id+"' required ></div><br /><br/><br />";
+               var rel_div_add = "<div id='rel_"+data.id+"'>1 "+ data.text +" = <input class='form-control decimal_no price_txtbox' type='text' style='display:inline-block;' id='rel_txt_"+data.id+"' required > <span class='wh_uom'>"+wh_uom+"</span>&nbsp; <br /> <br /> <div class='float-left mt-2'>Retail 1 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='width:90px;' id='rel_retail1_price_txt_"+data.id+"' required ></div><div class='float-left mt-2'>&nbsp; Retail 2 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='width:90px;' id='rel_retail2_price_txt_"+data.id+"' required ></div><div class='float-left mt-2'>&nbsp; Wholesale &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;width:90px;' id='rel_wholesale_price_txt_"+data.id+"' required ></div><div class='float-left mt-2'>&nbsp; Purchase &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;width:120px;' id='rel_purchase_price_txt_"+data.id+"' required ></div><br /><br/><br />";
 
-                if(add_rel) { 
+                if(add_rel) {
                     $(".relation").append(rel_div_add);
                 }
-                
+
             });
 
             $(".selling_uom_id").on("select2:unselect", function(e) {
@@ -305,7 +317,7 @@
 
                 if(app.isEdit) {
                     //check selling uom is already used or not
-                    var uom_id = data.id; 
+                    var uom_id = data.id;
                     var product_id    = $("#rel_txt_"+uom_id).attr("data-product");
                     var relation_val  = $("#rel_txt_"+uom_id).attr("data-relation");
                     app.checkSellingUom(product_id, uom_id, relation_val, 'remove');
@@ -317,7 +329,7 @@
                     if (index > -1) {
                       app.temp_selling_uom.splice(index, 1);
                     }
-                    if(!app.isEdit) {   
+                    if(!app.isEdit) {
                         if(app.temp_selling_uom.length > 0) {
                             app.isRequired = true;
                         } else {
@@ -332,11 +344,11 @@
 
             $(document).on('blur','.rel_value',function(evt) {
                 var product_id  = $(this).attr("data-product");
-                var uom_id      = $(this).attr("data-uom"); 
+                var uom_id      = $(this).attr("data-uom");
                 var relation_val = $(this).attr("data-relation");
                 app.checkSellingUom(product_id, uom_id, relation_val, 'edit');
             });
-           
+
         },
 
         methods: {
@@ -385,16 +397,14 @@
                     });
             },
 
-            checkSellingUom(product_id,uom_id,rel_value,action) {                
+            checkSellingUom(product_id,uom_id,rel_value,action) {
                 let app = this;
                 var msg = '';
                 var edit_val = $("#rel_txt_"+uom_id).val();
                 var chk = true;
-
                 if(action == 'edit' && rel_value == edit_val) {
                     chk = false;
                 }
-
                 if(chk) {
                     $("#loading").show();
                     axios
@@ -420,7 +430,7 @@
                                     if (index > -1) {
                                       app.temp_selling_uom.splice(index, 1);
                                     }
-                                    if(!app.isEdit) {   
+                                    if(!app.isEdit) {
                                         if(app.temp_selling_uom.length > 0) {
                                             app.isRequired = true;
                                         } else {
@@ -441,19 +451,24 @@
               axios
                 .get("/product/" + id)
                 .then(function(response) {
+                    console.log(response.data);
                     if(response.data.product.brand_id !="" || response.data.product.brand_id != null) {
                         app.filterCategories(response.data.product.brand_id);
                     } else {
                         app.initCategories();
                     }
-                    
+
                     app.form.product_name = response.data.product.product_name;
                     app.form.product_code = response.data.product.product_code;
                     app.form.brand_id = response.data.product.brand_id;
-                    app.form.min_qty = response.data.product.minimum_qty; 
-                   //app.form.percentage_qty = response.data.product.percentage_qty;                    
+                    app.form.product_code_type = response.data.product.product_code_type;
+                    app.form.min_qty = response.data.product.minimum_qty;
+                    // app.form.purchase_price = response.data.product.purchase_price;
+                   //app.form.percentage_qty = response.data.product.percentage_qty;
                     $('#brand_id').val(app.form.brand_id).trigger('change');
                     app.form.category_id = response.data.product.category_id;
+                    $('#product_code_type_id').val(app.form.product_code_type).trigger('change');
+                    // app.form.prodcut_code_type = response.data.product.prodcut_code_type;
                     $('#category_id').val(app.form.category_id).trigger('change');
                     app.form.uom_id = response.data.product.uom_id;
                     $('#uom_id').val(app.form.uom_id).trigger('change');
@@ -462,14 +477,14 @@
                     app.form.retail1_price = response.data.product.retail1_price;
                     app.form.retail2_price = response.data.product.retail2_price;
                     app.form.wholesale_price = response.data.product.wholesale_price;
-
+                    app.form.purchase_price = response.data.product.purchase_price;
                     var rel_div_add = '';
                     $.each(response.data.product.selling_uoms, function( key, obj ) {
-                        app.selected_selling_uom.push(String(obj.pivot.uom_id)); 
+                        app.selected_selling_uom.push(String(obj.pivot.uom_id));
 
-                        app.form.selling_uom_id.push(String(obj.pivot.uom_id)); 
+                        app.form.selling_uom_id.push(String(obj.pivot.uom_id));
 
-                        app.temp_selling_uom.push(String(obj.pivot.uom_id)); 
+                        app.temp_selling_uom.push(String(obj.pivot.uom_id));
 
                         if(obj.pivot.product_price==null) {
                             var price = '';
@@ -497,13 +512,18 @@
                         } else {
                             var wholesale_price = obj.pivot.wholesale_price;
                         }
+                        if(obj.pivot.warehouse_uom_purchase_price==null) {
+                            var purchase_price = '';
+                        } else {
+                            var purchase_price = obj.pivot.warehouse_uom_purchase_price;
+                        }
 
                        /* rel_div_add = "<div id='rel_"+obj.pivot.uom_id+"'>1 "+ obj.uom_name +" = <input class='form-control decimal_no price_txtbox rel_value' data-relation='"+obj.pivot.relation+"' data-uom ='"+obj.pivot.uom_id+"' data-product ='"+obj.pivot.product_id+"' type='text' style='display:inline-block;' id='rel_txt_"+obj.pivot.uom_id+"' value='"+obj.pivot.relation+"' required > <span class='wh_uom' >"+response.data.product.uom.uom_name+"</span>&nbsp; Selling Price <input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_price_txt_"+obj.pivot.uom_id+"' value='"+price+"' required >&nbsp; Per Warehouse UOM Price <input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_per_price_txt_"+obj.pivot.uom_id+"' value='"+per_price+"' required > <br /><br/>";
                         $(".relation").append(rel_div_add); */
 
-                        rel_div_add = "<div id='rel_"+obj.pivot.uom_id+"'>1 "+ obj.uom_name +" = <input class='form-control decimal_no price_txtbox rel_value' data-relation='"+obj.pivot.relation+"' data-uom ='"+obj.pivot.uom_id+"' data-product ='"+obj.pivot.product_id+"' type='text' style='display:inline-block;' id='rel_txt_"+obj.pivot.uom_id+"' value='"+obj.pivot.relation+"' required > <span class='wh_uom' >"+response.data.product.uom.uom_name+"</span>&nbsp; <br /><br /><div class='float-left mt-2'>Retail 1 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_retail1_price_txt_"+obj.pivot.uom_id+"' value='"+retail1_price+"' required ></div><div class='float-left mt-2'>&nbsp; Retail 2 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_retail2_price_txt_"+obj.pivot.uom_id+"' value='"+retail2_price+"' required ></div><div class='float-left mt-2'>&nbsp; Wholesale &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_wholesale_price_txt_"+obj.pivot.uom_id+"' value='"+wholesale_price+"' required ></div><br /><br/><br />";
+                        rel_div_add = "<div id='rel_"+obj.pivot.uom_id+"'>1 "+ obj.uom_name +" = <input class='form-control decimal_no price_txtbox rel_value' data-relation='"+obj.pivot.relation+"' data-uom ='"+obj.pivot.uom_id+"' data-product ='"+obj.pivot.product_id+"' type='text' style='display:inline-block;' id='rel_txt_"+obj.pivot.uom_id+"' value='"+obj.pivot.relation+"' required > <span class='wh_uom' >"+response.data.product.uom.uom_name+"</span>&nbsp; <br /><br /><div class='float-left mt-2'>Retail 1 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_retail1_price_txt_"+obj.pivot.uom_id+"' value='"+retail1_price+"' required ></div><div class='float-left mt-2'>&nbsp; Retail 2 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_retail2_price_txt_"+obj.pivot.uom_id+"' value='"+retail2_price+"' required ></div><div class='float-left mt-2'>&nbsp; Wholesale &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_wholesale_price_txt_"+obj.pivot.uom_id+"' value='"+wholesale_price+"' required ></div><div class='float-left mt-2'>&nbsp; Purchase &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_purchase_price_price_txt_"+obj.pivot.uom_id+"' value='"+purchase_price+"' required ></div><br /><br/><br />";
                         $(".relation").append(rel_div_add);
-                        
+
 
                     });
                     $(".selling_uom_id").val(app.form.selected_selling_uom).trigger("change");
@@ -521,14 +541,13 @@
             onSubmit: function(event) {
                 let app = this;
                 //app.form.selling_uom_id = $(".selling_uom_id").val();
-                app.form.selling_uom_id = app.temp_selling_uom;
-                console.log(app.form.selling_uom_id);
-                //add uom relation values to form obj
-                var selling_uom_arr = app.form.selling_uom_id; 
-                
+                // app.form.selling_uom_id = app.temp_selling_uom;
+                // var selling_uom_arr = app.form.selling_uom_id;
+                var selling_uom_arr = app.temp_selling_uom;
+
+                // console.log(selling_uom_arr);
 
                 if (!this.isEdit) {
-
                     swal({
                     title: "Are you sure?",
                     text: "Once added, you will not be able to update UOM and RELATION!",
@@ -537,9 +556,10 @@
                     dangerMode: true
                     }).then(willDelete => {
                         if (willDelete) {
-
-                        app.form.selected_selling_uom = $(".selling_uom_id").val();
-
+                            console.log(app);
+                        // app.form.selected_selling_uom = $(".selling_uom_id").val();
+                        // console.log(app.form.selected_selling_uom);
+                            app.form.selected_selling_uom=app.temp_selling_uom;
                         var relation_arr = [];
                         var price_arr = [];
                         var per_price_arr = [];
@@ -547,6 +567,7 @@
                         var retail1_price_arr = [];
                         var retail2_price_arr = [];
                         var wholesale_price_arr = [];
+                        var purchase_price_arr=[];
 
                         for(var key in selling_uom_arr) {
                             var ukey = selling_uom_arr[key];
@@ -564,15 +585,16 @@
                             retail1_price_arr[ukey] = $("#rel_retail1_price_txt_"+ukey).val();
                             retail2_price_arr[ukey] = $("#rel_retail2_price_txt_"+ukey).val();
                             wholesale_price_arr[ukey] = $("#rel_wholesale_price_txt_"+ukey).val();
+                            purchase_price_arr[ukey] = $("#rel_purchase_price_txt_"+ukey).val();
                         }
 
                         app.form.uom_relations = relation_arr;
                         app.form.uom_prices = price_arr;
                         app.form.uom_per_prices = per_price_arr;
-
                         app.form.uom_retail1_prices = retail1_price_arr;
                         app.form.uom_retail2_prices = retail2_price_arr;
                         app.form.uom_wholesale_prices = wholesale_price_arr;
+                        app.form.uom_purchase_prices = purchase_price_arr;
 
                         this.form
                           .post("/product")
@@ -585,11 +607,11 @@
                                 $("#brand_id").select2();
                                 $("#category_id").select2();
                                 $("#uom_id").select2();
-                                 
-                                app.form.selling_uom_id = []; 
+
+                                app.form.selling_uom_id = [];
                                 $(".selling_uom_id").select2();
-                                $(".selling_uom_id").select2("val","");                         
-                                $(".relation").html('');  
+                                $(".selling_uom_id").select2("val","");
+                                $(".relation").html('');
 
                                 swal({
                                     title: "Success!",
@@ -598,10 +620,10 @@
                                     button: true
                                 }).then(function() {
                                    // location.reload();
-                                   
+
 
                                 });
-                                                          
+
 
 
                                 /* location.reload();
@@ -638,11 +660,9 @@
                         }
                     });
 
-                    
+
                   } else {
-
                     //Edit Product
-
                     swal({
                     title: "Are you sure?",
                     text: "",
@@ -652,18 +672,15 @@
                     }).then(willDelete => {
                         if (willDelete) {
                             //app.form.selected_selling_uom = app.selected_selling_uom.concat($(".selling_uom_id").val());
-                            
                              app.form.selected_selling_uom = app.temp_selling_uom.filter((a, b) => app.temp_selling_uom.indexOf(a) === b);
-                             console.log(app.form.selected_selling_uom);
-
+                             // console.log(app.form.selected_selling_uom);
                         var relation_arr = [];
                         var price_arr = [];
                         var per_price_arr = [];
-
                         var retail1_price_arr = [];
                         var retail2_price_arr = [];
-                        var wholesale_price_arr = [];
-
+                            var wholesale_price_arr = [];
+                            var purchase_price_arr = [];
                         for(var key in app.form.selected_selling_uom) {
                             var ukey = app.form.selected_selling_uom[key];
 
@@ -680,16 +697,16 @@
                             retail1_price_arr[ukey] = $("#rel_retail1_price_txt_"+ukey).val();
                             retail2_price_arr[ukey] = $("#rel_retail2_price_txt_"+ukey).val();
                             wholesale_price_arr[ukey] = $("#rel_wholesale_price_txt_"+ukey).val();
+                            purchase_price_arr[ukey] = $("#rel_purchase_price_price_txt_"+ukey).val();
                         }
-
                         app.form.uom_relations = relation_arr;
                         app.form.uom_prices = price_arr;
                         app.form.uom_per_prices = per_price_arr;
 
                         app.form.uom_retail1_prices = retail1_price_arr;
                         app.form.uom_retail2_prices = retail2_price_arr;
-                        app.form.uom_wholesale_prices = wholesale_price_arr;
-
+                            app.form.uom_wholesale_prices = wholesale_price_arr;
+                            app.form.uom_purchase_prices = purchase_price_arr;
                         this.form
                           .patch("/product/" + app.product_id)
                           .then(function(data) {
@@ -701,7 +718,7 @@
                                 $("#category_id").select2();
                                 $("#uom_id").select2();
                                 $(".selling_uom_id").select2("val","");
-                                $(".relation").html('');  
+                                $(".relation").html('');
                             if(data.status == "success") {
                                 swal({
                                     title: "Success!",
@@ -710,7 +727,6 @@
                                     button: true
                                 }).then(function() {
                                     location.reload();
-
                                 });
                             } else {
                               $.notify("Error", {
@@ -738,10 +754,19 @@
                             });
                         }
                     });
-                    
+
                     //End Edit Product
                   }
             },
+            codeType(){
+                var check=this.form.product_code_type;
+                if(check=='automatic'){
+                    $( "#product_code" ).prop( "disabled", true );
+                }else{
+                    $( "#product_code" ).prop( "disabled", false );
+                }
+            },
+
         }
     }
 </script>
