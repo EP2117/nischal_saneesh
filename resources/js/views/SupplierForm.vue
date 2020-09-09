@@ -83,7 +83,7 @@
                             <div class="form-group col-md-4">
                                 <label for="shipping_address">Shipping Address</label>
                                 <textarea class="form-control" id="shipping_address" name="shipping_address"
-                                          v-model="form.shipping_address" rows='3' required></textarea>
+                                          v-modeapp.jsl="form.shipping_address" rows='3' required></textarea>
                             </div>
                         </div>
 
@@ -301,6 +301,7 @@ export default {
             } else {
                 // console.log(this);
                 //Edit Customer
+                var vm=this;
                 this.form
                     .patch('/supplier/'+ app.supplier_id+'/update')
                     .then(function(data) {
@@ -321,8 +322,7 @@ export default {
                                 // this.$router.push('/supplier');
                                 // location.replace('/supplier');
                                 // location.reload();
-                                this.$route.router.go('/');
-
+                                vm.$router.push({name:'supplier'})
                             });
                         } else {
                             $.notify("Error", {

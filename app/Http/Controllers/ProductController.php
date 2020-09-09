@@ -246,7 +246,6 @@ class ProductController extends Controller
                 $relation = $relation_arr[$key];
                 $selling_price = $price_arr[$key];
                 $uom_per_price = $per_price_arr[$key];
-
                 $product->selling_uoms()->attach($request->selected_selling_uom[$i],['relation' => $relation, 'retail1_price' => $retail1_price_arr[$key],  'retail2_price' => $retail2_price_arr[$key], 'wholesale_price' => $wholesale_price_arr[$key],'warehouse_uom_purchase_price' => $purchase_price_arr[$key]]);
             }
             $status = "success";

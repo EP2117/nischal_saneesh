@@ -88,6 +88,7 @@ const routes = [
       component: HomeComponent
     },
     {
+        name:'product',
       path: '/product',
       component: Product
     },
@@ -330,6 +331,7 @@ const routes = [
       component: ProductMinQtyImport
     },
     {
+        name:'supplier',
         path: '/supplier',
         component: Supplier
     },

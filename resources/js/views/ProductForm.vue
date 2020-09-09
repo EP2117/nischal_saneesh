@@ -707,6 +707,7 @@
                         app.form.uom_retail2_prices = retail2_price_arr;
                             app.form.uom_wholesale_prices = wholesale_price_arr;
                             app.form.uom_purchase_prices = purchase_price_arr;
+                            var vm= this;
                         this.form
                           .patch("/product/" + app.product_id)
                           .then(function(data) {
@@ -720,13 +721,16 @@
                                 $(".selling_uom_id").select2("val","");
                                 $(".relation").html('');
                             if(data.status == "success") {
+                                // vm.$route.push('/product');
                                 swal({
                                     title: "Success!",
                                     text: 'Product is updated.',
                                     icon: "success",
                                     button: true
                                 }).then(function() {
-                                    location.reload();
+                                    // this.$route
+                                    vm.$router.push({name:'product'});
+                                    // vm.location.reload();
                                 });
                             } else {
                               $.notify("Error", {
