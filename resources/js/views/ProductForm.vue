@@ -521,7 +521,7 @@
                        /* rel_div_add = "<div id='rel_"+obj.pivot.uom_id+"'>1 "+ obj.uom_name +" = <input class='form-control decimal_no price_txtbox rel_value' data-relation='"+obj.pivot.relation+"' data-uom ='"+obj.pivot.uom_id+"' data-product ='"+obj.pivot.product_id+"' type='text' style='display:inline-block;' id='rel_txt_"+obj.pivot.uom_id+"' value='"+obj.pivot.relation+"' required > <span class='wh_uom' >"+response.data.product.uom.uom_name+"</span>&nbsp; Selling Price <input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_price_txt_"+obj.pivot.uom_id+"' value='"+price+"' required >&nbsp; Per Warehouse UOM Price <input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_per_price_txt_"+obj.pivot.uom_id+"' value='"+per_price+"' required > <br /><br/>";
                         $(".relation").append(rel_div_add); */
 
-                        rel_div_add = "<div id='rel_"+obj.pivot.uom_id+"'>1 "+ obj.uom_name +" = <input class='form-control decimal_no price_txtbox rel_value' data-relation='"+obj.pivot.relation+"' data-uom ='"+obj.pivot.uom_id+"' data-product ='"+obj.pivot.product_id+"' type='text' style='display:inline-block;' id='rel_txt_"+obj.pivot.uom_id+"' value='"+obj.pivot.relation+"' required > <span class='wh_uom' >"+response.data.product.uom.uom_name+"</span>&nbsp; <br /><br /><div class='float-left mt-2'>Retail 1 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_retail1_price_txt_"+obj.pivot.uom_id+"' value='"+retail1_price+"' required ></div><div class='float-left mt-2'>&nbsp; Retail 2 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_retail2_price_txt_"+obj.pivot.uom_id+"' value='"+retail2_price+"' required ></div><div class='float-left mt-2'>&nbsp; Wholesale &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_wholesale_price_txt_"+obj.pivot.uom_id+"' value='"+wholesale_price+"' required ></div><div class='float-left mt-2'>&nbsp; Purchase &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_purchase_price_price_txt_"+obj.pivot.uom_id+"' value='"+purchase_price+"' required ></div><br /><br/><br />";
+                        rel_div_add = "<div id='rel_"+obj.pivot.uom_id+"'>1 "+ obj.uom_name +" = <input class='form-control decimal_no price_txtbox rel_value' data-relation='"+obj.pivot.relation+"' data-uom ='"+obj.pivot.uom_id+"' data-product ='"+obj.pivot.product_id+"' type='text' style='display:inline-block;' id='rel_txt_"+obj.pivot.uom_id+"' value='"+obj.pivot.relation+"' required > <span class='wh_uom' >"+response.data.product.uom.uom_name+"</span>&nbsp; <br /><br /><div class='float-left mt-2'>Retail 1 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_retail1_price_txt_"+obj.pivot.uom_id+"' value='"+retail1_price+"' required ></div><div class='float-left mt-2'>&nbsp; Retail 2 &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_retail2_price_txt_"+obj.pivot.uom_id+"' value='"+retail2_price+"' required ></div><div class='float-left mt-2'>&nbsp; Wholesale &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_wholesale_price_txt_"+obj.pivot.uom_id+"' value='"+wholesale_price+"' required ></div><div class='float-left mt-2'>&nbsp; Purchase &nbsp;</div><div class='float-left'><input class='form-control float_num price_txtbox' type='text' style='display:inline-block;' id='rel_purchase_price_txt_"+obj.pivot.uom_id+"' value='"+purchase_price+"' required ></div><br /><br/><br />";
                         $(".relation").append(rel_div_add);
 
 
@@ -689,23 +689,19 @@
                             app.form.uom_relations.push(obj);  */
 
                             relation_arr[ukey] = $("#rel_txt_"+ukey).val();
-
                             price_arr[ukey] = $("#rel_price_txt_"+ukey).val();
-
                             per_price_arr[ukey] = $("#rel_per_price_txt_"+ukey).val();
-
                             retail1_price_arr[ukey] = $("#rel_retail1_price_txt_"+ukey).val();
                             retail2_price_arr[ukey] = $("#rel_retail2_price_txt_"+ukey).val();
                             wholesale_price_arr[ukey] = $("#rel_wholesale_price_txt_"+ukey).val();
-                            purchase_price_arr[ukey] = $("#rel_purchase_price_price_txt_"+ukey).val();
+                            purchase_price_arr[ukey] = $("#rel_purchase_price_txt_"+ukey).val();
                         }
                         app.form.uom_relations = relation_arr;
                         app.form.uom_prices = price_arr;
                         app.form.uom_per_prices = per_price_arr;
-
                         app.form.uom_retail1_prices = retail1_price_arr;
                         app.form.uom_retail2_prices = retail2_price_arr;
-                            app.form.uom_wholesale_prices = wholesale_price_arr;
+                        app.form.uom_wholesale_prices = wholesale_price_arr;
                             app.form.uom_purchase_prices = purchase_price_arr;
                             var vm= this;
                         this.form

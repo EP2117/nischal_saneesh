@@ -206,6 +206,8 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
+//        dd(count($request->selected_selling_uom));
+//        dd($request->all());
         try {
             $this->validate($request, [
                 'product_code' => 'max:255|unique:products,product_code,'.$id,
@@ -241,12 +243,13 @@ class ProductController extends Controller
             $retail2_price_arr = $request->uom_retail2_prices;
             $wholesale_price_arr = $request->uom_wholesale_prices;
             $purchase_price_arr = $request->uom_purchase_prices;
-            for($i=0; $i<count($request->selected_selling_uom); $i++) {
-                $key = $request->selected_selling_uom[$i];
-                $relation = $relation_arr[$key];
-                $selling_price = $price_arr[$key];
-                $uom_per_price = $per_price_arr[$key];
-                $product->selling_uoms()->attach($request->selected_selling_uom[$i],['relation' => $relation, 'retail1_price' => $retail1_price_arr[$key],  'retail2_price' => $retail2_price_arr[$key], 'wholesale_price' => $wholesale_price_arr[$key],'warehouse_uom_purchase_price' => $purchase_price_arr[$key]]);
+//            for($i=0; $i<count($request->selected_selling_uom); $i++) {
+            foreach($request->selected_selling_uom as $key=>$s){
+//                $key = $request->selected_selling_uom[$i];
+                $relation = $relation_arr[$s];
+//                $selling_price = $price_arr[$key];
+//                $uom_per_price = $per_price_arr[$key];
+                $product->selling_uoms()->attach($s,['relation' => $relation, 'retail1_price' => $retail1_price_arr[$s],  'retail2_price' => $retail2_price_arr[$s], 'wholesale_price' => $wholesale_price_arr[$s],'warehouse_uom_purchase_price' => $purchase_price_arr[$s]]);
             }
             $status = "success";
             return compact('status');
