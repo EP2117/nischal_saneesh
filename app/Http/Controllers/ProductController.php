@@ -138,15 +138,15 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-//        dd($request->all());
 
     	try {
 	        $this->validate($request, [
 	            'product_code' => 'max:255|unique:products',
 	        ]);
-//	        dd($request->all());
             $latest = Product::orderBy('id','desc')->first();
+//            dd($latest);
             $random_code = "P".str_pad((int)$latest->id + 1,8,"0",STR_PAD_LEFT);
+
             $product_code=$request->product_code_type=='manual' ? $request->product_code: $random_code ;
             $product = new Product;
 	        $product->product_name      = $request->product_name;
@@ -155,35 +155,30 @@ class ProductController extends Controller
 	        $product->brand_id          = $request->brand_id;
 	        $product->category_id       = $request->category_id;
 	        $product->uom_id            = $request->uom_id;
-            $product->product_price     = $request->product_price;
-
-            $product->retail1_price     = $request->retail1_price;
-            $product->retail2_price     = $request->retail2_price;
-            $product->wholesale_price   = $request->wholesale_price;
+            $product->selling_price    = $request->selling_price;
             $product->purchase_price    = $request->purchase_price;
             $product->minimum_qty       = $request->min_qty;
-            //$product->percentage_qty    = $request->percentage_qty;
+            $product->reorder_level       = $request->reorder_level;
             $product->is_active = 1;
 	        $product->created_by        = Auth::user()->id;
 	        $product->updated_by        = Auth::user()->id;
 	        $product->save();
-
-	        $relation_arr = $request->uom_relations; //array value(key is uom_id, value is related uom value)
-            $price_arr = $request->uom_prices; //array value(key is uom_id, value is related uom selling price)
-            $per_price_arr = $request->uom_per_prices; //array value(key is uom_id, value is related warehouse uom per price)
-
-            $retail1_price_arr = $request->uom_retail1_prices;
-            $retail2_price_arr = $request->uom_retail2_prices;
-            $wholesale_price_arr = $request->uom_wholesale_prices;
-            $purchase_price_arr = $request->uom_purchase_prices;
-
-	        for($i=0; $i<count($request->selected_selling_uom); $i++) {
-	           	$key = $request->selected_selling_uom[$i];
-	           	$relation = $relation_arr[$key];
-                $selling_price = $price_arr[$key];
-                $uom_per_price = $per_price_arr[$key];
-	            $product->selling_uoms()->attach($request->selected_selling_uom[$i],['relation' => $relation, 'retail1_price' => $retail1_price_arr[$key],  'retail2_price' => $retail2_price_arr[$key], 'wholesale_price' => $wholesale_price_arr[$key],'warehouse_uom_purchase_price' => $purchase_price_arr[$key]]);
-	        }
+//	        $relation_arr = $request->uom_relations; //array value(key is uom_id, value is related uom value)
+//            $price_arr = $request->uom_prices; //array value(key is uom_id, value is related uom selling price)
+//            $per_price_arr = $request->uom_per_prices; //array value(key is uom_id, value is related warehouse uom per price)
+//
+//            $retail1_price_arr = $request->uom_retail1_prices;
+//            $retail2_price_arr = $request->uom_retail2_prices;
+//            $wholesale_price_arr = $request->uom_wholesale_prices;
+//            $purchase_price_arr = $request->uom_purchase_prices;
+//
+//	        for($i=0; $i<count($request->selected_selling_uom); $i++) {
+//	           	$key = $request->selected_selling_uom[$i];
+//	           	$relation = $relation_arr[$key];
+//                $selling_price = $price_arr[$key];
+//                $uom_per_price = $per_price_arr[$key];
+//	            $product->selling_uoms()->attach($request->selected_selling_uom[$i],['relation' => $relation, 'retail1_price' => $retail1_price_arr[$key],  'retail2_price' => $retail2_price_arr[$key], 'wholesale_price' => $wholesale_price_arr[$key],'warehouse_uom_purchase_price' => $purchase_price_arr[$key]]);
+//	        }
 
 	        $status = "success";
 	        return compact('status');
@@ -212,45 +207,41 @@ class ProductController extends Controller
             $this->validate($request, [
                 'product_code' => 'max:255|unique:products,product_code,'.$id,
             ]);
-            $latest = Product::orderBy('id','desc')->first();
-            $random_code = "P".str_pad((int)$latest->id + 1,8,"0",STR_PAD_LEFT);
-            $product_code=$request->product_code_type=='manual' ? $request->product_code: $random_code;
+//            $latest = Product::orderBy('id','desc')->first();
+//            $random_code = "P".str_pad((int)$latest->id + 1,8,"0",STR_PAD_LEFT);
+//            $product_code=$request->product_code_type=='manual' ? $request->product_code: $random_code;
             $product = Product::find($id);
             $product->product_name      = $request->product_name;
             $product->product_code_type      = $request->product_code_type;
-            $product->product_code      = $product_code;
+            $product->product_code      = $request->product_code;
             $product->brand_id          = $request->brand_id;
             $product->uom_id            = $request->uom_id;
             $product->category_id       = $request->category_id;
             $product->minimum_qty       = $request->min_qty;
-            $product->retail1_price     = $request->retail1_price;
-            $product->retail2_price     = $request->retail2_price;
-            $product->wholesale_price   = $request->wholesale_price;
+            $product->selling_price    = $request->selling_price;
             $product->purchase_price    = $request->purchase_price;
-
-            //$product->uom_id = $request->uom_id;
+            $product->reorder_level       = $request->reorder_level;
             $product->updated_at = time();
             $product->updated_by = Auth::user()->id;
             $product->save();
-            //remove previous relations
-            $product->selling_uoms()->detach();
-            //add updated relations
-            $relation_arr = $request->uom_relations; //array value(key is uom_id, value is related uom value)
-            $price_arr = $request->uom_prices; //array value(key is uom_id, value is related uom selling price)
-            $per_price_arr = $request->uom_per_prices; //array value(key is uom_id, value is related uom per warehouse uom price)
-
-            $retail1_price_arr = $request->uom_retail1_prices;
-            $retail2_price_arr = $request->uom_retail2_prices;
-            $wholesale_price_arr = $request->uom_wholesale_prices;
-            $purchase_price_arr = $request->uom_purchase_prices;
-//            for($i=0; $i<count($request->selected_selling_uom); $i++) {
-            foreach($request->selected_selling_uom as $key=>$s){
-//                $key = $request->selected_selling_uom[$i];
-                $relation = $relation_arr[$s];
-//                $selling_price = $price_arr[$key];
-//                $uom_per_price = $per_price_arr[$key];
-                $product->selling_uoms()->attach($s,['relation' => $relation, 'retail1_price' => $retail1_price_arr[$s],  'retail2_price' => $retail2_price_arr[$s], 'wholesale_price' => $wholesale_price_arr[$s],'warehouse_uom_purchase_price' => $purchase_price_arr[$s]]);
-            }
+//            $product->selling_uoms()->detach();
+//            //add updated relations
+//            $relation_arr = $request->uom_relations; //array value(key is uom_id, value is related uom value)
+//            $price_arr = $request->uom_prices; //array value(key is uom_id, value is related uom selling price)
+//            $per_price_arr = $request->uom_per_prices; //array value(key is uom_id, value is related uom per warehouse uom price)
+//
+//            $retail1_price_arr = $request->uom_retail1_prices;
+//            $retail2_price_arr = $request->uom_retail2_prices;
+//            $wholesale_price_arr = $request->uom_wholesale_prices;
+//            $purchase_price_arr = $request->uom_purchase_prices;
+////            for($i=0; $i<count($request->selected_selling_uom); $i++) {
+//            foreach($request->selected_selling_uom as $key=>$s){
+////                $key = $request->selected_selling_uom[$i];
+//                $relation = $relation_arr[$s];
+////                $selling_price = $price_arr[$key];
+////                $uom_per_price = $per_price_arr[$key];
+//                $product->selling_uoms()->attach($s,['relation' => $relation, 'retail1_price' => $retail1_price_arr[$s],  'retail2_price' => $retail2_price_arr[$s], 'wholesale_price' => $wholesale_price_arr[$s],'warehouse_uom_purchase_price' => $purchase_price_arr[$s]]);
+//            }
             $status = "success";
             return compact('status');
         }
