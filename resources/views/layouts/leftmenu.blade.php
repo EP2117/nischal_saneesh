@@ -312,7 +312,52 @@
         </router-link>-->
 
         @endif
+            @if(Request::path() == 'van' || Request::path() == 'purchase_office')
+                @if(Request::path() == 'purchase_office')
+                    <li class="text-center">
+                        <i class="fas fa-building module_logo_sm"></i>
+                        <h6 class="text-white">Purchase</h6>
+                    </li>
+                @else
+                @endif
 
+
+                <hr class="sidebar-divider">
+
+                @if(Auth::user()->role->role_name != 'office_order_user' && Auth::user()->role->role_name != 'delivery' && Auth::user()->role->id != 6 && Auth::user()->role->id != 7)
+
+                <!-- Van Sale == 2; Office Sale == 1; -->
+                    <router-link  tag="li" to="/purchase/<?php echo $role = Request::path() == 'van' ? '2' : '1'; ?>/" class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Purchase Invoice</span>
+                        </a>
+                    </router-link>
+                    <!--if(Request::path() != 'van' && Auth::user()->role->id != 6 && Auth::user()->role->id != 7) -->
+                    <!--for only system and admin role -->
+
+                @endif
+                    @if(Request::path() != 'van' && (Auth::user()->role->id == 1 || Auth::user()->role->id == 2))
+                        <hr class="sidebar-divider">
+                        <router-link  tag="li" to="/purchase_collection" class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-coins"></i>
+                                <span>Credit Payment</span>
+                            </a>
+                        </router-link>
+                    @endif
+
+                <!-- Divider -->
+                <!--<hr class="sidebar-divider">
+
+                <router-link  tag="li" to="/sale" class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span>Collection</span>
+                    </a>
+                </router-link>-->
+
+            @endif
         @if(Request::path() == 'report')
         <li class="text-center">
             <i class="far fa-chart-bar module_logo_sm"></i>

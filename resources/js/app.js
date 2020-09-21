@@ -80,7 +80,10 @@ import Warehouse from './views/warehouse.vue';
 import WarehouseForm from './views/warehouseForm.vue';
 import SupplierForm from "./views/SupplierForm";
 import Supplier  from "./views/Supplier.Vue";
-
+import Purchase  from "./views/Purchase";
+import PurchaseForm  from "./views/PurchaseForm";
+import PurchaseCollection from "./views/PurchaseCollection"
+import PurchaseCollectionForm from "./views/PurchaseCollectionForm"
 const routes = [
     {
       name: 'home',
@@ -343,6 +346,32 @@ const routes = [
         path: '/supplier/edit/:id',
         component: SupplierForm
     },
+    {
+        name:'purchase',
+        path:'/purchase/:purchase_type',
+        component:Purchase
+    },
+    {
+        path:'/purchase/:purchase_type/create',
+        component:PurchaseForm
+    },
+    {
+        path:'/purchase/edit/:id',
+        component:PurchaseForm
+    },
+    {
+        name:'purchase_collection',
+        path:'/purchase_collection',
+        component: PurchaseCollection
+    },
+    {
+        path:'/purchase_collection/new',
+        component: PurchaseCollectionForm
+    },
+    {
+        path:'/purchase_collection/edit/:id',
+        component: PurchaseCollectionForm
+    }
 
 ];
 

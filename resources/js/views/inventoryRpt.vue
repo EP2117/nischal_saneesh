@@ -104,16 +104,16 @@
                                 <th class="text-center">Product Name</th>
                                 <th class="text-center">Warehouse UOM</th>
                                 <th class="text-center">Opening</th>
-                                <th class="text-center">In</th>                                
+                                <th class="text-center">In</th>
                                 <th class="text-center">Stock <br />Receive</th>
                                 <th class="text-center">Stock <br />Transfer</th>
-                                <th class="text-center">Sale Order</th>
-                                <th class="text-center">Approval <br />QTY</th>
-                                <th class="text-center">Revise <br />QTY</th>
-                                <th class="text-center">Revise Sale</th>
-                                <th class="text-center">No Revise Sale</th>
+<!--                                <th class="text-center">Sale Order</th>-->
+<!--                                <th class="text-center">Approval <br />QTY</th>-->
+<!--                                <th class="text-center">Revise <br />QTY</th>-->
+<!--                                <th class="text-center">Revise Sale</th>-->
+<!--                                <th class="text-center">No Revise Sale</th>-->
                                 <th class="text-center">Direct Sale</th>
-                                <th class="text-center">Reserve <br />Balance</th>
+<!--                                <th class="text-center">Reserve <br />Balance</th>-->
                                 <th class="text-center">Balance</th>
                             </tr>
                         </thead>
@@ -128,18 +128,19 @@
                                     <td>{{product.product_name}}</td>
                                     <td>{{product.uom_name}}</td>
                                     <td>{{product.product_opening = getOpening(product.product_id)}}</td>
-                                    <td>{{product.inQty = product.in_qty == null ? '0' : product.in_qty}}</td>
+                                    <td>{{ parseInt(product.in_qty)}}</td>
+<!--                                    <td>{{// product.inQty = product.in_qty == null ? '0' : product.in_qty}}</td>-->
                                     <td>{{product.receiveQty = product.receive_qty == null ? '0' : product.receive_qty}}</td>
                                     <td>{{product.transferQty = product.transfer_qty == null ? '0' : product.transfer_qty}}</td>
-                                    <td>{{product.saleOrder = getSO(product.product_id)}}</td>
-                                    <td>{{product.approvalQty = product.approval_qty == null ? '0' : product.approval_qty}}</td>
-                                    <td>{{product.reviseQty = product.revise_qty == null ? '0' : product.revise_qty}}</td>
-                                    <td>{{product.reviseSaleQty = product.revise_sale_qty == null ? '0' : product.revise_sale_qty}}</td>
-                                    <td>{{product.approvalSaleQty = product.approval_sale_qty == null ? '0' : product.approval_sale_qty}}</td>
+<!--                                    <td>{{product.saleOrder = getSO(product.product_id)}}</td>-->
+<!--                                    <td>{{product.approvalQty = product.approval_qty == null ? '0' : product.approval_qty}}</td>-->
+<!--                                    <td>{{product.reviseQty = product.revise_qty == null ? '0' : product.revise_qty}}</td>-->
+<!--                                    <td>{{product.reviseSaleQty = product.revise_sale_qty == null ? '0' : product.revise_sale_qty}}</td>-->
+<!--                                    <td>{{product.approvalSaleQty = product.approval_sale_qty == null ? '0' : product.approval_sale_qty}}</td>-->
                                     <td>{{product.saleQty = product.sale_qty == null ? '0' : product.sale_qty}}</td>
-                                    <td>{{(parseFloat(product.product_opening) + parseFloat(product.inQty) + parseFloat(product.receiveQty) + parseFloat(product.reviseQty)) - (parseFloat(product.saleQty) + parseFloat(product.saleOrder) + parseFloat(product.reviseSaleQty) + parseFloat(product.transferQty))}}</td>
+<!--                                    <td>{{(parseFloat(product.product_opening) + parseFloat(product.inQty)+parseInt(product.in_purchase_qty)+parseFloat(product.product_opening) + parseFloat(product.receiveQty) ) - (parseFloat(product.saleQty)  + parseFloat(product.transferQty))}}</td>-->
                                     <td>
-                                        {{(parseFloat(product.product_opening) + parseFloat(product.inQty) + parseFloat(product.receiveQty) + parseFloat(product.reviseQty))-(parseFloat(product.saleQty) + parseFloat(product.approvalQty) + parseFloat(product.reviseSaleQty) + parseFloat(product.transferQty))}}
+                                        {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) +parseFloat(product.product_opening)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty))}}
                                     </td>
                                 </tr>
                                 </template>
@@ -154,21 +155,23 @@
                                     <td>{{product.product_name}}</td>
                                     <td>{{product.uom_name}}</td>
                                     <td>{{product.product_opening = getOpening(product.product_id)}}</td>
-                                    <td>{{product.inQty = product.in_qty == null ? '0' : product.in_qty}}</td>
+                                <td>{{parseInt(product.in_qty)}}</td>
+
+                                <!--                                    <td>{{product.inQty = product.in_qty == null ? '0' : product.in_qty}}</td>-->
                                     <td>{{product.receiveQty = product.receive_qty == null ? '0' : product.receive_qty}}</td>
                                     <td>{{product.transferQty = product.transfer_qty == null ? '0' : product.transfer_qty}}</td>
-                                    <td>{{product.saleOrder = getSO(product.product_id)}}</td>
-                                    <td>{{product.approvalQty = product.approval_qty == null ? '0' : product.approval_qty}}</td>
-                                    <td>{{product.reviseQty = product.revise_qty == null ? '0' : product.revise_qty}}</td>
-                                    <td>{{product.reviseSaleQty = product.revise_sale_qty == null ? '0' : product.revise_sale_qty}}</td>
-                                    <td>{{product.approvalSaleQty = product.approval_sale_qty == null ? '0' : product.approval_sale_qty}}</td>
+<!--                                    <td>{{product.saleOrder = getSO(product.product_id)}}</td>-->
+<!--                                    <td>{{product.approvalQty = product.approval_qty == null ? '0' : product.approval_qty}}</td>-->
+<!--                                    <td>{{product.reviseQty = product.revise_qty == null ? '0' : product.revise_qty}}</td>-->
+<!--                                    <td>{{product.reviseSaleQty = product.revise_sale_qty == null ? '0' : product.revise_sale_qty}}</td>-->
+<!--                                    <td>{{product.approvalSaleQty = product.approval_sale_qty == null ? '0' : product.approval_sale_qty}}</td>-->
                                     <td>{{product.saleQty = product.sale_qty == null ? '0' : product.sale_qty}}</td>
-                                    <td>{{(parseFloat(product.product_opening) + parseFloat(product.inQty) + parseFloat(product.receiveQty) + parseFloat(product.reviseQty)) - (parseFloat(product.saleQty) + parseFloat(product.saleOrder) + parseFloat(product.reviseSaleQty) + parseFloat(product.transferQty))}}</td>
+<!--                                    <td>{{(parseFloat(product.product_opening) + parseFloat(product.inQty) + parseFloat(product.receiveQty) + parseFloat(product.reviseQty)) - (parseFloat(product.saleQty) + parseFloat(product.saleOrder) + parseFloat(product.reviseSaleQty) + parseFloat(product.transferQty))}}</td>-->
                                     <td>
-                                        {{(parseFloat(product.product_opening) + parseFloat(product.inQty) + parseFloat(product.receiveQty) + parseFloat(product.reviseQty))-(parseFloat(product.saleQty) + parseFloat(product.approvalQty) + parseFloat(product.reviseSaleQty) + parseFloat(product.transferQty))}}
+                                        {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) + parseFloat(product.receiveQty))-(parseFloat(product.saleQty)+ parseFloat(product.transferQty))}}
                                     </td>
                             </tr>
-                            </template>                            
+                            </template>
                         </tbody>
                     </table>
                 </div>
@@ -244,7 +247,7 @@
             })
             .on("dp.show", function(e) {
                 var y = new Date().getFullYear();
-                if(app.user_year < y) { 
+                if(app.user_year < y) {
                   if(app.search.from_date == app.user_year+"-12-31" || app.search.from_date == '') {
                     app.search.from_date = app.user_year+"-12-31";
                   }
@@ -275,7 +278,7 @@
             })
             .on("dp.show", function(e) {
                 var y = new Date().getFullYear();
-                if(app.user_year < y) { 
+                if(app.user_year < y) {
                   if(app.search.to_date == app.user_year+"-12-31" || app.search.to_date == '') {
                     app.search.to_date = app.user_year+"-12-31";
                   }
@@ -291,7 +294,7 @@
 
                 var data = e.params.data;
                 app.search.branch_id = data.id;
-                app.warehouses = []; 
+                app.warehouses = [];
                 if(data.id != "") {
                     axios.get("warehouses_bybranch/"+ data.id).then(({ data }) => (app.warehouses = data.data));
                 } else {
@@ -339,7 +342,7 @@
                         qty = value.order_qty;
                     }
                 });*/
-                var key = app.order_products.findIndex(x => x.product_id == product_id); 
+                var key = app.order_products.findIndex(x => x.product_id == product_id);
                 if(key != -1) {
                     qty = app.order_products[key].order_qty;
                 }
@@ -349,10 +352,10 @@
 
             getInventoryRpt(page = 1) {
 
-                if(this.search.from_date == "" || this.search.branch_id == "") {                  
+                if(this.search.from_date == "" || this.search.branch_id == "") {
                     swal("Warning!", "From Date, and Branch must be added!", "warning")
                     return false;
-                } 
+                }
 
                 $("#loading").show();
                 let app = this;
@@ -390,10 +393,12 @@
                 var in_count = 0;
                 var out_count = 0;
 
-                var key = app.op_products.findIndex(x => x.product_id == id); 
+                var key = app.op_products.findIndex(x => x.product_id == id);
                 if(key != -1) {
                     in_count = in_count + parseFloat(app.op_products[key].in_qty);
                     out_count = out_count + parseFloat(app.op_products[key].out_qty);
+                }else{
+                    return 0;
                 }
 
                 /***** for (var key in app.op_products) {
@@ -409,13 +414,13 @@
 
             },
 
-            exportExcel() {    
+            exportExcel() {
 
                 let app = this;
-                if(this.search.from_date == "") {                  
+                if(this.search.from_date == "") {
                     swal("Warning!", "From Date must be added!", "warning")
                     return false;
-                } 
+                }
 
               var search =
                 "&from_date=" +
@@ -491,8 +496,8 @@
 
            return this.numberWithCommas(sum);
         },
-      }, 
-        
+      },
+
 
     }
 </script>

@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Auth;
 
 class SupplierController extends Controller
 {
+    public function index()
+    {
+        $data = Supplier::orderBy('id', 'ASC')->where('is_active', 1)->get();
+        return compact('data');
+    }
     public function getSupplier(Request $request){
 //        dd($request->all());
         $data = Supplier::orderBy('id', 'ASC')->paginate(30);

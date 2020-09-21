@@ -23,6 +23,7 @@ Route::get('/', function () {return view('home');})->middleware('auth');
 Route::get('/master/', function () {return view('module_vw');})->middleware('auth');
 Route::get('/van/', function () {return view('module_vw');})->middleware('auth');
 Route::get('/office/', function () {return view('module_vw');})->middleware('auth');
+Route::get('/purchase_office', function () {return view('module_vw');})->middleware('auth');
 Route::get('/inventory/', function () {return view('module_vw');})->middleware('auth');
 Route::get('/report/', function () {return view('module_vw');})->middleware('auth');
 
@@ -54,6 +55,7 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
     Route::get('/customers', 'CustomerController@allCustomers');
     Route::get('/productsByUserWarehouse', 'ProductTransitionController@getProductsByUserWarehouse');
     Route::get('/productsByUserWarehouse/{action}/{id}', 'ProductTransitionController@getProductsForSaleInvoice');
+    Route::get('/get_product_for_purchase/{action}/{id}', 'ProductTransitionController@getProductsForPurchaseInvoice');
     Route::get('/filterProductsByUserWarehouse/{action}/{id}', 'ProductTransitionController@filterProductsForSaleInvoice');
     Route::get('/sale/maxid/', 'SaleController@getMaxId');
     Route::resource('sale', 'SaleController');
@@ -133,14 +135,29 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
 
     Route::get('/generate_invoice/{sale_id}', 'SaleController@generateInvoicePDF');
     Route::get('/generate_order/{order_id}', 'OrderController@generateOrderPDF');
-
-    //supplier
     Route::group(['prefix'=>'supplier'],function() {
-        Route::get('supplier','SupplierController@index');
+        Route::get('','SupplierController@index');
         Route::post('create','SupplierController@store');
         Route::get('get_suppliers','SupplierController@getSupplier');
         Route::get('/edit/{id}','SupplierController@edit');
         Route::patch('{id}/update','SupplierController@update');
         Route::get('supplier_status','SupplierController@changeStatus');
+    });
+    Route::group(['prefix'=>'purchase'],function() {
+        Route::post('create','PurchaseInvoiceController@store');
+        Route::get('get_purchase_list','PurchaseInvoiceController@index');
+        Route::get('/{id}/edit',"PurchaseInvoiceController@edit");
+        Route::get('/{id}/destroy',"PurchaseInvoiceController@destroy");
+        Route::patch('/{id}/update',"PurchaseInvoiceController@update");
+        Route::get('/{id}/get_previous_balance','PurchaseInvoiceController@getPreviousBalance');
+    });
+    Route::group(['prefix' => 'purchase_collection'], function () {
+        Route::get('get_collection','PurchaseCollectionController@getPurchaseCollection');
+        Route::get('supplier_credit_purchase/{id}', 'PurchaseCollectionController@getSupplierCreditPurchase');
+        Route::post('store',"PurchaseCollectionController@store");
+        Route::get('edit/{c_id}', 'PurchaseCollectionController@edit');
+        Route::patch('update/{c_id}', 'PurchaseCollectionController@update');
+        Route::delete('destroy/{id}', 'PurchaseCollectionController@destroy');
+
     });
 });
