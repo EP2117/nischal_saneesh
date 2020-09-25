@@ -347,6 +347,7 @@
                         </router-link>
                     @endif
 
+
                 <!-- Divider -->
                 <!--<hr class="sidebar-divider">
 
@@ -358,6 +359,73 @@
                 </router-link>-->
 
             @endif
+            @if(Request::path() == 'van' || Request::path() == 'account')
+                @if(Request::path() == 'account')
+                    <li class="text-center">
+                        <i class="fas fa-building module_logo_sm"></i>
+                        <h6 class="text-white">Account</h6>
+                    </li>
+                @else
+                @endif
+
+
+                <hr class="sidebar-divider">
+
+                @if(Auth::user()->role->role_name != 'office_order_user' && Auth::user()->role->role_name != 'delivery' && Auth::user()->role->id != 6 && Auth::user()->role->id != 7)
+
+                <!-- Van Sale == 2; Office Sale == 1; -->
+                    <router-link  tag="li" to="/account_head" class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Account Head</span>
+                        </a>
+                    </router-link>
+                    <!--if(Request::path() != 'van' && Auth::user()->role->id != 6 && Auth::user()->role->id != 7) -->
+                    <!--for only system and admin role -->
+
+                @endif
+                @if(Request::path() != 'van' && (Auth::user()->role->id == 1 || Auth::user()->role->id == 2))
+                    <hr class="sidebar-divider">
+                    <router-link  tag="li" to="/sub_account" class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-coins"></i>
+                            <span>Sub Account</span>
+                        </a>
+                    </router-link>
+                @endif
+                @if(Request::path() != 'van' && (Auth::user()->role->id == 1 || Auth::user()->role->id == 2))
+                    <hr class="sidebar-divider">
+                    <router-link  tag="li" to="/receipt" class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-receipt"></i>
+                            <span>Receipt</span>
+                        </a>
+                    </router-link>
+                @endif
+                @if(Request::path() != 'van' && (Auth::user()->role->id == 1 || Auth::user()->role->id == 2))
+                    <hr class="sidebar-divider">
+                    <router-link  tag="li" to="/payment" class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-receipt"></i>
+                            <span>Payment</span>
+                        </a>
+                    </router-link>
+                @endif
+
+
+
+            <!-- Divider -->
+                <!--<hr class="sidebar-divider">
+
+                <router-link  tag="li" to="/sale" class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span>Collection</span>
+                    </a>
+                </router-link>-->
+
+            @endif
+
         @if(Request::path() == 'report')
         <li class="text-center">
             <i class="far fa-chart-bar module_logo_sm"></i>
@@ -412,10 +480,8 @@
             </a>
         </router-link>-->
         @endif
-
         <!-- Divider -->
         <hr class="sidebar-divider">
-
         <router-link  tag="li" to="/report/inventory-rpt" class="nav-item">
             <a class="nav-link" href="#">
                 <i class="fas fa-chart-bar"></i>

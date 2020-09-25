@@ -225,7 +225,7 @@
                         @endif
                              @if((Auth::user()->role->role_name != 'van_user' && Auth::user()->role->role_name != 'delivery' && Auth::user()->role->role_name != 'office_order_user') || Auth::user()->role->id == 6 || Auth::user()->role->id == 7)
                                  <div class="col-lg-4 col-md-4">
-                                     <div class="card-6  carhover">
+                                     <div class="card-6 carhover">
                                          <a href="{{url('/purchase_office')}}">
                                              <div class="main-col">
                                                  <div class="col1-1">
@@ -233,6 +233,26 @@
                                                      <ul>
                                                          <li><i class="fas fa-file-invoice-dollar"></i>Purchase Invoice</li>
                                                          <li><i class="fas fa-file-invoice-dollar"></i>Credit Payment</li>
+                                                     </ul>
+                                                 </div>
+                                                 <div class="col1-2 report">
+                                                     <i class="fas fa-paste"></i>
+                                                 </div>
+                                             </div>
+                                         </a>
+                                     </div>
+                                 </div>
+                             @endif
+                             @if((Auth::user()->role->role_name != 'van_user' && Auth::user()->role->role_name != 'delivery' && Auth::user()->role->role_name != 'office_order_user') || Auth::user()->role->id == 6 || Auth::user()->role->id == 7)
+                                 <div class="col-lg-4 col-md-4">
+                                     <div class="card-7 carhover">
+                                         <a href="{{url('/account')}}">
+                                             <div class="main-col">
+                                                 <div class="col1-1">
+                                                     <h3>Account</h3>
+                                                     <ul>
+                                                         <li><i class="fas fa-file-invoice-dollar"></i>Account Head</li>
+                                                         <li><i class="fas fa-file-invoice-dollar"></i>Sub Account</li>
                                                      </ul>
                                                  </div>
                                                  <div class="col1-2 report">

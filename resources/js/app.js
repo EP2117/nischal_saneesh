@@ -84,6 +84,14 @@ import Purchase  from "./views/Purchase";
 import PurchaseForm  from "./views/PurchaseForm";
 import PurchaseCollection from "./views/PurchaseCollection"
 import PurchaseCollectionForm from "./views/PurchaseCollectionForm"
+import AccountHead from "./views/AccountHead";
+import AccountHeadForm from "./views/AccountHeadForm";
+import SubAccount from "./views/SubAccount/SubAccount";
+import SubAccountForm from "./views/SubAccount/SubAccountForm";
+import Receipt from "./views/Receipt/Receipt";
+import ReceiptForm from "./views/Receipt/ReceiptForm";
+import Payment from "./views/Payment/Payment";
+import PaymentForm from "./views/Payment/PaymentForm";
 const routes = [
     {
       name: 'home',
@@ -371,7 +379,59 @@ const routes = [
     {
         path:'/purchase_collection/edit/:id',
         component: PurchaseCollectionForm
-    }
+    },
+    {
+        name:'account_head',
+        path: '/account_head',
+        component: AccountHead
+    },
+    {
+        path: '/account_head/new',
+        component: AccountHeadForm
+    },
+    {
+        path: '/account_head/edit/:id',
+        component: AccountHeadForm
+    },
+    {
+        name:'sub_account',
+        path: '/sub_account',
+        component: SubAccount
+    },
+    {
+        path: '/sub_account/new',
+        component: SubAccountForm
+    },
+    {
+        path: '/sub_account/edit/:id',
+        component: SubAccountForm
+    },
+    {
+        name:'receipt',
+        path: '/receipt',
+        component: Receipt
+    },
+    {
+        path: '/receipt/new',
+        component: ReceiptForm
+    },
+    {
+        path: '/receipt/edit/:id',
+        component: ReceiptForm
+    },
+    {
+        name:'payment',
+        path: '/payment',
+        component: Payment
+    },
+    {
+        path: '/payment/new',
+        component: PaymentForm
+    },
+    {
+        path: '/payment/edit/:id',
+        component: PaymentForm
+    },
 
 ];
 

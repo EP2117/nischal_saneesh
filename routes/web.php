@@ -23,6 +23,7 @@ Route::get('/', function () {return view('home');})->middleware('auth');
 Route::get('/master/', function () {return view('module_vw');})->middleware('auth');
 Route::get('/van/', function () {return view('module_vw');})->middleware('auth');
 Route::get('/office/', function () {return view('module_vw');})->middleware('auth');
+Route::get('/account/', function () {return view('module_vw');})->middleware('auth');
 Route::get('/purchase_office', function () {return view('module_vw');})->middleware('auth');
 Route::get('/inventory/', function () {return view('module_vw');})->middleware('auth');
 Route::get('/report/', function () {return view('module_vw');})->middleware('auth');
@@ -159,5 +160,39 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
         Route::patch('update/{c_id}', 'PurchaseCollectionController@update');
         Route::delete('destroy/{id}', 'PurchaseCollectionController@destroy');
 
+    });
+    Route::group(['prefix' => 'account_head'], function () {
+        Route::get('get_all','AccountHeadController@getAll');
+        Route::get('get_financial_type/{type}','AccountHeadController@getFinancialType');
+        Route::get('edit/{id}','AccountHeadController@edit');
+        Route::post('store','AccountHeadController@store');
+        Route::get('change_status/{id}/{active}','AccountHeadController@changeStatus');
+
+        Route::patch('update/{id}','AccountHeadController@update');
+        Route::delete('destroy/{id}','AccountHeadController@destroy');
+    });
+    Route::group(['prefix' => 'sub_account'], function () {
+        Route::get('get_all','SubAccountController@getAll');
+        Route::get('get_sub_account/{type}','SubAccountController@getSubAccount');
+        Route::get('get_account_type','SubAccountController@getAccountType');
+        Route::get('get_account_head','SubAccountController@getAccountHead');
+        Route::get('change_status/{id}/{active}','SubAccountController@changeStatus');
+        Route::get('edit/{id}','SubAccountController@edit');
+        Route::post('store','SubAccountController@store');
+        Route::patch('update/{id}','SubAccountController@update');
+        Route::delete('destroy/{id}','SubAccountController@destroy');
+    });
+    Route::group(['prefix' => 'receipt'], function () {
+        Route::get('get_all','ReceiptController@getAll');
+        Route::get('edit/{id}','ReceiptController@edit');
+        Route::post('store','ReceiptController@store');
+        Route::patch('update/{id}','ReceiptController@update');
+        Route::delete('destroy/{id}','ReceiptController@destroy');    });
+    Route::group(['prefix' => 'payment'], function () {
+        Route::get('get_all','PaymentController@getAll');
+        Route::get('edit/{id}','PaymentController@edit');
+        Route::post('store','PaymentController@store');
+        Route::patch('update/{id}','PaymentController@update');
+        Route::delete('destroy/{id}','PaymentController@destroy');
     });
 });
