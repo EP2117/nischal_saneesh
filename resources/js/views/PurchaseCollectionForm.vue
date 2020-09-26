@@ -465,7 +465,6 @@ export default {
         },
 
         calcAutoPay() {
-
             let app = this;
             if(app.form.is_auto) {
                 if((app.purchase_invoices.length > 0 && app.selected_invoices.length > 0) || app.isEdit) {

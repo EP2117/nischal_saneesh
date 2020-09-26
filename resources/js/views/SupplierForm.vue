@@ -5,7 +5,7 @@
                 <li class="breadcrumb-item"><a href="#!"><i class="feather icon-home"></i></a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/'">Home</a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/master'">Master</a></li>
-                <li class="breadcrumb-item"><router-link tag="span" to="/supplier" class="font-weight-normal"><a href="#">Customer</a></router-link></li>
+                <li class="breadcrumb-item"><router-link tag="span" to="/supplier" class="font-weight-normal"><a href="#">Supplier</a></router-link></li>
                 <li class="breadcrumb-item active" aria-current="page">Supplier Form</li>
             </ol>
         </nav>
@@ -83,7 +83,7 @@
                             <div class="form-group col-md-4">
                                 <label for="shipping_address">Shipping Address</label>
                                 <textarea class="form-control" id="shipping_address" name="shipping_address"
-                                          v-modeapp.jsl="form.shipping_address" rows='3' required></textarea>
+                                          v-model="form.shipping_address" rows='3' required></textarea>
                             </div>
                         </div>
 
@@ -315,7 +315,7 @@ export default {
                         if(data.status == "success") {
                             swal({
                                 title: "Success!",
-                                text: 'Customer is updated.',
+                                text: 'Supplier is updated.',
                                 icon: "success",
                                 button: true
                             }).then(function() {

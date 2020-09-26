@@ -4,8 +4,8 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#!"><i class="feather icon-home"></i></a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/'">Home</a></li>
-                <li class="breadcrumb-item"><a :href="site_path+'/office'">Office Sale</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Collection</li>
+                <li class="breadcrumb-item"><a :href="site_path+'/purchase_office'">Purchase</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Credit Payment</li>
 
             </ol>
         </nav>

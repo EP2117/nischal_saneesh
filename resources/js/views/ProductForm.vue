@@ -52,7 +52,7 @@
                             <div class="col-lg-6">
                                 <input class="form-control" type="text"
                                     id="product_code" name="product_code"
-                                    v-model="form.product_code" required >
+                                    v-model="form.product_code"  >
                             </div>
                         </div>
                         <div class="form-group row">
@@ -547,10 +547,7 @@
 
             onSubmit: function(event) {
                 let app = this;
-                //app.form.selling_uom_id = $(".selling_uom_id").val();
-                // app.form.selling_uom_id = app.temp_selling_uom;
-                // var selling_uom_arr = app.form.selling_uom_id;
-                // var selling_uom_arr = app.temp_selling_uom;
+
                 if (!this.isEdit) {
                     swal({
                     title: "Are you sure?",

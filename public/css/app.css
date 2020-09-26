@@ -11180,9 +11180,7 @@ select.brands > span.select2-selection__rendered {
 .card-2,
 .card-3,
 .card-4,
-.card-5,
-.card-6,
-.card-7{
+.card-5 {
   display: flex;
   margin: 0.6rem;
   width: 100%;
@@ -11215,12 +11213,6 @@ select.brands > span.select2-selection__rendered {
 
 .card-5 {
   background-color: #003A6F;
-}
-.card-6 {
-    background-color: #857b26;
-}
-.card-7 {
-    background-color: #4f1915;
 }
 
 .col1-2 i {

@@ -4,15 +4,15 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#!"><i class="feather icon-home"></i></a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/'">Home</a></li>
-                <li class="breadcrumb-item" v-if="purchase_type == 1"><a :href="site_path+'/office'">Office Sale</a></li>
-                <li class="breadcrumb-item" v-else><a :href="site_path+'/van'">Van Sale</a></li>
-                <li class="breadcrumb-item"><router-link tag="span" :to="'/purchse/'+purchase_type+'/'" class="font-weight-normal"><a href="#">Purchase Invoice</a></router-link></li>
-                <li class="breadcrumb-item active" aria-current="page">Sale Invoice Form</li>
+                <li class="breadcrumb-item" v-if="purchase_type == 1"><a :href="site_path+'/purchase_office'">Purchase Office</a></li>
+<!--                <li class="breadcrumb-item" v-else><a :href="site_path+'/van'">Van Sale</a></li>-->
+                <li class="breadcrumb-item"><router-link tag="span" :to="'/purchase/'+purchase_type+'/'" class="font-weight-normal"><a href="#">Purchase Invoice</a></router-link></li>
+                <li class="breadcrumb-item active" aria-current="page">Purchase Invoice Form</li>
             </ol>
         </nav>
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h4 class="mb-0 text-gray-800">Sale Invoice Form</h4>
+            <h4 class="mb-0 text-gray-800">Purchase Invoice Form</h4>
         </div>
 
         <div class="card shadow mb-4">
@@ -34,7 +34,7 @@
                                        v-model="form.invoice_date" required :readonly="is_readonly">
                             </div>
                             <div class="form-group col-md-4">
-                                <label for="office_sale_man">User</label>
+                                <label >User</label>
                                 <input type="text" class="form-control" id="office_purchase_man" name="office_purchase_man"
                                        v-model="form.office_purchase_man" readonly>
                             </div>
@@ -2097,7 +2097,7 @@ export default {
                             $('#loading').hide();
                             swal({
                                 title: "Success!",
-                                text: 'Sale Invoice is saved.',
+                                text: 'Purchase Invoice is saved.',
                                 icon: "success",
                                 button: true
                             }).then(function() {
@@ -2197,7 +2197,7 @@ export default {
 
                                 swal({
                                     title: "Success!",
-                                    text: 'Sale Invoice is updated.',
+                                    text: 'Purchase Invoice is updated.',
                                     icon: "success",
                                     button: true
                                 }).then(function() {

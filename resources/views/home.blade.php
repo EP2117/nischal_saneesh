@@ -225,7 +225,7 @@
                         @endif
                              @if((Auth::user()->role->role_name != 'van_user' && Auth::user()->role->role_name != 'delivery' && Auth::user()->role->role_name != 'office_order_user') || Auth::user()->role->id == 6 || Auth::user()->role->id == 7)
                                  <div class="col-lg-4 col-md-4">
-                                     <div class="card-6 carhover">
+                                     <div class="card-5 carhover">
                                          <a href="{{url('/purchase_office')}}">
                                              <div class="main-col">
                                                  <div class="col1-1">
@@ -245,7 +245,7 @@
                              @endif
                              @if((Auth::user()->role->role_name != 'van_user' && Auth::user()->role->role_name != 'delivery' && Auth::user()->role->role_name != 'office_order_user') || Auth::user()->role->id == 6 || Auth::user()->role->id == 7)
                                  <div class="col-lg-4 col-md-4">
-                                     <div class="card-7 carhover">
+                                     <div class="card-5 carhover">
                                          <a href="{{url('/account')}}">
                                              <div class="main-col">
                                                  <div class="col1-1">
