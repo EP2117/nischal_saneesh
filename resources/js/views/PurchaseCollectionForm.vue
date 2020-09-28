@@ -437,13 +437,11 @@ export default {
         checkAuto(obj) {
             let app = this;
             var is_auto = $(obj).prop("checked");
-
             if(app.selected_invoices.length > 0) {
                 app.isRequired = false;
-            } else {
+            }else{
                 app.isRequired = true;
             }
-
             if(is_auto){
                 app.form.is_auto = true;
                 app.isReadonly = true;
@@ -610,7 +608,6 @@ export default {
                 app.calcTotalPay();
             }
         },
-
         calcTotalPay() {
             let app = this;
             app.total_pay = 0;

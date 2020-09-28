@@ -82,13 +82,12 @@ class PurchaseInvoiceController extends Controller
         $p->created_by = Auth::user()->id;
         $p->updated_by = Auth::user()->id;
         $p->save();
-
         for($i=0; $i<count($request->product); $i++) {
             $product_result = Product::select('uom_id')->find($request->product[$i]);
             $main_uom_id = $product_result->uom_id;
             $pivot = $p->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
             //get last pivot insert id
-            $last_row=DB::table('product_sale')->orderBy('id', 'DESC')->first();
+            $last_row=DB::table('product_purchase')->orderBy('id', 'DESC')->first();
             $pivot_id = $last_row->id;
             //calculate quantity for product pre-defined UOM
 //            $uom_relation = DB::table('product_selling_uom')
@@ -133,7 +132,6 @@ class PurchaseInvoiceController extends Controller
 //            }
 //        }
         $supplier_id = $purchase->supplier_id;
-
         $previous_balance = 0;
         $chk_balance = DB::table("purchase_invoices")
             ->select(DB::raw("SUM(CASE  WHEN balance_amount IS NOT NULL THEN balance_amount  ELSE 0 END)  as previous_balance"))
@@ -182,7 +180,7 @@ class PurchaseInvoiceController extends Controller
         $results =array_diff($ex_pivot_arr,$request->product_pivot); //get id that are not in request pivot array
         foreach($results as $key => $val) {
             //delete in pivot
-            DB::table('product_sale')
+            DB::table('product_purchase')
                 ->where('id', $val)
                 ->delete();
             //delete in transition
@@ -198,7 +196,7 @@ class PurchaseInvoiceController extends Controller
             //check product already exist or not
             if($request->product_pivot[$i] != '0' && in_array($request->product_pivot[$i], $ex_pivot_arr)) {
                 //update existing product in pivot and transition tables
-                DB::table('product_sale')
+                DB::table('product_purchase')
                     ->where('id', $request->product_pivot[$i])
                     ->update(array('uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]));
 
@@ -232,7 +230,7 @@ class PurchaseInvoiceController extends Controller
                 $pivot = $p->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
 
                 //get last pivot insert id
-                $last_row=DB::table('product_sale')->orderBy('id', 'DESC')->first();
+                $last_row=DB::table('product_purchase')->orderBy('id', 'DESC')->first();
 
                 $pivot_id = $last_row->id;
 
