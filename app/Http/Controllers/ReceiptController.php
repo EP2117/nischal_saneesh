@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AccountTransition;
 use App\Recepit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,9 +31,8 @@ class ReceiptController extends Controller
             $no=$latest->id;
         }
         $invoice_no = "INV".str_pad((int)$no + 1,8,"0",STR_PAD_LEFT);
-
         $cash_receipt_no = str_pad($invoice_no,5,"0",STR_PAD_LEFT);
-        Recepit::create([
+        $receipt=Recepit::create([
             'cash_receipt_no'=>$cash_receipt_no,
             'debit_id'=>$request->debit,
             'credit_id'=>$request->credit,
@@ -42,6 +42,39 @@ class ReceiptController extends Controller
             'created_by'=>Auth::user()->id,
             'updated_by'=>Auth::user()->id,
         ]);
+        if($receipt){
+            AccountTransition::create([
+                'sub_account_id'=>$receipt->debit->id,
+                'transition_date'=>$receipt->date,
+                'receipt_id'=>$receipt->id,
+                'is_cashbook'=>1,
+                'debit'=>$receipt->amount,
+                'description'=>$receipt->remark,
+                'created_by'=>Auth::user()->id,
+                'updated_by'=>Auth::user()->id,
+            ]);
+            AccountTransition::create([
+                'sub_account_id'=>$receipt->debit->id,
+                'transition_date'=>$receipt->date,
+                'receipt_id'=>$receipt->id,
+                'is_cashbook'=>0,
+                'debit'=>$receipt->amount,
+                'description'=>$receipt->remark,
+                'created_by'=>Auth::user()->id,
+                'updated_by'=>Auth::user()->id,
+            ]);
+            AccountTransition::create([
+                'sub_account_id'=>$receipt->credit->id,
+                'transition_date'=>$receipt->date,
+                'receipt_id'=>$receipt->id,
+                'is_cashbook'=>0,
+                'credit'=>$receipt->amount,
+                'description'=>$receipt->remark,
+                'created_by'=>Auth::user()->id,
+                'updated_by'=>Auth::user()->id,
+            ]);
+        }
+
         return response()->json([
             'status'=>'success',
         ]);
@@ -56,7 +89,7 @@ class ReceiptController extends Controller
         $validatedData = $request->validate([
             'cash_receipt_no' => 'max:255|unique:receipts,cash_receipt_no,'.$id,
         ]);
-        Recepit::whereId($id)->update([
+        $receipt=Recepit::whereId($id)->update([
             'cash_receipt_no'=>$request->cash_receipt_no,
             'debit_id'=>$request->debit,
             'credit_id'=>$request->credit,
@@ -66,11 +99,46 @@ class ReceiptController extends Controller
             'created_by'=>Auth::user()->id,
             'updated_by'=>Auth::user()->id,
         ]);
+        $receipt=Recepit::whereId($id)->first();
+        if($receipt){
+            AccountTransition::where('receipt_id',$id)->update([
+                'sub_account_id'=>$receipt->debit->id,
+                'transition_date'=>$receipt->date,
+                'receipt_id'=>$receipt->id,
+                'is_cashbook'=>1,
+                'debit'=>$receipt->amount,
+                'description'=>$receipt->remark,
+                'created_by'=>Auth::user()->id,
+                'updated_by'=>Auth::user()->id,
+            ]);
+            AccountTransition::where('receipt_id',$id)->update([
+                'sub_account_id'=>$receipt->debit->id,
+                'transition_date'=>$receipt->date,
+                'receipt_id'=>$receipt->id,
+                'is_cashbook'=>0,
+                'debit'=>$receipt->amount,
+                'description'=>$receipt->remark,
+                'created_by'=>Auth::user()->id,
+                'updated_by'=>Auth::user()->id,
+            ]);
+            AccountTransition::where('receipt_id',$id)->update([
+                'sub_account_id'=>$receipt->credit->id,
+                'transition_date'=>$receipt->date,
+                'receipt_id'=>$receipt->id,
+                'is_cashbook'=>0,
+                'credit'=>$receipt->amount,
+                'description'=>$receipt->remark,
+                'created_by'=>Auth::user()->id,
+                'updated_by'=>Auth::user()->id,
+            ]);
+        }
         return response()->json([
             'status'=>'success',
         ]);
     }
     public function destroy($id){
         Recepit::whereId($id)->delete();
+        AccountTransition::where('receipt_id',$id)->delete();
+
     }
 }

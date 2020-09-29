@@ -134,8 +134,7 @@ export default {
         } else {
             // this.initCategories();
         }
-        this.form.date = moment().format("YYYY-MM-DD");
-
+        // this.form.date = moment().format("YYYY-MM-DD");
     },
     mounted() {
         let app=this;
@@ -173,10 +172,10 @@ export default {
     },
     methods:{
         initDebit(){
-            axios.get('/sub_account/get_sub_account/'+"debit").then(({data})=>(this.debit=data.sub_account));
+            axios.get('/sub_account/get_sub_account/'+"credit").then(({data})=>(this.debit=data.sub_account));
         },
         initCredit(){
-            axios.get('/sub_account/get_sub_account/'+"credit").then(({data})=>(this.credit=data.sub_account));
+            axios.get('/sub_account/get_sub_account/'+"debit").then(({data})=>(this.credit=data.sub_account));
         },
         getPayment(id){
             let app=this;
@@ -185,10 +184,10 @@ export default {
                 app.form.cash_payment_no=r.cash_payment_no;
                 app.form.amount=r.amount;
                 app.form.remark=r.remark;
-                app.form.debit=r.debit_id;
+                app.form.debit=r.credit_id;
                 app.form.date = moment(r.date).format('YYYY-MM-DD');
                 $('#debit_id').val(app.form.debit).trigger('change');
-                app.form.credit=r.credit_id;
+                app.form.credit=r.debit_id;
                 $('#credit_id').val(app.form.credit).trigger('change');
             });
         },

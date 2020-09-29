@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AccountTransition;
 use App\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,7 @@ class PaymentController extends Controller
         $invoice_no = "INV".str_pad((int)$no + 1,8,"0",STR_PAD_LEFT);
 
         $cash_payment_no = str_pad($invoice_no,5,"0",STR_PAD_LEFT);
-        Payment::create([
+        $payment=Payment::create([
             'cash_payment_no'=>$cash_payment_no,
             'debit_id'=>$request->debit,
             'credit_id'=>$request->credit,
@@ -42,6 +43,40 @@ class PaymentController extends Controller
             'created_by'=>Auth::user()->id,
             'updated_by'=>Auth::user()->id,
         ]);
+        if ($payment) {
+            AccountTransition::create([
+                'sub_account_id' => $payment->credit->id,
+                'transition_date' => $payment->date,
+                'payment_id' => $payment->id,
+                'is_cashbook' => 1,
+                'credit' => $payment->amount,
+                'description' => $payment->remark,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
+            ]);
+            AccountTransition::create([
+                'sub_account_id' => $payment->debit->id,
+                'transition_date' => $payment->date,
+                'payment_id' => $payment->id,
+                'is_cashbook' => 0,
+                'debit' => $payment->amount,
+                'description' => $payment->remark,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
+            ]);
+            AccountTransition::create([
+                'sub_account_id' => $payment->credit->id,
+                'transition_date' => $payment->date,
+                'payment_id' => $payment->id,
+                'is_cashbook' => 0,
+                'credit' => $payment->amount,
+                'description' => $payment->remark,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
+            ]);
+
+        }
+
         return response()->json([
             'status'=>'success',
         ]);
@@ -66,11 +101,46 @@ class PaymentController extends Controller
             'created_by'=>Auth::user()->id,
             'updated_by'=>Auth::user()->id,
         ]);
+        $payment =Payment::whereId($id)->first();
+        if($payment){
+            AccountTransition::where('payment_id',$id)->update([
+                'sub_account_id' => $payment->credit->id,
+                'transition_date' => $payment->date,
+                'payment_id' => $payment->id,
+                'is_cashbook' => 1,
+                'credit' => $payment->amount,
+                'description' => $payment->remark,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
+            ]);
+            AccountTransition::where('payment_id',$id)->update([
+                'sub_account_id' => $payment->debit->id,
+                'transition_date' => $payment->date,
+                'payment_id' => $payment->id,
+                'is_cashbook' => 0,
+                'debit' => $payment->amount,
+                'description' => $payment->remark,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
+            ]);
+            AccountTransition::where('payment_id',$id)->update([
+                'sub_account_id' => $payment->credit->id,
+                'transition_date' => $payment->date,
+                'payment_id' => $payment->id,
+                'is_cashbook' => 0,
+                'credit' => $payment->amount,
+                'description' => $payment->remark,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
+            ]);
+        }
         return response()->json([
             'status'=>'success',
         ]);
     }
     public function destroy($id){
         Payment::whereId($id)->delete();
+        AccountTransition::where('payment_id',$id)->delete();
+
     }
 }
