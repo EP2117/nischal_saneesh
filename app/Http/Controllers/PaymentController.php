@@ -6,7 +6,6 @@ use App\AccountTransition;
 use App\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 class PaymentController extends Controller
 {
     public function getAll(Request $request){

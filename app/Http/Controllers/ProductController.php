@@ -144,10 +144,14 @@ class ProductController extends Controller
 	            'product_code' => 'max:255|unique:products',
 	        ]);
             $latest = Product::orderBy('id','desc')->first();
-//            dd($latest);
-            $random_code = "P".str_pad((int)$latest->id + 1,8,"0",STR_PAD_LEFT);
-
-            $product_code=$request->product_code_type=='manual' ? $request->product_code: $random_code ;
+            $date= str_replace("-", "", Carbon::today()->format('d-m-Y'));
+            $product_code=$this->getCode($request);
+//            $latest = Product::orderBy('id','desc')->first();
+////            dd($latest);
+//            $random_code = "P".str_pad((int)$latest->id + 1,8,"0",STR_PAD_LEFT);
+//
+//
+//            $product_code=$request->product_code_type=='manual' ? $request->product_code: $random_code ;
             $product = new Product;
 	        $product->product_name      = $request->product_name;
             $product->product_code      = $product_code;
@@ -179,7 +183,6 @@ class ProductController extends Controller
 //                $uom_per_price = $per_price_arr[$key];
 //	            $product->selling_uoms()->attach($request->selected_selling_uom[$i],['relation' => $relation, 'retail1_price' => $retail1_price_arr[$key],  'retail2_price' => $retail2_price_arr[$key], 'wholesale_price' => $wholesale_price_arr[$key],'warehouse_uom_purchase_price' => $purchase_price_arr[$key]]);
 //	        }
-
 	        $status = "success";
 	        return compact('status');
     	}
@@ -191,6 +194,26 @@ class ProductController extends Controller
     		], 422);
     	}
     }
+    public function getCode($request){
+        $code=$request->product_code;
+        $date= str_replace("-", "", Carbon::today()->format('d-m-Y'));
+        if($code==null){
+//            automatic
+            $latest=Product::orderBy('id','desc')->where('product_code_type','automatic')->first();
+            if($latest!=null){
+                $last_invoice=$latest->product_code;
+                $num=substr($last_invoice,-5);
+//                    dd($num);
+            }else{
+                $num=0;
+            }
+            $product_code = "P".str_pad((int)$num+1,5,"0",STR_PAD_LEFT);
+        }else{
+            $product_code=$request->product_code;
+        }
+        return $product_code;
+    }
+
 
     /**
      * Update the specified resource in storage.
