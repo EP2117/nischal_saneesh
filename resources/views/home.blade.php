@@ -165,6 +165,7 @@
                                 <div class="col1-1">
                                     <h3>Sale</h3>
                                     <ul>
+                                        <li><i class="fas fa-list-ul"></i></i>Sale Order</li>
                                         <li><i class="fas fa-file-invoice-dollar"></i>Sale Invoice</li>
                                         <li><i class="fas fa-file-invoice-dollar"></i>Credit Collection</li>
 

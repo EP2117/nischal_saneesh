@@ -100,8 +100,9 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
     Route::get('/branches', 'BranchController@allBranches');
     Route::get('/branches_byuser', 'BranchController@getBranchByUser');
     Route::get('/warehouses_bybranch/{id}', 'WarehouseController@warehouseByBranch');
-
-
+    Route::resource('sale_man', 'SaleManController');
+    Route::get('/saleman_status/{id}/{status}', 'SaleManController@updateStatus');
+    Route::get('/sale_men', 'SaleManController@allSaleMen');
     //Route for report and excel export
     Route::get('/daily_sale_product_report/', 'SaleController@getDailySaleProductReport');
     Route::get('/daily_sale_product_export/', 'SaleController@exportDailySaleProductReport');

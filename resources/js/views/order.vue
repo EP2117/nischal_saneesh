@@ -67,7 +67,7 @@
                             name="sale_man_id" v-model="search.sale_man_id" style="width:100%" required
                         >
                             <option value="">Select One</option>
-                            <option v-for="sale_man in sale_mans" :value="sale_man.id"  >{{sale_man.name}}</option>
+                            <option v-for="sale_man in sale_mans" :value="sale_man.id"  >{{sale_man.sale_man}}</option>
                         </select>
                     </div> 
 
@@ -98,7 +98,6 @@
                                 <th class="text-center">Branch</th>
                                 <th class="text-center">Customer</th>
                                 <th class="text-center">Sale Man</th>
-                                <th class="text-center">Warehouse</th>
                                 <th class="text-center">Sub Total</th>
                                 <th class="text-center">Remark</th>
                                 <th class="text-center">Created Time</th>
@@ -114,7 +113,6 @@
                                 <th class="text-center">Branch</th>
                                 <th class="text-center">Customer</th>
                                 <th class="text-center">Sale Man</th>
-                                <th class="text-center">Warehouse</th>
                                 <th class="text-center">Sub Total</th>
                                 <th class="text-center">Remark</th>
                                 <th class="text-center">Created Time</th>
@@ -131,7 +129,6 @@
                                 <td v-else></td>
                                 <td class="mm-txt">{{order.customer.cus_name}}</td>
                                 <td class="mm-txt">{{order.sale_man.name}}</td>
-                                <td class="textalign">{{order.warehouse.warehouse_name}}</td>
                                 <td class="text-right">{{order.total_amount}}</td>
                                 <td class="mm-txt">{{order.remark}}</td>
                                 <td>{{localTime(order.created_at)}}</td>
@@ -433,7 +430,7 @@
             },
 
             initSaleMan() {
-              axios.get("/sale_man").then(({ data }) => (this.sale_mans = data.data));
+              axios.get("/sale_men").then(({ data }) => (this.sale_mans = data.data));
               $("#sale_man_id").select2();
             },
 

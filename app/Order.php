@@ -8,7 +8,7 @@ class Order extends Model
 {
     public function products()
     {
-        return $this->belongsToMany('App\Product', 'product_order', 'order_id', 'product_id')->withPivot('id','uom_id','product_quantity','approved_quantity','price','price_variant','total_amount','is_foc');
+        return $this->belongsToMany('App\Product', 'product_order', 'order_id', 'product_id')->withPivot('id','uom_id','product_quantity','approved_quantity','price','price_variant','total_amount','is_foc','rate','actual_rate','discount','other_discount');
     }
 
     public function warehouse()
@@ -26,7 +26,7 @@ class Order extends Model
     }
 
     public function sale_man(){
-        return $this->belongsTo('App\User','sale_man_id','id');
+        return $this->belongsTo('App\SaleMan','sale_man_id','id');
     }
 
     public function branch()
