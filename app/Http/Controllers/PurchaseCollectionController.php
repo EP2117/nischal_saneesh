@@ -17,7 +17,6 @@ class PurchaseCollectionController extends Controller
         if($request->collection_no != "") {
             $data->where('collection_no',  $request->collection_no);
         }
-
         //for Country Head and Admin roles (can access multiple branch)
         if(Auth::user()->role->id == 6 || Auth::user()->role->id == 2) {
             if(Auth::user()->role->id != 1) { //system can access all branches

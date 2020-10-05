@@ -134,7 +134,7 @@ export default {
         } else {
             // this.initCategories();
         }
-        this.form.date = moment().format("YYYY-MM-DD");
+        // this.form.date = moment().format("YYYY-MM-DD");
 
     },
     mounted() {
