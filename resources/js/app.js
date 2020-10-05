@@ -78,6 +78,8 @@ import Branch from './views/branch.vue';
 import BranchForm from './views/branchForm.vue';
 import Warehouse from './views/warehouse.vue';
 import WarehouseForm from './views/warehouseForm.vue';
+import SaleMan from './views/saleMan.vue';
+import SaleManForm from './views/saleManForm.vue';
 import SupplierForm from "./views/SupplierForm";
 import Supplier  from "./views/Supplier.Vue";
 import Purchase  from "./views/Purchase";
@@ -277,6 +279,18 @@ const routes = [
     {
       path: '/warehouse/edit/:id',
       component: WarehouseForm
+    },
+    {
+      path: '/sale-man',
+      component: SaleMan
+    },
+    {
+      path: '/sale-man/new',
+      component: SaleManForm
+    },
+    {
+      path: '/sale-man/edit/:id',
+      component: SaleManForm
     },
     {
       path: '/report/daily-sale-rpt',

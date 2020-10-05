@@ -45,20 +45,31 @@
                                     <option v-for="cus in customers" :value="cus.id"  >{{cus.cus_name}}</option>
                                 </select>
                             </div>
+
                             <div class="form-group col-md-4">
+                                <label for="sale_man">Sale Man</label>
+                                <select id="sale_man" class="mm-txt"
+                                    name="sale_man" v-model="form.sale_man_id" style="width:100%" required
+                                >
+                                    <option value="">Select One</option>
+                                    <option v-for="sale_man in sale_men" :value="sale_man.id"  >{{sale_man.sale_man}}</option>
+                                </select>
+                            </div>
+
+                            <!--<div class="form-group col-md-4">
                                 <label for="warehouse">Warehouse</label>
                                  <input type="text" class="form-control" id="warehouse" name="warehouse"
                                 v-model="user_warehouse" readonly>
-                            </div>
+                            </div>-->
                            
                         </div>
 
                         <div class="row mt-3">
-                            <div class="form-group col-md-4">
+                            <!--<div class="form-group col-md-4">
                                 <label for="sale_man">Sale Man</label>
                                 <input type="text" class="form-control" id="sale_man" name="sale_man"
                                 v-model="sale_man" readonly>
-                            </div> 
+                            </div> -->
                             <div class="form-group col-md-4">
                                 <label for="branch_name">Branch</label>
                                  <input type="text" class="form-control" id="branch_name" name="branch_name"
@@ -81,7 +92,7 @@
                                 >
                                     <option value="">Select One</option>
                                     <option v-for="product in products" :data-uom="product.uom_name" 
-                                    :data-price="product.product_price"
+                                    :data-price="product.selling_price"
                                     :data-uomid="product.uom_id" :value="product.product_id" 
                                     data-pivotid = "0">{{product.product_name}}</option>
                                 </select>
@@ -93,11 +104,13 @@
                                         <tr>
                                             <th scope="col" >Product Name</th>
                                             <th scope="col" >Quantity</th>
-                                            <th scope="col" >Selling Unit</th>
-                                            <th scope="col" >Relation</th>
+                                            <th scope="col" >UOM</th>
+                                            <th scope="col" >Rate</th>
+                                            <th scope="col" >Discount (%)</th>
+                                            <th scope="col" >Actual Rate</th>
                                             <th scope="col" >FOC</th>
-                                            <th scope="col">Unit Price</th>
-                                            <th scope="col" >Total Amount</th>
+                                            <th scope="col">Other Discount (%)</th>
+                                            <th scope="col" >Amount</th>
                                             <th scope="col" class="text-center"></th>
                                         </tr>
                                     </thead>
@@ -105,44 +118,50 @@
                                         <template v-if="isEdit && ex_products.length > 0">
                                         </template>
                                         <template v-else>                                      
-                                        <tr>
+                                        <tr id="1">
                                             <td>                                               
                                                 <select class="form-control txt_product"
-                                                    name="product[]" style="min-width:150px;" required
+                                                    name="product[]" id="product_1" style="min-width:150px;" required
                                                 >
                                                     <option value="">Select One</option>
                                                     <option v-for="product in products" :data-uom="product.uom_name" 
-                                                    :data-price="product.product_price"
+                                                    :data-price="product.selling_price"
                                                     :data-uomid="product.uom_id" :value="product.product_id" 
                                                     data-pivotid = "0">{{product.product_name}}</option>
                                                 </select>
                                             </td>                                                
                                             <td>
-                                                <input type="text" class="form-control num_txt txt_qty" style="width:100px;" name="qty[]"  @blur="checkQty($event.target)" required />
+                                                <input type="text" class="form-control num_txt txt_qty" style="width:100px;" name="qty[]"  id="qty_1" @blur="checkQty($event.target)" required />
                                             </td>
                                             <td>
                                                 <select class="form-control txt_uom"
-                                                    name="uom[]" style="min-width:150px;" data-uom="" :disabled="readonly_status"required
+                                                    name="uom[]" id="uom_1" style="min-width:150px;" data-uom="" :disabled="readonly_status"required
                                                 >
                                                     <option value="">Select One</option>
                                                 </select>
                                             </td>
                                             <td>
-                                                <input type="text" style="min-width:200px;" class="form-control txt_relation" name="relation[]" readonly />
+                                                <input type="text" style="min-width:100px;" class="form-control" name="rate[]" id="rate_1" @blur="calTotalAmount($event.target)" required />
+                                            </td>
+                                            <td>
+                                                <input type="text" style="min-width:70px;" class="form-control num_txt" name="discount[]" id="discount_1" @blur="calTotalAmount($event.target)" />
+                                            </td>
+                                            <td>
+                                                <input type="text" style="min-width:100px;" class="form-control" name="actual_rate[]" id="actual_rate_1" readonly required />
                                             </td>
                                             <td class="text-center">
                                                 <input
                                                     type="checkbox"
-                                                    name="chk_foc[]"
+                                                    name="chk_foc[]" id="foc_1"
                                                     @change="checkFoc($event.target)"
                                                     :disabled="readonly_status"
                                                 >
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control float_num"  style="width:100px;" name="unit_price[]" @blur="calTotalAmount($event.target)" required />
+                                                <input type="text" style="width:70px;" class="form-control num_txt" name="other_discount[]" id="other_discount_1" @blur="calTotalAmount($event.target)" />
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control num_txt" readonly style="width:100px;" name="total_amount[]" required />
+                                                <input type="text" class="form-control num_txt" readonly style="width:100px;" name="total_amount[]" id="total_amount_1" required />
                                             </td>
                                             <td class="text-center">
                                                 <a class='remove-row red-icon' title='Remove' v-if="user_role != 'admin' && (order_status == 'Draft' || order_status == '')"><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>
@@ -150,11 +169,42 @@
                                         </tr>
                                         </template>
                                         <tr class="total_row">
-                                            <td colspan="6" class="text-right">Sub Total</td>
-                                            <td colspan="2">
+                                            <td colspan="7" class="text-right">Total Amount</td>
+                                            <td></td>
+                                            <td colspan="2" class="text-right">
                                                 <input type="text" v-model="form.sub_total" class="form-control num_txt" readonly style="width:150px;" required />
                                             </td>
-                                        </tr>                                       
+                                        </tr>
+                                        <tr class="total_row">
+                                            <td colspan="7" class="text-right">Cash Discount</td>
+                                            <td></td>
+                                            <td colspan="2">
+                                                <input type="text" v-model="form.cash_discount" class="form-control num_txt" style="width:150px;" @blur="changeCashDiscount()" />
+                                            </td>
+                                        </tr> 
+                                        <tr class="total_row">
+                                            <td colspan="7" class="text-right">Net Total</td>
+                                            <td></td>
+                                            <td colspan="2">
+                                                <input type="text" v-model="form.net_total" class="form-control num_txt" readonly style="width:150px;" required />
+                                            </td>
+                                        </tr> 
+                                        <tr class="total_row">
+                                            <td colspan="7" class="text-right">Tax</td>
+                                            <td><input type="text" v-model="form.tax" class="form-control num_txt" style="width:70px;" placeholder='%' @blur="changeTax()"/></td>
+                                            <td colspan="2">
+                                                <input type="text" v-model="form.tax_amount" class="form-control num_txt" readonly style="width:150px;" />
+                                            </td>
+                                        </tr>
+                                        <tr class="total_row">
+                                            <td colspan="4" class="text-right">Previous Balance :</td>
+                                            <td>{{form.previous_balance}}</td>
+                                            <td colspan="2" class="text-right">Balance Amount</td>
+                                            <td></td>
+                                            <td colspan="2">
+                                                <input type="text" v-model="form.balance_amount" class="form-control num_txt" readonly style="width:150px;" required />
+                                            </td>
+                                        </tr>                                     
                                     </tbody>
                                 </table>
 
@@ -200,6 +250,10 @@
                 uom: [],
                 qty: [],
                 unit_price: [],
+                rate: [],
+                actual_rate: [],
+                discount: [],
+                other_discount: [],
                 total_amount: [],
                 sub_total: 0,
                 ex_product_pivot: [],
@@ -209,6 +263,12 @@
                 price_variants: [],
                 sale_man_id: '',
                 remark: '',
+                cash_discount: '',
+                net_total: '',
+                tax: '',
+                tax_amount: '',
+                balance_amount: '',
+                previous_balance: '',
               }),
               isEdit: false,
               products: [],
@@ -228,6 +288,7 @@
               user_branch: '',
               site_path: '',
               storage_path: '',
+              sale_men: [],
             };
         },
 
@@ -242,7 +303,7 @@
 
             this.sale_man = document.querySelector("meta[name='user-name-likelink']").getAttribute('content');
 
-            this.form.sale_man_id = document.querySelector("meta[name='user-id-likelink']").getAttribute('content');
+            //this.form.sale_man_id = document.querySelector("meta[name='user-id-likelink']").getAttribute('content');
 
             this.site_path = document.querySelector("meta[name='site-path']").getAttribute('content');
             //this.site_path = this.site_path.substring(this.site_path.lastIndexOf('/')+1);
@@ -282,6 +343,16 @@
 
             $(".txt_product").select2();
 
+            app.initSaleMen();
+
+            $("#sale_man").select2();
+
+            $("#sale_man").on("select2:select", function(e) {
+
+                var data = e.params.data;
+                app.form.sale_man_id = data.id;
+            });
+
             app.initOrders();
 
             $("#customer_id").select2();
@@ -289,6 +360,9 @@
 
                 var data = e.params.data;
                 app.form.customer_id = data.id;
+
+                //get customer's previous balance
+                axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
             });
 
             $(".txt_product").on("select2:select", function(e) {
@@ -297,24 +371,27 @@
 
                 app.selling_uoms = [];
 
+                var row_id = $(this).closest('tr').attr('id');
+
                var uom      = e.target.options[e.target.options.selectedIndex].dataset.uom;
                var uom_id   = e.target.options[e.target.options.selectedIndex].dataset.uomid;
                var price    = e.target.options[e.target.options.selectedIndex].dataset.price;
 
-                //$(this).closest('td').next().find('.txt_uom').val(uom);
-                //$(this).closest('td').next().find('.txt_uom').attr('data-id',uom_id);
-
-                $(this).closest('td').next().next().find('.txt_uom').attr('data-uom',uom);
+                //$(this).closest('td').next().next().find('.txt_uom').attr('data-uom',uom);
+                $("#uom_"+row_id).attr('data-uom',uom);
 
                 //auto add new product row
-                if($(this).closest('tr').next().hasClass("total_row")) {
+                /**if($(this).closest('tr').next().hasClass("total_row")) {
                     app.addProduct();
-                }
+                }**/
 
                //add Warehouse UOM Selling Price
-                $(this).closest('td').next().next().next().next().next().find('input').val(price);
+               // $(this).closest('td').next().next().next().next().next().find('input').val(price);
+               $("#rate_"+row_id).val(price);
+               $("#actual_rate_"+row_id).val(price);
 
-                var selectbox_id = $(this).closest('td').next().next().find('.txt_uom');
+                //var selectbox_id = $(this).closest('td').next().next().find('.txt_uom');
+                var selectbox_id = $("#uom_"+row_id);
 
                 selectbox_id.find('option').remove();
 
@@ -325,25 +402,10 @@
                 }
                 $(".txt_uom").select2();
 
-                app.getSellingUomByProduct(selectbox_id, data.id);
+                //app.getSellingUomByProduct(selectbox_id, data.id);
             });
 
             $(".txt_uom").select2();
-
-            $(".txt_uom").on("select2:select", function(e) {
-                app.checkQty(e.target.options[e.target.options.selectedIndex]);
-                var uom_relation = e.target.options[e.target.options.selectedIndex].dataset.relation;
-                   //for van sale
-                   // var uom_price = e.target.options[e.target.options.selectedIndex].dataset.price;
-
-                //for office sale
-                var uom_price = e.target.options[e.target.options.selectedIndex].dataset.perprice;
-
-                $(this).closest('td').next().find('.txt_relation').val(uom_relation);
-                $(this).closest('td').next().next().next().find('input').val(uom_price);
-
-                app.calTotalAmount($(this).closest('td').next().next().next().find('input'));
-            });
 
             $(".datetimepicker")
                 .datetimepicker({
@@ -438,6 +500,11 @@
               $("#warehouse").select2();
             },
 
+            initSaleMen() {
+              axios.get("/sale_men").then(({ data }) => (this.sale_men = data.data));
+              $("#sale_man").select2();
+            },
+
             initCustomers() {
               axios.get("/customers").then(({ data }) => (this.customers = data.data));
               $("#customer_id").select2();
@@ -460,14 +527,24 @@
               });
             },
 
-            addProduct() {
+            addProduct() {           
+
+                var max = 0;
+                $('#product_table tbody tr').each(function(){
+                    max = $(this).attr('id') > max ? $(this).attr('id') : max;
+                });
+
+                //var max = $('#product_table tbody tr').sort(function(a, b) { return +a.id < +b.id })[0].id;
+                var row_id = parseInt(max) +1;
+
                 let app = this;
                 var table=document.getElementById("product_table");
-                var row=table.insertRow((table.rows.length)-1);
+                var row=table.insertRow((table.rows.length)-5);
                 var cell1=row.insertCell(0);
-
+                    row.id = row_id;
                 var t1=document.createElement("select");
                     t1.name = "product[]";
+                    t1.id = "product_"+row_id;
                     t1.className = "form-control txt_product";
                     t1.style = "min-width:150px;";
                     $(t1).attr("required", true);
@@ -495,6 +572,7 @@
                 var cell2=row.insertCell(1);
                 var t2=document.createElement("input");
                     t2.name = "qty[]";
+                    t2.id = "qty_"+row_id;
                     t2.style = "width:100px;";
                     t2.className ="form-control num_txt";
                     $(t2).attr("required", true);
@@ -505,6 +583,7 @@
 
                 var t3=document.createElement("select");
                     t3.name = "uom[]";
+                    t3.id = "uom_"+row_id;
                     t3.className = "form_control txt_uom";
                     t3.style = "min-width:150px;";
                     $(t3).attr("required", true);
@@ -522,13 +601,33 @@
 
 
                 var cell4=row.insertCell(3);
-                var t4=document.createElement("input");
-                    t4.type = "text";
-                    t4.name = "relation[]";
-                    t4.style = "min-width:200px;";
-                    t4.className ="form-control txt_relation";
-                    $(t4).attr('readonly', true);
-                    cell4.appendChild(t4);
+                var rate=document.createElement("input");
+                    rate.name = "rate[]";
+                    rate.id = "rate_"+row_id;
+                    rate.style = "width:100px;";
+                    rate.className ="form-control num_txt";
+                    $(rate).attr("required", true);
+                    rate.addEventListener('blur', function(){ app.calTotalAmount(rate); });
+                    cell4.appendChild(rate);
+
+                var cell_discount=row.insertCell(4);
+                var discount=document.createElement("input");
+                    discount.name = "discount[]";
+                    discount.id = "discount_"+row_id;
+                    discount.style = "width:70px;";
+                    discount.className ="form-control num_txt";
+                    discount.addEventListener('blur', function(){ app.calTotalAmount(discount); });
+                    cell_discount.appendChild(discount);
+
+                var cell_actual=row.insertCell(5);
+                var actual_rate=document.createElement("input");
+                    actual_rate.name = "actual_rate[]";
+                    actual_rate.id = "actual_rate_"+row_id;
+                    actual_rate.style = "width:100px;";
+                    actual_rate.className ="form-control num_txt";
+                    $(actual_rate).attr("required", true);
+                    $(actual_rate).attr("readonly", true);
+                    cell_actual.appendChild(actual_rate);
                 
 
                 $(".txt_product").select2();
@@ -542,80 +641,28 @@
                     app.form.customer_id = data.id;
                 });
 
-                $(".txt_product").on("select2:select", function(e) {
-                    var data = e.params.data;
-
-                    app.selling_uoms = [];
-
-                   var uom = e.target.options[e.target.options.selectedIndex].dataset.uom;
-                   var uom_id = e.target.options[e.target.options.selectedIndex].dataset.uomid;
-                   var price = e.target.options[e.target.options.selectedIndex].dataset.price;
-
-                    //$(this).closest('td').next().find('.txt_uom').val(uom);
-                    //$(this).closest('td').next().find('.txt_uom').attr('data-id',uom_id);
-
-                    $(this).closest('td').next().next().find('.txt_uom').attr('data-uom',uom);
-
-                    //auto add new product row
-                    if($(this).closest('tr').next().hasClass("total_row")) {
-                        app.addProduct();
-                    }
-
-                    //add Warehouse UOM Selling Price
-                    $(this).closest('td').next().next().next().next().next().find('input').val(price);
-                    
-
-                    var selectbox_id = $(this).closest('td').next().next().find('.txt_uom');
-
-                    selectbox_id.find('option').remove();
-
-                    //add pre-defined product uom 
-                    if(selectbox_id.find('option[value="'+uom_id+'"]').text() == "") {
-                        selectbox_id.append('<option value="">Select One</option><option value="'+uom_id+'" data-relation="" data-uomqty="1" data-productuom = "'+uom+'" data-productid="'+data.id+'" data-price="'+price+'" data-perprice="'+price+'" selected>'+uom+'</option>'); 
-                    }
-                    $(".txt_uom").select2();
-
-                    app.getSellingUomByProduct(selectbox_id, data.id);
-                });
-
-                $(".txt_uom").select2();
-
-                $(".txt_uom").on("select2:select", function(e) {
-                    app.checkQty(e.target.options[e.target.options.selectedIndex]);
-                    var uom_relation = e.target.options[e.target.options.selectedIndex].dataset.relation;
-
-                    //for van sale
-                    //var uom_price = e.target.options[e.target.options.selectedIndex].dataset.price;
-                    
-                    //for office sale
-                    var uom_price = e.target.options[e.target.options.selectedIndex].dataset.perprice;
-
-                    $(this).closest('td').next().find('.txt_relation').val(uom_relation);
-                    $(this).closest('td').next().next().next().find('input').val(uom_price);
-
-                    app.calTotalAmount($(this).closest('td').next().next().next().find('input'));
-                });
-
-                var cell5=row.insertCell(4);
+                var cell5=row.insertCell(6);
                     cell5.className = "text-center";
                 var t5=document.createElement("input");
                     t5.type = "checkbox";
                     t5.name = "chk_foc[]";
+                    t5.id = "foc_"+row_id;
                     t5.addEventListener('change', function(){ app.checkFoc(t5); });
                     cell5.appendChild(t5);
 
-                var cell6=row.insertCell(5);
-                var t6=document.createElement("input");
-                    t6.name = "unit_price[]";
-                    t6.style = "width:100px;";
-                    t6.className ="form-control float_num";
-                    $(t6).attr("required", true);
-                    t6.addEventListener('blur', function(){ app.calTotalAmount(t6); });
-                    cell6.appendChild(t6);
+                var cell_other_disc=row.insertCell(7);
+                var other_discount=document.createElement("input");
+                    other_discount.name = "other_discount[]";
+                    other_discount.id = "other_discount_"+row_id;
+                    other_discount.style = "width:70px;";
+                    other_discount.className ="form-control num_txt";
+                    other_discount.addEventListener('blur', function(){ app.calTotalAmount(other_discount); });
+                    cell_other_disc.appendChild(other_discount);
 
-                var cell7=row.insertCell(6);
+                var cell7=row.insertCell(8);
                 var t7=document.createElement("input");
                     t7.name = "total_amount[]";
+                    t7.id = "total_amount_"+row_id;
                     t7.style = "width:100px;";
                     t7.className ="form-control num_txt";
                     $(t7).attr("required", true);
@@ -623,10 +670,50 @@
                    // t2.addEventListener('blur', function(){ app.checkQty(t2); });
                     cell7.appendChild(t7);
 
-                var cell8=row.insertCell(7);
+                var cell8=row.insertCell(9);
                 cell8.className = "text-center";
                 var row_action = "<a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>";
                 $(cell8).append(row_action);
+
+                $(".txt_product").on("select2:select", function(e) {
+
+                    var data = e.params.data;
+
+                    app.selling_uoms = [];
+
+                    var row_id = $(this).closest('tr').attr('id');
+
+                   var uom      = e.target.options[e.target.options.selectedIndex].dataset.uom;
+                   var uom_id   = e.target.options[e.target.options.selectedIndex].dataset.uomid;
+                   var price    = e.target.options[e.target.options.selectedIndex].dataset.price;
+
+                    //$(this).closest('td').next().next().find('.txt_uom').attr('data-uom',uom);
+                    $("#uom_"+row_id).attr('data-uom',uom);
+
+                    //auto add new product row
+                    /**if($(this).closest('tr').next().hasClass("total_row")) {
+                        app.addProduct();
+                    }**/
+
+                   //add Warehouse UOM Selling Price
+                   // $(this).closest('td').next().next().next().next().next().find('input').val(price);
+                   $("#rate_"+row_id).val(price);
+                   $("#actual_rate_"+row_id).val(price);
+
+                    //var selectbox_id = $(this).closest('td').next().next().find('.txt_uom');
+                    var selectbox_id = $("#uom_"+row_id);
+
+                    selectbox_id.find('option').remove();
+
+                    //add pre-defined product uom 
+
+                    if(selectbox_id.find('option[value="'+uom_id+'"]').text() == "") {
+                        selectbox_id.append('<option value="">Select One</option><option value="'+uom_id+'" data-relation="" data-uomqty = "1" data-productuom = "'+uom+'" data-productid="'+data.id+'" data-perprice="'+price+'" data-price="'+price+'" selected>'+uom+'</option>'); 
+                    }
+                    $(".txt_uom").select2();
+
+                    //app.getSellingUomByProduct(selectbox_id, data.id);
+                });
 
             },
 
@@ -668,23 +755,26 @@
                     if(app.order_status != 'Draft' && app.order_status != '') {
                         app.readonly_status = "disabled";
                     }
-
-                    app.form.sub_total  = response.data.order.total_amount;
-
+                   
                     $.each(app.ex_products, function( key, value ) {
                         app.form.ex_product_pivot.push(value.pivot.id);
                     });
 
                     //add  products dynamically
                     var subTotal = 0;
-                    $.each(app.ex_products, function( key, product ) {                        
+                    var row_id = 0;
+
+                    $.each(app.ex_products, function( key, product ) {  
+                        row_id = row_id+1;                      
                         if(app.user_role != "Country Head" || (app.user_role == "Country Head" && response.data.access_brands.indexOf(product.brand_id) > -1)) {
                             var table=document.getElementById("product_table");
-                            var row=table.insertRow((table.rows.length) - 1);
+                            var row=table.insertRow((table.rows.length) - 5);
+                            row.id = row_id;
                             var cell1=row.insertCell(0);
 
                             var t1=document.createElement("select");
                                 t1.name = "product[]";
+                                t1.id = "product_"+row_id;
                                 t1.className = "form-control txt_product";
                                 t1.style = "min-width:150px;";
                                 $(t1).attr("required", true);
@@ -705,6 +795,7 @@
                             var cell2=row.insertCell(1);
                             var t2=document.createElement("input");
                                 t2.name = "qty[]";
+                                t2.id = "qty_"+row_id;
                                 t2.value = product.pivot.product_quantity;
                                 t2.style = "width:100px;";
                                 t2.className ="form-control num_txt";
@@ -721,8 +812,9 @@
 
                             var t3=document.createElement("select");
                                 t3.name = "uom[]";
+                                t3.id = "uom_"+row_id;
                                 t3.className = "form-control txt_uom";
-                                t3.style = "width:200px;";
+                                t3.style = "width:150px;";
                                 $(t3).attr("required", true);
 
                                 if(app.order_status != 'Draft' && app.order_status != '') {
@@ -776,18 +868,42 @@
 
 
                             var cell4=row.insertCell(3);
-                            var t4=document.createElement("input");
-                                t4.type = "text";
-                                if(product.pivot.uom_id != product.uom_id) {
-                                    t4.value = relation_val;
-                                } else {
-                                    t4.value = "";
+                            var rate=document.createElement("input");
+                                rate.name = "rate[]";
+                                rate.id = "rate_"+row_id;
+                                rate.style = "width:100px;";
+                                rate.value = product.pivot.rate;
+                                rate.className ="form-control num_txt";
+                                $(rate).attr("required", true);
+                                if(product.pivot.is_foc == 1) {
+                                    $(rate).attr("readonly", true);
                                 }
-                                t4.name = "relation[]";
-                                t4.style = "min-width:200px;";
-                                t4.className ="form-control txt_relation";
-                                $(t4).attr('readonly', true);
-                                cell4.appendChild(t4);
+                                rate.addEventListener('blur', function(){ app.calTotalAmount(rate); });
+                                cell4.appendChild(rate);
+
+                            var cell_discount=row.insertCell(4);
+                            var discount=document.createElement("input");
+                                discount.name = "discount[]";
+                                discount.id = "discount_"+row_id;
+                                discount.value = product.pivot.discount == null ? '' : product.pivot.discount;
+                                discount.style = "width:70px;";
+                                discount.className ="form-control num_txt";
+                                if(product.pivot.is_foc == 1) {
+                                    $(discount).attr("readonly", true);
+                                }
+                                discount.addEventListener('blur', function(){ app.calTotalAmount(discount); });
+                                cell_discount.appendChild(discount);
+
+                            var cell_actual=row.insertCell(5);
+                            var actual_rate=document.createElement("input");
+                                actual_rate.name = "actual_rate[]";
+                                actual_rate.id = "actual_rate_"+row_id;
+                                actual_rate.value = product.pivot.actual_rate;
+                                actual_rate.style = "width:100px;";
+                                actual_rate.className ="form-control num_txt";
+                                $(actual_rate).attr("required", true);
+                                $(actual_rate).attr("readonly", true);
+                                cell_actual.appendChild(actual_rate);
 
                             
 
@@ -800,70 +916,17 @@
 
                                 var data = e.params.data;
                                 app.form.customer_id = data.id;
-                            });
 
-                            $(".txt_product").on("select2:select", function(e) {
+                                //get customer's previous balance
+                                axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
+                            });                            
 
-                                var data = e.params.data;
-
-                                app.selling_uoms = [];
-
-                               var uom = e.target.options[e.target.options.selectedIndex].dataset.uom;
-                               var uom_id = e.target.options[e.target.options.selectedIndex].dataset.uomid;
-                               var price = e.target.options[e.target.options.selectedIndex].dataset.price;
-
-                                //$(this).closest('td').next().find('.txt_uom').val(uom);
-                                //$(this).closest('td').next().find('.txt_uom').attr('data-id',uom_id);
-
-                                $(this).closest('td').next().next().find('.txt_uom').attr('data-uom',uom);
-
-                                //auto add new product row
-                                if($(this).closest('tr').next().hasClass("total_row")) {
-                                    app.addProduct();
-                                }
-
-                                //add Warehouse UOM Selling Price
-                                $(this).closest('td').next().next().next().next().next().find('input').val(price);
-
-                                var selectbox_id = $(this).closest('td').next().next().find('.txt_uom');
-
-                                selectbox_id.find('option').remove();
-
-                                //add pre-defined product uom 
-                                if(selectbox_id.find('option[value="'+uom_id+'"]').text() == "") {
-                                    selectbox_id.append('<option value="">Select One</option><option value="'+uom_id+'" data-relation="" data-uomqty="1" data-productuom = "'+uom+'" data-productid="'+data.id+'" data-price="'+price+'" data-perprice="'+price+'">'+uom+'</option>'); 
-                                }
-                                $(".txt_uom").select2();
-
-                                app.getSellingUomByProduct(selectbox_id, data.id);
-                            });
-
-                            $(".txt_uom").select2();
-
-                            $(".txt_uom").on("select2:select", function(e) {
-
-                                app.checkQty(e.target.options[e.target.options.selectedIndex]);
-
-                                var uom_relation = e.target.options[e.target.options.selectedIndex].dataset.relation;
-
-                                
-                                //for van sale
-                                //var uom_price = e.target.options[e.target.options.selectedIndex].dataset.price;
-                               
-                                //for office sale
-                                var uom_price = e.target.options[e.target.options.selectedIndex].dataset.perprice;
-
-                                $(this).closest('td').next().find('.txt_relation').val(uom_relation);
-                                $(this).closest('td').next().next().next().find('input').val(uom_price);
-
-                                app.calTotalAmount($(this).closest('td').next().next().next().find('input'));
-                            });
-
-                            var cell5=row.insertCell(4);
+                            var cell5=row.insertCell(6);
                                 cell5.className = "text-center";
                             var t5=document.createElement("input");
                                 t5.type = "checkbox";
                                 t5.name = "chk_foc[]";
+                                t5.id = "foc_"+row_id;
                                 if(product.pivot.is_foc == '1') {
                                     $(t5). prop("checked", true);
                                 }
@@ -874,27 +937,23 @@
                                 t5.addEventListener('change', function(){ app.checkFoc(t5); });
                                 cell5.appendChild(t5);
 
-                            var cell6=row.insertCell(5);
-                            var t6=document.createElement("input");
-                                t6.name = "unit_price[]";
-                                t6.style = "width:100px;";
-                                if(product.pivot.price != 0 && product.pivot.price != null) {
-                                    t6.value = product.pivot.price;
+                            var cell_other_disc=row.insertCell(7);
+                            var other_discount=document.createElement("input");
+                                other_discount.name = "other_discount[]";
+                                other_discount.id = "other_discount_"+row_id;
+                                other_discount.style = "width:70px;";
+                                other_discount.value = product.pivot.other_discount == null ? '' : product.pivot.other_discount;
+                                if(product.pivot.is_foc == 1) {
+                                    $(other_discount).attr("readonly", true);
                                 }
-                                t6.className ="form-control float_num";
-                                $(t6).attr("required", true);
-                                if(product.pivot.is_foc == '1') {
-                                    $(t6).attr("readonly", true);
-                                }
-                                if(app.order_status != 'Draft' && app.order_status != '') {
-                                    $(t6).attr('readonly', true);
-                                }
-                                t6.addEventListener('blur', function(){ app.calTotalAmount(t6); });
-                                cell6.appendChild(t6);
+                                other_discount.className ="form-control num_txt";
+                                other_discount.addEventListener('blur', function(){ app.calTotalAmount(other_discount); });
+                                cell_other_disc.appendChild(other_discount);
 
-                            var cell7=row.insertCell(6);
+                            var cell7=row.insertCell(8);
                             var t7=document.createElement("input");
                                 t7.name = "total_amount[]";
+                                t7.id = "total_amount_"+row_id;
                                 t7.style = "width:100px;";
                                 if(product.pivot.total_amount != 0 && product.pivot.total_amount != null) {
                                     t7.value = product.pivot.total_amount;
@@ -906,17 +965,63 @@
                                // t2.addEventListener('blur', function(){ app.checkQty(t2); });
                                 cell7.appendChild(t7);
 
-                            var cell8=row.insertCell(7);
+                            var cell8=row.insertCell(9);
                             cell8.className = "text-center";
                             if(app.user_role != 'admin' && (app.order_status == 'Draft' || app.order_status == ''))
                             {
                                 var row_action = "<a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>";
                             }
                             $(cell8).append(row_action);
+
+                            $(".txt_product").on("select2:select", function(e) {
+
+                                var data = e.params.data;
+
+                                app.selling_uoms = [];
+
+                                var row_id = $(this).closest('tr').attr('id');
+
+                               var uom      = e.target.options[e.target.options.selectedIndex].dataset.uom;
+                               var uom_id   = e.target.options[e.target.options.selectedIndex].dataset.uomid;
+                               var price    = e.target.options[e.target.options.selectedIndex].dataset.price;
+
+                                //$(this).closest('td').next().next().find('.txt_uom').attr('data-uom',uom);
+                                $("#uom_"+row_id).attr('data-uom',uom);
+
+                                //auto add new product row
+                                /**if($(this).closest('tr').next().hasClass("total_row")) {
+                                    app.addProduct();
+                                }**/
+
+                               //add Warehouse UOM Selling Price
+                               // $(this).closest('td').next().next().next().next().next().find('input').val(price);
+                               $("#rate_"+row_id).val(price);
+                               $("#actual_rate_"+row_id).val(price);
+
+                                //var selectbox_id = $(this).closest('td').next().next().find('.txt_uom');
+                                var selectbox_id = $("#uom_"+row_id);
+
+                                selectbox_id.find('option').remove();
+
+                                //add pre-defined product uom 
+
+                                if(selectbox_id.find('option[value="'+uom_id+'"]').text() == "") {
+                                    selectbox_id.append('<option value="">Select One</option><option value="'+uom_id+'" data-relation="" data-uomqty = "1" data-productuom = "'+uom+'" data-productid="'+data.id+'" data-perprice="'+price+'" data-price="'+price+'" selected>'+uom+'</option>'); 
+                                }
+                                $(".txt_uom").select2();
+
+                                //app.getSellingUomByProduct(selectbox_id, data.id);
+                            });
                         }
                     });
 
-                    app.form.sub_total  = subTotal;
+                    app.form.sub_total  = response.data.order.total_amount;
+                    app.form.cash_discount  = response.data.order.cash_discount;
+                    app.form.net_total     = response.data.order.net_total;
+                    app.form.tax           = response.data.order.tax;
+                    app.form.tax_amount    = response.data.order.tax_amount;
+                    app.form.balance_amount= response.data.order.balance_amount;
+                    app.form.previous_balance = response.data.previous_balance
 
                 })
                 .catch(function(error) {
@@ -935,9 +1040,13 @@
                 if(typeof obj.name !== 'undefined') {
                     //For quantity box onBlur Event
 
-                    var product_id = $(obj).closest('td').prev().find(':selected').val();
+                    var row_id = $(obj).closest('tr').attr('id');
+
+                    //var product_id = $(obj).closest('td').prev().find(':selected').val();
+                    var product_id = $("#product_"+row_id).find(':selected').val();
                     var transfer_qty = obj.value;
-                    var uom = $(obj).closest('td').next().find(':selected').val();   
+                    //var uom = $(obj).closest('td').next().find(':selected').val(); 
+                    var uom = $("#uom_"+row_id).find(':selected').val();  
 
                     var product_qty = 0; 
                     var uom_val = "";
@@ -948,11 +1057,18 @@
 
                     if(product_id != "" && transfer_qty != "" && uom != "") {
                         //calculate same products quantity in product list
+                         var row_no = '';
                         $(".txt_product").each(function() {
+                            row_no = $(this).closest('tr').attr('id');
                             if(product_id == $(this).val()) {
-                                p_uom_val  = $(this).closest('td').next().next().find(':selected').attr('data-uomqty');
+                                /***p_uom_val  = $(this).closest('td').next().next().find(':selected').attr('data-uomqty');
                                 p_uom_name = $(this).closest('td').next().next().find(':selected').attr('data-productuom');
-                                p_qty =  $(this).closest('td').next().find('input').val();
+                                p_qty =  $(this).closest('td').next().find('input').val(); **/
+
+                                p_uom_val  = $("#uom_"+row_no).find(':selected').attr('data-uomqty');
+                                p_uom_name = $("#uom_"+row_no).find(':selected').attr('data-productuom');
+                                p_qty =  $("#qty_"+row_no).val();
+
                                 if(typeof p_uom_val !== "undefined" && typeof p_uom_name != "undefined" != "" && p_qty != "") {
 
                                     product_qty = parseInt(product_qty) + (parseInt(p_qty) * parseInt(p_uom_val));
@@ -961,7 +1077,9 @@
                         });
 
                         //uom_val  = $(obj).closest('td').next().find(':selected').attr('data-uomqty');
-                        uom_name = $(obj).closest('td').next().find(':selected').attr('data-productuom');
+                        //uom_name = $(obj).closest('td').next().find(':selected').attr('data-productuom');
+
+                        uom_name = $("#uom_"+row_id).find(':selected').attr('data-productuom');
 
                         //product_qty = parseInt(product_qty) + (parseInt(transfer_qty) * parseInt(uom_val));
 
@@ -974,16 +1092,11 @@
                         var available_qty = parseInt(this.products[key].in_count)-(parseInt(this.products[key].direct_sale_qty) + parseInt(order_qty) + parseInt(this.products[key].transfer_qty) + parseInt(this.products[key].revise_sale_qty));
 
                         var min_qty = this.products[key].minimum_qty == null ? 0 : this.products[key].minimum_qty;
-                        var percentage_qty = this.products[key].percentage_qty == null ? 0 : this.products[key].percentage_qty;
                         available_qty = parseInt(available_qty) - parseInt(min_qty);
                         console.log(min_qty+','+this.products[key].in_count+', '+this.products[key].direct_sale_qty+','+order_qty);
                         console.log(product_qty);
 
                         if(product_qty > available_qty) {
-                            if(percentage_qty != 0) {
-                                available_qty = (available_qty/parseInt(percentage_qty)) * 100;
-                                available_qty = Math.round(available_qty)+"%";
-                            }
                             
                             swal("Warning!", "Not enough quantity! Availabel quantity is "+available_qty+" "+uom_name+".", "warning");
 
@@ -1001,17 +1114,25 @@
                     var p_qty = 0;  
 
                     var product_id = $(obj).attr('data-productid');
-                    var transfer_qty = $(obj).closest('td').prev().find('input').val();
+                    //var transfer_qty = $(obj).closest('td').prev().find('input').val();
+                     var transfer_qty = $("#qty_"+row_id).val();
                     var uom = obj.value;                    
 
                     if(product_id != "" && transfer_qty != "" && uom != "") {
 
                         //calculate same products quantity in product list
+                        var row_no = '';
                         $(".txt_product").each(function() {
+                            row_no = $(this).closest('tr').attr('id');
                             if(product_id == $(this).val()) {
-                                p_uom_val  = $(this).closest('td').next().next().find(':selected').attr('data-uomqty');
+                                /***p_uom_val  = $(this).closest('td').next().next().find(':selected').attr('data-uomqty');
                                 p_uom_name = $(this).closest('td').next().next().find(':selected').attr('data-productuom');
-                                p_qty =  $(this).closest('td').next().find('input').val();
+                                p_qty =  $(this).closest('td').next().find('input').val(); ***/
+
+                                p_uom_val  = $("#uom_"+row_no).find(':selected').attr('data-uomqty');
+                                p_uom_name = $("#uom_"+row_no).find(':selected').attr('data-productuom');
+                                p_qty =  $("#qty_"+row_no).val();
+
                                 if(typeof p_uom_val !== "undefined" && typeof p_uom_name != "undefined" != "" && p_qty != "") {
 
                                     product_qty = parseInt(product_qty) + (parseInt(p_qty) * parseInt(p_uom_val));
@@ -1030,28 +1151,43 @@
                         var available_qty = parseInt(this.products[key].in_count)-(parseInt(this.products[key].direct_sale_qty) + parseInt(order_qty) + parseInt(this.products[key].transfer_qty) + parseInt(this.products[key].revise_sale_qty));
 
                         var min_qty = this.products[key].minimum_qty == null ? 0 : this.products[key].minimum_qty;
-                        var percentage_qty = this.products[key].percentage_qty == null ? 0 : this.products[key].percentage_qty;
+                        //var percentage_qty = this.products[key].percentage_qty == null ? 0 : this.products[key].percentage_qty;
                         available_qty = (parseInt(available_qty) - parseInt(order_qty)) - parseInt(min_qty);
                         if(product_qty > available_qty) {
 
-                            if(percentage_qty != 0) {
+                            /***if(percentage_qty != 0) {
                                 available_qty = (available_qty/parseInt(percentage_qty)) * 100;
                                 available_qty = Math.round(available_qty)+"%";
-                            }
+                            }***/
 
                             swal("Warning!", "Not enough quantity! Availabel quantity is "+available_qty+" "+uom_name+".", "warning");
 
-                            $(obj).closest('td').prev().find('input').focus();  $(obj).closest('td').prev().find('input').val('');
+                            /**$(obj).closest('td').prev().find('input').focus();  $(obj).closest('td').prev().find('input').val('');**/
+
+                            $("#qty_"+row_id).focus();
+                            $("#qty_"+row_id).val('');
                         }
                     }
                 } 
 
                 //claculate total amount
-                var unit_price = $(obj).closest('td').next().next().next().next().find('input').val();
-                var relation_val = $(obj).closest('td').next().find(':selected').attr('data-uomqty');
-                if(obj.value != "" && unit_price != "") {
-                    var total_amount = parseInt(obj.value) * parseInt(relation_val) * parseFloat(unit_price);
-                    $(obj).closest('td').next().next().next().next().next().find('input').val(Math.round(total_amount));
+                /**var unit_price = $(obj).closest('td').next().next().next().next().find('input').val();
+                var relation_val = $(obj).closest('td').next().find(':selected').attr('data-uomqty');**/
+
+                var actual_rate = $("#actual_rate_"+row_id).val();
+                var other_discount = $("#other_discount_"+row_id).val(); 
+
+                if(obj.value != "" && actual_rate != "") {
+
+                    var total_amount = parseInt(obj.value) * parseInt(actual_rate);
+                    var discount_amount = 0;
+                    if(other_discount != "") {
+                        discount_amount = other_discount/100 * total_amount;
+                    }
+                    
+                    total_amount = total_amount - parseInt(discount_amount);
+
+                    $("#total_amount_"+row_id).val(Math.round(total_amount));
                 }
 
                 //get all sub total amount
@@ -1080,21 +1216,40 @@
 
             calTotalAmount(obj) {
                let app = this;
-               var price = $(obj).val();
-               var qty = $(obj).closest('td').prev().prev().prev().prev().find('input').val();
 
-               //check price variant
-              /* var product_id = $(obj).closest('td').prev().prev().prev().prev().prev().find(':selected').val();
-               var key = app.products.findIndex(x => x.product_id == product_id);               
-               var product_price = app.products[key].product_price; */
+               var row_id = $(obj).closest('tr').attr('id');
+
+               var qty = $("#qty_"+row_id).val() == "" ? 0 : $("#qty_"+row_id).val();
+               var rate = $("#rate_"+row_id).val();
+               var discount = $("#discount_"+row_id).val();
+               var actual_discount = 0;
+               var actual_rate = '';
+               if(discount != '') {
+                    actual_discount = parseInt(discount)/100 * parseInt(rate);
+                    actual_rate = parseInt(rate) - actual_discount;
+               } else {
+                    actual_rate = $("#actual_rate_"+row_id).val() == "" ? 0 : $("#actual_rate_"+row_id).val();
+               }
+               $("#actual_rate_"+row_id).val(actual_rate);
+               var other_discount = $("#other_discount_"+row_id).val();
+               var amount = parseInt(qty) * parseInt(actual_rate);
+               var discount_amount = 0;
+                if(other_discount != "") {
+                    discount_amount = parseInt(other_discount)/100 * amount;
+                }
+                    
+               amount = parseInt(amount) - parseInt(discount_amount);
+
+                $("#total_amount_"+row_id).val(Math.round(amount));
 
                 //Van Sale
                 //var product_price = $(obj).closest('td').prev().prev().prev().find(':selected').attr('data-price');
 
                 //office Sale
-                var product_price = $(obj).closest('td').prev().prev().prev().find(':selected').attr('data-perprice');
+                //var product_price = $(obj).closest('td').prev().prev().prev().find(':selected').attr('data-perprice');
+                var product_price = $("#uom_"+row_id).find(':selected').attr('data-perprice');
 
-               if(product_price != '') {
+               /***if(product_price != '') {
                     var price_variant =  parseFloat(price) - parseFloat(product_price);
                     price_variant = price_variant.toFixed(2);
                     const wrapper = document.createElement('div');
@@ -1115,13 +1270,7 @@
                           timer:1000
                         });
                     }
-               }
-
-               if(price != "" && qty != "") {
-                    var relation_val = $(obj).closest('td').prev().prev().prev().find(':selected').attr('data-uomqty');
-                    var total = parseInt(qty) * parseInt(relation_val) * parseFloat(price);
-                    $(obj).closest('td').next().find('input').val(Math.round(total));
-               }
+               }***/
 
                //get all sub total amount
                var sub_total = 0;
@@ -1130,10 +1279,37 @@
                         sub_total += parseFloat(document.getElementsByName('total_amount[]')[i].value);
                     }
                }
+               var cash_discount = app.form.cash_discount == '' || app.form.cash_discount == null ? 0 : app.form.cash_discount;
 
                app.form.sub_total = Math.round(sub_total);
+
+               app.form.net_total = parseInt(app.form.sub_total) - parseInt(cash_discount);
+
+                var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
+                var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
+                app.form.tax_amount = tax_amount;
+                app.form.balance_amount = parseInt(app.form.net_total) + parseInt(app.form.tax_amount);
             },
 
+            changeCashDiscount() {
+                let app = this;
+                var cash_discount = app.form.cash_discount == '' || app.form.cash_discount == null ? 0 : app.form.cash_discount;
+
+                app.form.net_total = parseInt(app.form.sub_total) - parseInt(cash_discount);
+
+                var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
+                var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
+                app.form.tax_amount = tax_amount;
+                app.form.balance_amount = parseInt(app.form.net_total) + parseInt(app.form.tax_amount);
+            },
+
+            changeTax() {
+                let app = this;
+                var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
+                var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
+                app.form.tax_amount = tax_amount;
+                app.form.balance_amount = parseInt(app.form.net_total) + parseInt(app.form.tax_amount);
+            },
 
             onSubmit: function(event){
 
@@ -1143,40 +1319,38 @@
                 app.form.qty = [];
                 app.form.unit_price = [];
                 app.form.total_amount = [];
+
+                app.form.rate = [];
+                app.form.actual_rate = [];
+                app.form.discount = [];
+                app.form.other_discount = [];
+
                 $("#loading").show();
 
                 if (!this.isEdit) {
 
                     for(var i=0; i<document.getElementsByName('product[]').length; i++) {
+
                         app.form.product.push(document.getElementsByName('product[]')[i].value);
                         app.form.uom.push(document.getElementsByName('uom[]')[i].value);
                         app.form.qty.push(document.getElementsByName('qty[]')[i].value);
-                        app.form.unit_price.push(document.getElementsByName('unit_price[]')[i].value);
                         app.form.total_amount.push(document.getElementsByName('total_amount[]')[i].value);
+
+                        app.form.rate.push(document.getElementsByName('rate[]')[i].value);
+                        app.form.actual_rate.push(document.getElementsByName('actual_rate[]')[i].value);
+                        app.form.discount.push(document.getElementsByName('discount[]')[i].value);
+                        app.form.other_discount.push(document.getElementsByName('other_discount[]')[i].value);
+                        
                         if(document.getElementsByName('chk_foc[]')[i].checked == true) {
                             app.form.is_foc.push('1');
                         } else {
                             app.form.is_foc.push('0');
                         }
-
-                        //for  price variant
-                       /* var key = app.products.findIndex(x => x.product_id == document.getElementsByName('product[]')[i].value);
-                        var product_price = app.products[key].product_price;*/
-
-                        //van sale
-                        //var product_price = document.getElementsByName('uom[]')[i].options[document.getElementsByName('uom[]')[i].options.selectedIndex].dataset.price;
-
-                        //office sale
-                        var product_price = document.getElementsByName('uom[]')[i].options[document.getElementsByName('uom[]')[i].options.selectedIndex].dataset.perprice;
-
-                        var price_variant =  parseInt(document.getElementsByName('unit_price[]')[i].value) - parseInt(product_price);
-
-                        app.form.price_variants.push(price_variant);
                         
                     }
                     //console.log(app.form.total_amount);
                     //console.log(app.form.is_foc); return false;
-
+                    
                     this.form
                       .post("/order")
                       .then(function(data) {
@@ -1217,32 +1391,24 @@
 
 
                     for(var i=0; i<document.getElementsByName('product[]').length; i++) {
+
+                        app.form.product_pivot.push(document.getElementsByName('product[]')[i].options[document.getElementsByName('product[]')[i].options.selectedIndex].dataset.pivotid);
+
                         app.form.product.push(document.getElementsByName('product[]')[i].value);
                         app.form.uom.push(document.getElementsByName('uom[]')[i].value);
                         app.form.qty.push(document.getElementsByName('qty[]')[i].value);
-                        app.form.unit_price.push(document.getElementsByName('unit_price[]')[i].value);
                         app.form.total_amount.push(document.getElementsByName('total_amount[]')[i].value);
+
+                        app.form.rate.push(document.getElementsByName('rate[]')[i].value);
+                        app.form.actual_rate.push(document.getElementsByName('actual_rate[]')[i].value);
+                        app.form.discount.push(document.getElementsByName('discount[]')[i].value);
+                        app.form.other_discount.push(document.getElementsByName('other_discount[]')[i].value);
+                        
                         if(document.getElementsByName('chk_foc[]')[i].checked == true) {
                             app.form.is_foc.push('1');
                         } else {
                             app.form.is_foc.push('0');
                         }
-
-                        app.form.product_pivot.push(document.getElementsByName('product[]')[i].options[document.getElementsByName('product[]')[i].options.selectedIndex].dataset.pivotid);
-
-                        //for  price variant
-                        /*var key = app.products.findIndex(x => x.product_id == document.getElementsByName('product[]')[i].value);
-                        var product_price = app.products[key].product_price;*/
-
-                        //van sale
-                        //var product_price = document.getElementsByName('uom[]')[i].options[document.getElementsByName('uom[]')[i].options.selectedIndex].dataset.price;
-
-                        //office sale
-                        var product_price = document.getElementsByName('uom[]')[i].options[document.getElementsByName('uom[]')[i].options.selectedIndex].dataset.perprice;
-
-                        var price_variant =  parseInt(document.getElementsByName('unit_price[]')[i].value) - parseInt(product_price);
-
-                        app.form.price_variants.push(price_variant);
                     }
                     //console.log(app.form.ex_product_pivot);
                     //console.log(app.form.product_pivot);
@@ -1285,40 +1451,36 @@
             checkFoc(obj) {
                 let app = this;
                 var is_foc = $(obj).prop("checked");
+                var row_id = $(obj).closest('tr').attr('id');
                 if(is_foc) {
 
-                    $(obj).closest('td').next().find('input').attr('readonly',true);
+                   $("#rate_"+row_id).attr('readonly',true);
+                   $("#discount_"+row_id).val('');
+                   $("#discount_"+row_id).attr('readonly',true);
+                   $("#actual_rate_"+row_id).val('');
+                   $("#actual_rate_"+row_id).attr('readonly',true);
+                   $("#actual_rate_"+row_id).attr('required',false);
+                   $("#total_amount_"+row_id).val('');
+                   $("#total_amount_"+row_id).attr('readonly',true);
+                   $("#other_discount_"+row_id).val('');
+                   $("#other_discount_"+row_id).attr('readonly',true);
+                   $("#total_amount_"+row_id).attr('required',false);
 
-                    var t1=document.createElement("input");
-                    t1.name = "unit_price[]";
-                    t1.style = "width:100px;";
-                    t1.className ="form-control float_num";
-                    $(t1).attr("readonly", true);
-                    t1.addEventListener('blur', function(){ app.calTotalAmount(t1); });
-                    $(obj).closest('td').next().html(t1);
-
-                    var t2=document.createElement("input");
-                    t2.name = "total_amount[]";
-                    t2.style = "width:100px;";
-                    t2.className ="form-control num_txt";
-                    $(t2).attr("readonly", true);
-                    $(obj).closest('td').next().next().html(t2);
-
-                    $(obj).closest('td').next().find('input').attr('required',false);
                 } else {
-                    $(obj).closest('td').next().find('input').attr('readonly',false);
-                    $(obj).closest('td').next().find('input').attr('required',true);
 
-                    //Van Sale
-                    //var product_price = $(obj).closest('td').prev().prev().find(':selected').attr('data-price');
-
-                    //office Sale
-                    var product_price = $(obj).closest('td').prev().prev().find(':selected').attr('data-perprice');
-
-                   $(obj).closest('td').next().find('input').val(product_price);
+                   $("#rate_"+row_id).attr('readonly',false);
+                   $("#discount_"+row_id).val('');
+                   $("#discount_"+row_id).attr('readonly',false);
+                   $("#actual_rate_"+row_id).val($("#rate_"+row_id).val());
+                   $("#actual_rate_"+row_id).attr('required',true);
+                   $("#total_amount_"+row_id).val('');
+                   $("#other_discount_"+row_id).val('');
+                   $("#other_discount_"+row_id).attr('readonly',false);
+                   $("#total_amount_"+row_id).attr('required',true);
                 }
 
-                app.calTotalAmount($(obj).closest('td').next().find('input'));
+                app.calTotalAmount(obj);
+
             },
 
             removeProduct(id) {

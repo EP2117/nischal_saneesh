@@ -138,7 +138,7 @@ class OrderController extends Controller
 
         $order->order_no = $order_no;
         $order->order_date = $request->order_date;
-        $order->warehouse_id = Auth::user()->warehouse_id;
+        //$order->warehouse_id = Auth::user()->warehouse_id;
         $order->branch_id = Auth::user()->branch_id;
         $order->customer_id = $request->customer_id;
         $order->remark = $request->remark;
@@ -148,6 +148,11 @@ class OrderController extends Controller
         }
 
         $order->total_amount = $request->sub_total;
+        $order->cash_discount = $request->cash_discount;
+        $order->net_total = $request->net_total;
+        $order->tax = $request->tax;
+        $order->tax_amount = $request->tax_amount;
+        $order->balance_amount = $request->balance_amount;
         $order->created_by = Auth::user()->id;
         $order->updated_by = Auth::user()->id;        
         $order->save();
@@ -156,7 +161,7 @@ class OrderController extends Controller
         for($i=0; $i<count($request->product); $i++) {
 
             //add product into pivot table
-            $pivot = $order->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);  
+            $pivot = $order->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);  
 
                     
         }
@@ -179,9 +184,16 @@ class OrderController extends Controller
         $order = Order::find($id);
         $order->order_no = $request->order_no;
         $order->order_date = $request->order_date;
-        $order->warehouse_id = Auth::user()->warehouse_id;
+        //$order->warehouse_id = Auth::user()->warehouse_id;
         $order->customer_id = $request->customer_id;
+
         $order->total_amount = $request->sub_total;
+        $order->cash_discount = $request->cash_discount;
+        $order->net_total = $request->net_total;
+        $order->tax = $request->tax;
+        $order->tax_amount = $request->tax_amount;
+        $order->balance_amount = $request->balance_amount;
+
         $order->updated_at = time();
         $order->updated_by = Auth::user()->id;  
         $order->remark = $request->remark;      
@@ -206,13 +218,16 @@ class OrderController extends Controller
                 //update existing product in pivot and transition tables
                 DB::table('product_order')
                     ->where('id', $request->product_pivot[$i])
-                    ->update(array('uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]));
+                    ->update(array('uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]));
 
                 
             } else {
 
                 //add product into pivot table if not exist
-                $pivot = $order->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]); 
+                /**$pivot = $order->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);**/ 
+
+                //add product into pivot table
+                $pivot = $order->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
 
                 
             }
@@ -239,7 +254,19 @@ class OrderController extends Controller
                 array_push($access_brands, $brand->id);
             }
         }
-        return compact('order','access_brands');
+
+        $customer_id = $order->customer_id;
+        $previous_balance = 0;
+        $chk_balance = DB::table("sales")
+
+            ->select(DB::raw("SUM(CASE  WHEN balance_amount IS NOT NULL THEN balance_amount  ELSE 0 END)  as previous_balance"))
+            ->where('customer_id','=',$customer_id)
+            ->groupBy('customer_id')
+            ->first();
+        if($chk_balance) {
+            $previous_balance = $chk_balance->previous_balance;
+        }
+        return compact('order','access_brands','previous_balance');
     }
 
     /**

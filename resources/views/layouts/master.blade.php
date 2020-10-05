@@ -168,7 +168,7 @@
     <!--<a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>-->
-    <script src="{{ mix('js/app.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/app.js') }}" type="text/javascript"></script>
     <script type="text/javascript" src="{{ asset('js/notify.min.js') }}"></script>
     <!-- Custom scripts for all pages-->
     <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
