@@ -411,6 +411,15 @@
                         </a>
                     </router-link>
                 @endif
+                    @if(Request::path() != 'van' && (Auth::user()->role->id == 1 || Auth::user()->role->id == 2))
+                        <hr class="sidebar-divider">
+                        <router-link  tag="li" to="/cashbook" class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-receipt"></i>
+                                <span>Cashbook</span>
+                            </a>
+                        </router-link>
+                    @endif
 
 
 

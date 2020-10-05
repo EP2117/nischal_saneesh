@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AccountTransition;
 use App\Product;
 use App\ProductTransition;
 use App\PurchaseInvoice;
@@ -60,7 +61,7 @@ class PurchaseInvoiceController extends Controller
         }else{
             $no=$latest->id;
         }
-        $invoice_no = "P-INV".str_pad((int)$no + 1,8,"0",STR_PAD_LEFT);
+        $invoice_no = "PI".str_pad((int)$no + 1,8,"0",STR_PAD_LEFT);
         $p->invoice_no = $invoice_no;
         $p->branch_id = Auth::user()->branch_id;
         $p->reference_no = $request->reference_no;
@@ -73,15 +74,41 @@ class PurchaseInvoiceController extends Controller
         $p->pay_amount = $request->pay_amount;
         $p->balance_amount = $request->balance_amount;
         if($request->payment_type == 'credit') {
+            $sub_account_id=6;       /*Credit Payment Sub account ID */
+            if($request->pay_amount!=0){
+                $amount=$request->pay_amount;
+            }else{
+                $amount=null;
+            }
             $p->payment_type = 'credit';
             $p->due_date = $request->due_date;
             $p->credit_day = $request->credit_day;
         } else {
+            $sub_account_id=5;        /*Purchase Sub account ID */
+            $amount=$request->pay_amount;
             $p->payment_type = 'cash';
         }
         $p->created_by = Auth::user()->id;
         $p->updated_by = Auth::user()->id;
         $p->save();
+        $description="Inv ".$p->invoice_no.",Inv Date ".$p->invoice_date." to " .$p->supplier->name;
+
+        if($p){
+            if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)){
+                AccountTransition::create([
+                    'sub_account_id' => $sub_account_id,
+                    'transition_date' => $p->invoice_date,
+                    'purchase_id' => $p->id,
+                    'vochur_no'=>$invoice_no,
+                    'description'=>$description,
+                    'is_cashbook' => 1,
+                    'credit' => $amount,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
+                ]);
+
+            }
+        }
         for($i=0; $i<count($request->product); $i++) {
             $product_result = Product::select('uom_id')->find($request->product[$i]);
             $main_uom_id = $product_result->uom_id;
@@ -164,17 +191,57 @@ class PurchaseInvoiceController extends Controller
         $p->balance_amount = $request->balance_amount;
 //        $sale->sale_type  = $request->sale_type;
         if($request->payment_type == 'credit') {
+            if($request->pay_amount != 0){
+                $amount=$request->pay_amount;
+            }
+            $sub_account_id=6;
             $p->payment_type = 'credit';
             $p->due_date = $request->due_date;
             $p->credit_day = $request->credit_day;
         } else {
             $p->payment_type = 'cash';
+            $amount=$request->sub_total;
+            $sub_account_id=5;        /*Purchase Sub account ID */
         }
 
         $p->updated_at = time();
         $p->updated_by = Auth::user()->id;
         $p->save();
+        $description="Inv ".$p->invoice_no.",Inv Date ".$p->invoice_date." to " .$p->supplier->name;
+        if($p){
+            if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
+                $at=AccountTransition::find($id);
+                if($at){
+                    AccountTransition::where('purchase_id',$id)->update([
+                        'sub_account_id' => $sub_account_id,
+                        'transition_date' => $p->invoice_date,
+                        'purchase_id' => $p->id,
+                        'is_cashbook' => 1,
+                        'description'=>$description,
+                        'vochur_no'=>$request->invoice_no,
+                        'credit' => $amount,
+                        'created_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id,
+                    ]);
+                }else{
+                    AccountTransition::create([
+                        'sub_account_id' => $sub_account_id,
+                        'transition_date' => $p->invoice_date,
+                        'purchase_id' => $p->id,
+                        'is_cashbook' => 1,
+                        'description'=>$description,
+                        'vochur_no'=>$request->invoice_no,
+                        'credit' => $amount,
+                        'created_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id,
+                    ]);
 
+                }
+            }elseif($request->payment_type=='credit' && $request->pay_amount==0){
+                AccountTransition::where('purchase_id',$id)->delete();
+            }
+
+        }
         $ex_pivot_arr = $request->ex_product_pivot;
         //remove id in pivot that are removed in sale Form
         $results =array_diff($ex_pivot_arr,$request->product_pivot); //get id that are not in request pivot array

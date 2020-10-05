@@ -92,6 +92,7 @@ import Receipt from "./views/Receipt/Receipt";
 import ReceiptForm from "./views/Receipt/ReceiptForm";
 import Payment from "./views/Payment/Payment";
 import PaymentForm from "./views/Payment/PaymentForm";
+import Cashbook from "./views/Cashbook/Cashbook";
 const routes = [
     {
       name: 'home',
@@ -431,6 +432,11 @@ const routes = [
     {
         path: '/payment/edit/:id',
         component: PaymentForm
+    },
+    {
+        name:'cashbook',
+        path: '/cashbook',
+        component: Cashbook
     },
 
 ];

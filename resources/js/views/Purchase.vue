@@ -285,139 +285,138 @@
                             </tr>
 
                             <!-- detail view for each invoice -->
-                            <template v-if="purchase_type == 2">
-                                <div :id="p.id" style="display:none;">
-                                    <div style="text-aling:center;display:inline-block; margin:0 auto; width:100%;">
-                                        <h4 class="text-center title">Like Link Co., Ltd.</h4>
-                                        <!--<div style="text-align:center">
-                                            <img src="images/LikeLinklogo.png" width="100" />
-                                        </div>-->
-                                        <table style="border:none;">
-                                            <tr>
-                                                <td class="mm-txt">၀ယ္သူ</td>
-                                                <td class="mm-txt">{{p.supplier.name}}</td>
-                                                <td class="mm-txt" style="text-align:right">ရက္စဲြ</td>
-                                                <td style="text-align:right">{{p.invoice_date}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="mm-txt">လိပ္စာ</td>
-                                                <td>{{p.supplier.sup_shipping_address}}</td>
-                                                <td style="text-align:right">Invoice No.</td>
-                                                <td style="text-align:right">{{p.invoice_no}}</td>
-                                            </tr>
-                                        </table>
+<!--                            <template v-if="purchase_type == 2">-->
+<!--                                <div :id="p.id" style="display:none;">-->
+<!--                                    <div style="text-aling:center;display:inline-block; margin:0 auto; width:100%;">-->
+<!--                                        <h4 class="text-center title">Like Link Co., Ltd.</h4>-->
+<!--                                        &lt;!&ndash;<div style="text-align:center">-->
+<!--                                            <img src="images/LikeLinklogo.png" width="100" />-->
+<!--                                        </div>&ndash;&gt;-->
+<!--                                        <table style="border:none;">-->
+<!--                                            <tr>-->
+<!--                                                <td class="mm-txt">၀ယ္သူ</td>-->
+<!--                                                <td class="mm-txt">{{p.supplier.name}}</td>-->
+<!--                                                <td class="mm-txt" style="text-align:right">ရက္စဲြ</td>-->
+<!--                                                <td style="text-align:right">{{p.invoice_date}}</td>-->
+<!--                                            </tr>-->
+<!--                                            <tr>-->
+<!--                                                <td class="mm-txt">လိပ္စာ</td>-->
+<!--                                                <td>{{p.supplier.sup_shipping_address}}</td>-->
+<!--                                                <td style="text-align:right">Invoice No.</td>-->
+<!--                                                <td style="text-align:right">{{p.invoice_no}}</td>-->
+<!--                                            </tr>-->
+<!--                                        </table>-->
 
-                                        <table class="t-class" cellspacing="2" style="margin-top:20px;">
-                                            <thead>
-                                            <tr>
-                                                <td class='mm-txt font-bold'>စဥ္</td>
-                                                <td class='mm-txt font-bold'>အမ်ိဳးအမည္</td>
-                                                <td class='mm-txt font-bold' style="min-width:50px;">အေရအတြက္</td>
-                                                <td class='mm-txt font-bold' style="min-width:30px;">ေစ်းႏႈန္း</td>
-                                                <td class='mm-txt font-bold'>သင့္ေငြ</td>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr v-for="(product,i) in p.products">
-                                                <td>{{i+1}}</td>
-                                                <td>{{product.product_name}}</td>
+<!--                                        <table class="t-class" cellspacing="2" style="margin-top:20px;">-->
+<!--                                            <thead>-->
+<!--                                            <tr>-->
+<!--                                                <td class='mm-txt font-bold'>စဥ္</td>-->
+<!--                                                <td class='mm-txt font-bold'>အမ်ိဳးအမည္</td>-->
+<!--                                                <td class='mm-txt font-bold' style="min-width:50px;">အေရအတြက္</td>-->
+<!--                                                <td class='mm-txt font-bold' style="min-width:30px;">ေစ်းႏႈန္း</td>-->
+<!--                                                <td class='mm-txt font-bold'>သင့္ေငြ</td>-->
+<!--                                            </tr>-->
+<!--                                            </thead>-->
+<!--                                            <tbody>-->
+<!--                                            <tr v-for="(product,i) in p.products">-->
+<!--                                                <td>{{i+1}}</td>-->
+<!--                                                <td>{{product.product_name}}</td>-->
 
-                                                <td>
-                                                    {{product.pivot.product_quantity}} {{getUomName(product,product.pivot.uom_id)}}
-                                                </td>
+<!--                                                <td>-->
+<!--                                                    {{product.pivot.product_quantity}} {{getUomName(product,product.pivot.uom_id)}}-->
+<!--                                                </td>-->
+<!--                                                <td v-if="product.pivot.is_foc == '0'">{{product.pivot.price}}</td>-->
+<!--                                                <td v-else>FOC</td>-->
+<!--                                                <td v-if="product.pivot.is_foc == '0'" class="text-right">{{product.pivot.total_amount}}</td>-->
+<!--                                                <td v-else></td>-->
+<!--                                            </tr>-->
+<!--                                            <tr>-->
+<!--                                                <td colspan="4" class="text-right mm-txt">စုစုေပါင္း</td>-->
+<!--                                                <td class="text-right">{{numberWithCommas(p.total_amount)}}</td>-->
+<!--                                            </tr>-->
+<!--                                            &lt;!&ndash;<tr>-->
+<!--                                                <td colspan="4" class="text-right mm-txt">လက္က်န္ေငြ</td>-->
+<!--                                                <td class="text-right">{{sale.balance_amount}}</td>-->
+<!--                                            </tr>&ndash;&gt;-->
+<!--                                            </tbody>-->
+<!--                                        </table>-->
 
-                                                <td v-if="product.pivot.is_foc == '0'">{{product.pivot.price}}</td>
-                                                <td v-else>FOC</td>
-                                                <td v-if="product.pivot.is_foc == '0'" class="text-right">{{product.pivot.total_amount}}</td>
-                                                <td v-else></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="4" class="text-right mm-txt">စုစုေပါင္း</td>
-                                                <td class="text-right">{{numberWithCommas(p.total_amount)}}</td>
-                                            </tr>
-                                            <!--<tr>
-                                                <td colspan="4" class="text-right mm-txt">လက္က်န္ေငြ</td>
-                                                <td class="text-right">{{sale.balance_amount}}</td>
-                                            </tr>-->
-                                            </tbody>
-                                        </table>
+<!--                                        <h4 class="text-center">Thanks for your purchase!</h4>-->
+<!--                                    </div>-->
 
-                                        <h4 class="text-center">Thanks for your purchase!</h4>
-                                    </div>
+<!--                                </div>-->
+<!--                            </template>-->
 
-                                </div>
-                            </template>
+<!--                            <template v-else>-->
+<!--                                <div :id="p.id" style="display:none;">-->
+<!--                                    <div style="text-aling:center;display:inline-block; margin-top:212px; width:100%;">-->
+<!--                                        &lt;!&ndash;<div style="text-align:center">-->
+<!--                                            <img src="images/LikeLinklogo.png" width="100" />-->
+<!--                                        </div>&ndash;&gt;-->
+<!--                                        <table style="border:none;">-->
+<!--                                            <tr>-->
+<!--                                                <td class="mm-txt">၀ယ္သူ</td>-->
+<!--                                                <td class="mm-txt">{{p.supplier.name}}</td>-->
+<!--                                                <td class="mm-txt" style="text-align:right">ရက္စဲြ</td>-->
+<!--                                                <td style="text-align:right">{{p.invoice_date}}</td>-->
+<!--                                            </tr>-->
+<!--                                            <tr>-->
+<!--                                                <td class="mm-txt">လိပ္စာ</td>-->
+<!--                                                <td>{{p.supplier.sup_shipping_address}}</td>-->
+<!--                                                <td style="text-align:right">Invoice No.</td>-->
+<!--                                                <td style="text-align:right">{{p.invoice_no}}</td>-->
+<!--                                            </tr>-->
+<!--                                        </table>-->
 
-                            <template v-else>
-                                <div :id="p.id" style="display:none;">
-                                    <div style="text-aling:center;display:inline-block; margin-top:212px; width:100%;">
-                                        <!--<div style="text-align:center">
-                                            <img src="images/LikeLinklogo.png" width="100" />
-                                        </div>-->
-                                        <table style="border:none;">
-                                            <tr>
-                                                <td class="mm-txt">၀ယ္သူ</td>
-                                                <td class="mm-txt">{{p.supplier.name}}</td>
-                                                <td class="mm-txt" style="text-align:right">ရက္စဲြ</td>
-                                                <td style="text-align:right">{{p.invoice_date}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="mm-txt">လိပ္စာ</td>
-                                                <td>{{p.supplier.sup_shipping_address}}</td>
-                                                <td style="text-align:right">Invoice No.</td>
-                                                <td style="text-align:right">{{p.invoice_no}}</td>
-                                            </tr>
-                                        </table>
+<!--                                        <table class="t-office-class" cellspacing="0" style="margin-top:20px;">-->
+<!--                                            <thead>-->
+<!--                                            <tr>-->
+<!--                                                <td class='mm-txt font-bold' style="text-align:center;">စဥ္</td>-->
+<!--                                                <td class='mm-txt font-bold' style="text-align:center;">အမ်ိဳးအမည္</td>-->
+<!--                                                <td class='mm-txt font-bold' style="min-width:50px;text-align:center;">အေရအတြက္</td>-->
+<!--                                                <td class='mm-txt font-bold' style="min-width:30px;text-align:center;">ေစ်းႏႈန္း</td>-->
+<!--                                                <td class='mm-txt font-bold' style="text-align:center;">သင့္ေငြ</td>-->
+<!--                                            </tr>-->
+<!--                                            </thead>-->
+<!--                                            <tbody>-->
+<!--                                            <tr v-for="(product,i) in p.products">-->
+<!--                                                <td>{{i+1}}</td>-->
+<!--                                                <td>{{product.product_name}}</td>-->
 
-                                        <table class="t-office-class" cellspacing="0" style="margin-top:20px;">
-                                            <thead>
-                                            <tr>
-                                                <td class='mm-txt font-bold' style="text-align:center;">စဥ္</td>
-                                                <td class='mm-txt font-bold' style="text-align:center;">အမ်ိဳးအမည္</td>
-                                                <td class='mm-txt font-bold' style="min-width:50px;text-align:center;">အေရအတြက္</td>
-                                                <td class='mm-txt font-bold' style="min-width:30px;text-align:center;">ေစ်းႏႈန္း</td>
-                                                <td class='mm-txt font-bold' style="text-align:center;">သင့္ေငြ</td>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr v-for="(product,i) in p.products">
-                                                <td>{{i+1}}</td>
-                                                <td>{{product.product_name}}</td>
+<!--                                                <td v-if="product.pivot.uom_id == product.uom_id">-->
+<!--                                                    {{product.pivot.product_quantity}} {{getUomName(product,product.pivot.uom_id)}}-->
+<!--                                                </td>-->
 
-                                                <td v-if="product.pivot.uom_id == product.uom_id">
-                                                    {{product.pivot.product_quantity}} {{getUomName(product,product.pivot.uom_id)}}
-                                                </td>
+<!--                                                <td v-else>-->
+<!--                                                    {{product.pivot.product_quantity}} {{getUomName(product,product.pivot.uom_id)}} x {{getUomRelation(product,product.pivot.uom_id)}} {{getUomName(product,product.uom_id)}}-->
+<!--                                                </td>-->
 
-                                                <td v-else>
-                                                    {{product.pivot.product_quantity}} {{getUomName(product,product.pivot.uom_id)}} x {{getUomRelation(product,product.pivot.uom_id)}} {{getUomName(product,product.uom_id)}}
-                                                </td>
+<!--                                                <td v-if="product.pivot.is_foc == '0'">{{product.pivot.price}}</td>-->
+<!--                                                <td v-else>FOC</td>-->
+<!--                                                <td v-if="product.pivot.is_foc == '0'" class="text-right">{{product.pivot.total_amount}}</td>-->
+<!--                                                <td v-else></td>-->
+<!--                                            </tr>-->
+<!--                                            <tr>-->
+<!--                                                <td colspan="4" class="text-right mm-txt">စုစုေပါင္း</td>-->
+<!--                                                <td class="text-right">{{numberWithCommas(p.total_amount)}}</td>-->
+<!--                                            </tr>-->
+<!--                                            &lt;!&ndash;<tr>-->
+<!--                                                <td colspan="4" class="text-right mm-txt">လက္က်န္ေငြ</td>-->
+<!--                                                <td class="text-right">{{sale.balance_amount}}</td>-->
+<!--                                            </tr>&ndash;&gt;-->
+<!--                                            </tbody>-->
+<!--                                        </table>-->
 
-                                                <td v-if="product.pivot.is_foc == '0'">{{product.pivot.price}}</td>
-                                                <td v-else>FOC</td>
-                                                <td v-if="product.pivot.is_foc == '0'" class="text-right">{{product.pivot.total_amount}}</td>
-                                                <td v-else></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="4" class="text-right mm-txt">စုစုေပါင္း</td>
-                                                <td class="text-right">{{numberWithCommas(p.total_amount)}}</td>
-                                            </tr>
-                                            <!--<tr>
-                                                <td colspan="4" class="text-right mm-txt">လက္က်န္ေငြ</td>
-                                                <td class="text-right">{{sale.balance_amount}}</td>
-                                            </tr>-->
-                                            </tbody>
-                                        </table>
+<!--                                        <table style="border:none;width:100%;margin-top:50px;">-->
+<!--                                            <tr>-->
+<!--                                                <td class="mm-txt">Check By</td>-->
+<!--                                                <td style="text-align:right">Receive By</td>-->
+<!--                                            </tr>-->
+<!--                                        </table>-->
+<!--                                    </div>-->
 
-                                        <table style="border:none;width:100%;margin-top:50px;">
-                                            <tr>
-                                                <td class="mm-txt">Check By</td>
-                                                <td style="text-align:right">Receive By</td>
-                                            </tr>
-                                        </table>
-                                    </div>
-
-                                </div>
-                            </template>
+<!--                                </div>-->
+<!--                            </template>-->
                             <!-- END detail view for each invoice -->
                         </template>
                         </tbody>
@@ -704,7 +703,7 @@ export default {
                 app.pagination.next_page_url = data.next_page_url;
                 app.rows = data.total;
                 app.currentPage = data.current_page;
-                console.log(app);
+                // console.log(app);
                 // console.log('Current Page is '+app.currentPage);
 
                 // console.log(app.currentPage);

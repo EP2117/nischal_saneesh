@@ -699,14 +699,10 @@ export default {
                 var date2 = new Date(app.form.due_date);
                 // To calculate the time difference of two dates
                 var Difference_In_Time = date2.getTime() - date1.getTime();
-
                 // To calculate the no. of days between two dates
                 var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
                 app.form.credit_day = Difference_In_Days;
-
             });
-
-
 
         /*$(document).on('click','.add-new',function(evt){
             app.addProduct();
@@ -1307,7 +1303,7 @@ export default {
                         if(app.user_role != "Country Head" || (app.user_role == "Country Head")) {
 
                             var table=document.getElementById("product_table");
-                            var row=table.insertRow((table.rows.length) - 5);
+                            var row=table.insertRow((table.rows.length) - 4);
                             row.id = row_id;
 
                             // var cell1=row.insertCell(0);

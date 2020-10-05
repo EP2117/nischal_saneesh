@@ -176,6 +176,8 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
         Route::get('get_sub_account/{type}','SubAccountController@getSubAccount');
         Route::get('get_account_type','SubAccountController@getAccountType');
         Route::get('get_account_head','SubAccountController@getAccountHead');
+        Route::get('get_all_sub_account','SubAccountController@getAllSubAccount');
+
         Route::get('change_status/{id}/{active}','SubAccountController@changeStatus');
         Route::get('edit/{id}','SubAccountController@edit');
         Route::post('store','SubAccountController@store');
@@ -194,5 +196,8 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
         Route::post('store','PaymentController@store');
         Route::patch('update/{id}','PaymentController@update');
         Route::delete('destroy/{id}','PaymentController@destroy');
+    });
+    Route::group(['prefix' => 'cashbook'], function () {
+        Route::get('get_all_cashbook','AccountTransitionController@getAllCashbook');
     });
 });

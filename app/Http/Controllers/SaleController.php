@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AccountTransition;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
@@ -40,17 +41,17 @@ class SaleController extends Controller
                             ->where('warehouse_id',Auth::user()->warehouse_id);
                 $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
                 $data->whereIn('order_id',$orders);
-                $data = $data->orderBy('id', 'DESC')->get(); 
+                $data = $data->orderBy('id', 'DESC')->get();
 
             } else {
                 $data = Sale::with('products','products.uom', 'warehouse','customer','products.selling_uoms','branch')
                             ->where('warehouse_id',Auth::user()->warehouse_id);
                 $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
-                $data = $data->orderBy('id', 'DESC')->get(); 
+                $data = $data->orderBy('id', 'DESC')->get();
             }
-            
+
         }
-       	
+
         return response(compact('data'), 200);
     }
 
@@ -102,7 +103,7 @@ class SaleController extends Controller
             }
 
             if($request->from_date != '' && $request->to_date != '')
-            {            
+            {
                 $data->whereBetween('invoice_date', array($request->from_date, $request->to_date));
             } else if($request->from_date != '') {
                 $data->whereDate('invoice_date', '>=', $request->from_date);
@@ -143,7 +144,7 @@ class SaleController extends Controller
                 }
             }
 
-            $data = $data->orderBy('id', 'DESC')->paginate($limit); 
+            $data = $data->orderBy('id', 'DESC')->paginate($limit);
 
         } else {
 
@@ -152,8 +153,8 @@ class SaleController extends Controller
 
             if($request->sale_man_id != "") {
                 $data->whereHas('order', function ($query) use ($request) {
-                    $query->where('sale_man_id', $request->sale_man_id);                         
-                });   
+                    $query->where('sale_man_id', $request->sale_man_id);
+                });
             }
 
             if($request->invoice_no != "") {
@@ -161,7 +162,7 @@ class SaleController extends Controller
             }
 
             if($request->from_date != '' && $request->to_date != '')
-            {            
+            {
                 $data->whereBetween('invoice_date', array($request->from_date, $request->to_date));
             } else if($request->from_date != '') {
                 $data->whereDate('invoice_date', '>=', $request->from_date);
@@ -177,7 +178,7 @@ class SaleController extends Controller
             if(isset($request->branch_id) && $request->branch_id != "") {
                 $data->where('branch_id', $request->branch_id);
             }
-        
+
             if($request->office_sale_man_id != "") {
                 $data->where('office_sale_man_id', $request->office_sale_man_id);
             }
@@ -210,7 +211,7 @@ class SaleController extends Controller
                     array_push($access_users, $ls->id);
                     $ls_query = User::with('local_supervisor_children')->find($ls->id);
                     foreach($ls_query->local_supervisor_children as $sm) {
-                        array_push($access_users, $sm->id);                
+                        array_push($access_users, $sm->id);
                     }
                 }
 
@@ -229,7 +230,7 @@ class SaleController extends Controller
                               ->orWhereIn('office_sale_man_id',$office_sale_man_arr);
                     });
             }
-        
+
             if(Auth::user()->role->role_name == "Local Supervisor") {
                 //for Local Supervisor user
                 $ls_access_users = array();
@@ -249,7 +250,7 @@ class SaleController extends Controller
             if(Auth::user()->role->role_name == "delivery") {
                  $data->where('delivery_approve',1);
             }
-            
+
 
             $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
 
@@ -270,7 +271,7 @@ class SaleController extends Controller
                     $data->where('branch_id',$branch);
                 }
             }
-            $data = $data->orderBy('id', 'DESC')->paginate($limit);            
+            $data = $data->orderBy('id', 'DESC')->paginate($limit);
         }
 
         return response(compact('data'), 200);
@@ -318,19 +319,39 @@ class SaleController extends Controller
         $sale->sale_type  = $request->sale_type;
 
         if($request->payment_type == 'credit') {
+            $sub_account_id=9;     /*sub account_id for sale advance*/
+            if($request->pay_amount!=0){
+                $amount=$request->pay_amount;
+            }
             $sale->payment_type = 'credit';
             $sale->due_date = $request->due_date;
             $sale->credit_day = $request->credit_day;
         } else {
+            $sub_account_id=8;     /*sub account_id for sale*/
+            $amount=$request->pay_amount;
             $sale->payment_type = 'cash';
         }
         $sale->created_by = Auth::user()->id;
-        $sale->updated_by = Auth::user()->id;        
+        $sale->updated_by = Auth::user()->id;
         $sale->save();
-
+        $description="SI ".$sale->invoice_no.",Inv Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
+        /* Cash Book  for sale*/
+        if($sale) {
+            if ($request->payment_type == 'cash' || ($request->payment_type == 'credit' && $request->pay_amount != 0)) {
+                AccountTransition::create([
+                    'sub_account_id' => $sub_account_id,
+                    'transition_date' => $sale->invoice_date,
+                    'sale_id' => $sale->id,
+                    'vochur_no'=>$invoice_no,
+                    'description'=>$description,
+                    'is_cashbook' => 1,
+                    'debit' => $amount,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
+                ]);
+            }
+        }
         $sale_id = $sale->id;
-
-        
         for($i=0; $i<count($request->product); $i++) {
 
             //get product pre-defined UOM
@@ -338,12 +359,12 @@ class SaleController extends Controller
             $main_uom_id = $product_result->uom_id;
 
             //add product into pivot table
-            $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);  
+            $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
 
             //get last pivot insert id
             $last_row=DB::table('product_sale')->orderBy('id', 'DESC')->first();
 
-            $pivot_id = $last_row->id; 
+            $pivot_id = $last_row->id;
 
             //calculate quantity for product pre-defined UOM
             $uom_relation = DB::table('product_selling_uom')
@@ -357,7 +378,7 @@ class SaleController extends Controller
                 //for pre-defined product uom
                 $relation_val = 1;
             }
-            
+
             //add products in transition table=> transition_type = out (for sold out)
             $obj = new ProductTransition;
             $obj->product_id            = $request->product[$i];
@@ -365,7 +386,7 @@ class SaleController extends Controller
             $obj->transition_sale_id   = $sale_id;
             $obj->transition_product_pivot_id   = $pivot_id;
             $obj->branch_id  = Auth::user()->branch_id;
-            $obj->warehouse_id          = Auth::user()->warehouse_id; 
+            $obj->warehouse_id          = Auth::user()->warehouse_id;
             $obj->transition_date       = $request->invoice_date;
             $obj->transition_product_uom_id        = $request->uom[$i];
             $obj->transition_product_quantity      = $request->qty[$i];
@@ -373,7 +394,7 @@ class SaleController extends Controller
             $obj->product_quantity      = $request->qty[$i] * $relation_val;
             $obj->created_by = Auth::user()->id;
             $obj->updated_by = Auth::user()->id;
-            $obj->save(); 
+            $obj->save();
         }
 
         $status = "success";
@@ -409,17 +430,57 @@ class SaleController extends Controller
         $sale->sale_type  = $request->sale_type;
 
         if($request->payment_type == 'credit') {
+            $sub_account_id=9;     /*sub account_id for sale advance*/
+            if($request->pay_amount!=0){
+                $amount=$request->pay_amount;
+            }
             $sale->payment_type = 'credit';
             $sale->due_date = $request->due_date;
             $sale->credit_day = $request->credit_day;
         } else {
+            $sub_account_id=8;     /*sub account_id for sale*/
+            $amount=$request->pay_amount;
             $sale->payment_type = 'cash';
         }
-        
-        $sale->updated_at = time();
-        $sale->updated_by = Auth::user()->id;        
-        $sale->save();
 
+        $sale->updated_at = time();
+        $sale->updated_by = Auth::user()->id;
+        $sale->save();
+        $description="Inv ".$sale->invoice_no.",Inv Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
+        if($sale){
+            if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
+                $at=AccountTransition::find($id);
+                if($at){
+                    AccountTransition::where('purchase_id',$id)->update([
+                        'sub_account_id' => $sub_account_id,
+                        'transition_date' => $sale->invoice_date,
+                        'sale_id' => $sale->id,
+                        'is_cashbook' => 1,
+                        'debit' => $amount,
+                        'description'=>$description,
+
+                        'vochur_no'=>$request->invoice_no,
+                        'created_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id,
+                    ]);
+                }else{
+                    AccountTransition::create([
+                        'sub_account_id' => $sub_account_id,
+                        'transition_date' => $sale->invoice_date,
+                        'sale_id' => $sale->id,
+                        'is_cashbook' => 1,
+                        'description'=>$description,
+                        'vochur_no'=>$request->invoice_no,
+                        'credit' => $amount,
+                        'created_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id,
+                    ]);
+
+                }
+            }elseif($request->payment_type=='credit' && $request->pay_amount==0){
+                AccountTransition::where('purchase_id',$id)->delete();
+            }
+        }
         $ex_pivot_arr = $request->ex_product_pivot;
 
         //remove id in pivot that are removed in sale Form
@@ -477,12 +538,12 @@ class SaleController extends Controller
                 $main_uom_id = $product_result->uom_id;
 
                 //add product into pivot table
-                $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]); 
+                $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
 
                 //get last pivot insert id
                 $last_row=DB::table('product_sale')->orderBy('id', 'DESC')->first();
 
-                $pivot_id = $last_row->id; 
+                $pivot_id = $last_row->id;
 
                 //calculate quantity for product pre-defined UOM
                 $uom_relation = DB::table('product_selling_uom')
@@ -516,7 +577,7 @@ class SaleController extends Controller
             }
         }
 
-        $status = "success";        
+        $status = "success";
         return compact('status');
 
     }
@@ -571,7 +632,7 @@ class SaleController extends Controller
     }
 
     //Daily Sale Report
-    public function getDailySaleReport(Request $request) 
+    public function getDailySaleReport(Request $request)
     {
 
         $sales =    Sale::with('customer','order','order.sale_man','customer.township','customer.customer_type','warehouse','office_sale_man','branch');
@@ -606,7 +667,7 @@ class SaleController extends Controller
         }
 
         if($request->from_date != '' && $request->to_date != '')
-        {            
+        {
             $sales->whereBetween('invoice_date', array($request->from_date, $request->to_date));
         } else if($request->from_date != '') {
             $sales->whereDate('invoice_date', '>=', $request->from_date);
@@ -625,20 +686,20 @@ class SaleController extends Controller
 
         if($request->cus_type != "") {
             $sales->whereHas('customer', function ($query) use ($request) {
-                $query->where('customer_type_id', $request->cus_type);                         
+                $query->where('customer_type_id', $request->cus_type);
             });
         }
 
         if($request->township_id != "") {
             $sales->whereHas('customer', function ($query) use ($request) {
-                $query->where('township_id', $request->township_id);                         
+                $query->where('township_id', $request->township_id);
             });
         }
 
         if($request->sale_man_id != "") {
             $sales->whereHas('order', function ($query) use ($request) {
-                $query->where('sale_man_id', $request->sale_man_id);                         
-            });   
+                $query->where('sale_man_id', $request->sale_man_id);
+            });
         }
 
         if($request->office_sale_man_id != "") {
@@ -653,7 +714,7 @@ class SaleController extends Controller
                 array_push($access_users, $ls->id);
                 $ls_query = User::with('local_supervisor_children')->find($ls->id);
                 foreach($ls_query->local_supervisor_children as $sm) {
-                    array_push($access_users, $sm->id);                
+                    array_push($access_users, $sm->id);
                 }
             }
 
@@ -673,7 +734,7 @@ class SaleController extends Controller
                       ->orWhereIn('office_sale_man_id',$office_sale_man_arr);
             });
         }
-    
+
         if(Auth::user()->role->id == 7) {
             //for Local Supervisor user
             $ls_access_users = array();
@@ -698,7 +759,7 @@ class SaleController extends Controller
                             ->pluck('id')->toArray();
 
             $sales->whereIn('order_id',$orders);
-        } 
+        }
 
         if($request->order == "") {
             $order = "ASC";
@@ -711,11 +772,11 @@ class SaleController extends Controller
             }
             else {}
         } else {
-            $sales->orderBy('invoice_date', 'DESC'); 
+            $sales->orderBy('invoice_date', 'DESC');
         }
 
        //$data    =  $sales->orderBy('invoice_date', 'DESC')->get();
-        $data = $sales->get(); 
+        $data = $sales->get();
 
         return response(compact('data'), 200);
     }
@@ -766,7 +827,7 @@ class SaleController extends Controller
         }
 
         if($request->from_date != '' && $request->to_date != '')
-        {            
+        {
             $sales->whereBetween('invoice_date', array($request->from_date, $request->to_date));
         } else if($request->from_date != '') {
             $sales->whereDate('invoice_date', '>=', $request->from_date);
@@ -785,20 +846,20 @@ class SaleController extends Controller
 
         if($request->cus_type != "") {
             $sales->whereHas('customer', function ($query) use ($request) {
-                $query->where('customer_type_id', $request->cus_type);                         
+                $query->where('customer_type_id', $request->cus_type);
             });
         }
 
         if($request->township_id != "") {
             $sales->whereHas('customer', function ($query) use ($request) {
-                $query->where('township_id', $request->township_id);                         
+                $query->where('township_id', $request->township_id);
             });
         }
 
         if($request->sale_man_id != "") {
             $sales->whereHas('order', function ($query) use ($request) {
-                $query->where('sale_man_id', $request->sale_man_id);                         
-            });   
+                $query->where('sale_man_id', $request->sale_man_id);
+            });
         }
 
         if($request->office_sale_man_id != "") {
@@ -813,14 +874,14 @@ class SaleController extends Controller
                 array_push($access_users, $ls->id);
                 $ls_query = User::with('local_supervisor_children')->find($ls->id);
                 foreach($ls_query->local_supervisor_children as $sm) {
-                    array_push($access_users, $sm->id);                
+                    array_push($access_users, $sm->id);
                 }
             }
 
             foreach(Auth::user()->office_sale_mans as $osm) {
                 array_push($office_sale_man_arr, $osm->id);
             }
-            
+
             //get order user's order id
             $orders = DB::table('orders')
                             ->whereIn('created_by',$access_users)
@@ -832,7 +893,7 @@ class SaleController extends Controller
                       ->orWhereIn('office_sale_man_id',$office_sale_man_arr);
             });
         }
-    
+
         if(Auth::user()->role->id == 7) {
             //for Local Supervisor user
             $ls_access_users = array();
@@ -857,7 +918,7 @@ class SaleController extends Controller
                             ->pluck('id')->toArray();
 
             $sales->whereIn('order_id',$orders);
-        } 
+        }
 
         if($request->order == "") {
             $order = "ASC";
@@ -870,7 +931,7 @@ class SaleController extends Controller
             }
             else {}
         } else {
-            $sales->orderBy('invoice_date', 'DESC'); 
+            $sales->orderBy('invoice_date', 'DESC');
         }
 
        //$data    =  $sales->orderBy('invoice_date', 'DESC')->get();
@@ -886,14 +947,14 @@ class SaleController extends Controller
            'Content-Type' => 'application/pdf',
             'Content-Disposition' =>  'inline; filename="sale_invoice.pdf"',
         ]);*/
-  
+
         return $pdf->output();
 
     }
 
 
     //Daily Sale Product Wise Report
-    public function getDailySaleProductReportssss(Request $request) 
+    public function getDailySaleProductReportssss(Request $request)
     {
         ini_set('memory_limit','512M');
 
@@ -905,7 +966,7 @@ class SaleController extends Controller
         }
 
         if($request->from_date != '' && $request->to_date != '')
-        {            
+        {
             $sales->whereBetween('invoice_date', array($request->from_date, $request->to_date));
         } else if($request->from_date != '') {
             $sales->whereDate('invoice_date', '>=', $request->from_date);
@@ -936,14 +997,14 @@ class SaleController extends Controller
 
         if($request->brand_id != "") {
             $sales->whereHas('products', function ($query) use ($request) {
-                $query->where('brand_id', $request->brand_id);                         
+                $query->where('brand_id', $request->brand_id);
             });
         }
 
         if($request->sale_man_id != "") {
             $sales->whereHas('order', function ($query) use ($request) {
-                $query->where('sale_man_id', $request->sale_man_id);                         
-            });   
+                $query->where('sale_man_id', $request->sale_man_id);
+            });
         }
 
         if($request->office_sale_man_id != "") {
@@ -958,7 +1019,7 @@ class SaleController extends Controller
                 array_push($access_users, $ls->id);
                 $ls_query = User::with('local_supervisor_children')->find($ls->id);
                 foreach($ls_query->local_supervisor_children as $sm) {
-                    array_push($access_users, $sm->id);                
+                    array_push($access_users, $sm->id);
                 }
             }
 
@@ -977,7 +1038,7 @@ class SaleController extends Controller
                       ->orWhereIn('office_sale_man_id',$office_sale_man_arr);
             });
         }
-    
+
         if(Auth::user()->role->id == 7) {
             //for Local Supervisor user
             $ls_access_users = array();
@@ -1002,7 +1063,7 @@ class SaleController extends Controller
                             ->pluck('id')->toArray();
 
             $sales->whereIn('order_id',$orders);
-        } 
+        }
 
         if($request->order == "") {
             $order = "ASC";
@@ -1015,16 +1076,16 @@ class SaleController extends Controller
             }
             else {}
         } else {
-            $sales->orderBy('invoice_date', 'DESC'); 
+            $sales->orderBy('invoice_date', 'DESC');
         }
 
-       // $data    =  $sales->orderBy('invoice_date', 'DESC')->get(); 
+       // $data    =  $sales->orderBy('invoice_date', 'DESC')->get();
         $data = $sales->get();
 
         return response(compact('data'), 200);
     }
 
-    public function getDailySaleProductReport(Request $request) 
+    public function getDailySaleProductReport(Request $request)
     {
         ini_set('memory_limit','512M');
         ini_set('max_execution_time', 240);
@@ -1035,7 +1096,7 @@ class SaleController extends Controller
                     ->select(DB::raw("product_sale.*, sales.invoice_date, sales.invoice_no, sales.order_id, sales.branch_id, sales.warehouse_id, sales.customer_id, sales.office_sale_man_id, products.product_code, products.product_name, products.brand_id, brands.brand_name, u1.name as office_sale_man, customers.cus_name, uoms.uom_name, u2.name as sale_man,orders.sale_man_id,branches.branch_name"))
 
                     ->leftjoin('sales', 'sales.id', '=', 'product_sale.sale_id')
-                    
+
                     ->leftjoin('orders', 'orders.id', '=', 'sales.order_id')
 
                     ->leftjoin('products', 'products.id', '=', 'product_sale.product_id')
@@ -1047,7 +1108,7 @@ class SaleController extends Controller
                     ->leftjoin('uoms', 'uoms.id', '=', 'product_sale.uom_id')
 
                     ->leftjoin('users as u1', 'u1.id', '=', 'sales.office_sale_man_id')
-                    
+
                     ->leftjoin('users as u2', 'u2.id', '=', 'orders.sale_man_id')
 
                     ->leftjoin('branches', 'branches.id', '=', 'sales.branch_id');
@@ -1057,7 +1118,7 @@ class SaleController extends Controller
         }
 
         if($request->from_date != '' && $request->to_date != '')
-        {            
+        {
             $sales->whereBetween('sales.invoice_date', array($request->from_date, $request->to_date));
         } else if($request->from_date != '') {
             $sales->whereDate('sales.invoice_date', '>=', $request->from_date);
@@ -1094,18 +1155,18 @@ class SaleController extends Controller
         }
 
         if($request->product_name != "") {
-            //$products->where('products.product_name', 'LIKE', "%$request->product_name%"); 
+            //$products->where('products.product_name', 'LIKE', "%$request->product_name%");
             $binds = array(strtolower($request->product_name));
             $sales->whereRaw('lower(products.product_name) like lower(?)', ["%{$request->product_name}%"]);
         }
 
         /*if($request->brand_id != "") {
             $sales->whereHas('products', function ($query) use ($request) {
-                $query->where('brand_id', $request->brand_id);                         
+                $query->where('brand_id', $request->brand_id);
             });
         }*/
         if($request->brand_id != "") {
-            $sales->where('products.brand_id', $request->brand_id); 
+            $sales->where('products.brand_id', $request->brand_id);
         } else {
             if(Auth::user()->role->id == 6) {
                 //for Country Head User
@@ -1113,19 +1174,19 @@ class SaleController extends Controller
                 foreach(Auth::user()->brands as $brand) {
                     array_push($access_brands, $brand->id);
                 }
-                
+
                 $sales->whereIn('products.brand_id',$access_brands);
             }
         }
 
         /*if($request->sale_man_id != "") {
             $sales->whereHas('order', function ($query) use ($request) {
-                $query->where('sale_man_id', $request->sale_man_id);                         
-            });   
+                $query->where('sale_man_id', $request->sale_man_id);
+            });
         }*/
         if($request->sale_man_id != "") {
-            $sales->where('orders.sale_man_id', $request->sale_man_id);   
-        } 
+            $sales->where('orders.sale_man_id', $request->sale_man_id);
+        }
 
         if($request->office_sale_man_id != "") {
             $sales->where('sales.office_sale_man_id', $request->office_sale_man_id);
@@ -1139,7 +1200,7 @@ class SaleController extends Controller
                 array_push($access_users, $ls->id);
                 $ls_query = User::with('local_supervisor_children')->find($ls->id);
                 foreach($ls_query->local_supervisor_children as $sm) {
-                    array_push($access_users, $sm->id);                
+                    array_push($access_users, $sm->id);
                 }
             }
 
@@ -1158,7 +1219,7 @@ class SaleController extends Controller
                       ->orWhereIn('office_sale_man_id',$office_sale_man_arr);
             });
         }
-    
+
         if(Auth::user()->role->id == 7) {
             //for Local Supervisor user
             $ls_access_users = array();
@@ -1183,7 +1244,7 @@ class SaleController extends Controller
                             ->pluck('id')->toArray();
 
             $sales->whereIn('order_id',$orders);
-        } 
+        }
 
         if($request->order == "") {
             $order = "ASC";
@@ -1196,13 +1257,13 @@ class SaleController extends Controller
             }
             else {}
         } else {
-            $sales->orderBy('sales.invoice_date', 'DESC'); 
+            $sales->orderBy('sales.invoice_date', 'DESC');
         }
 
-       // $data    =  $sales->orderBy('invoice_date', 'DESC')->get(); 
+       // $data    =  $sales->orderBy('invoice_date', 'DESC')->get();
         $data = $sales->get();
-        
-        /*$access_brands = array();        
+
+        /*$access_brands = array();
 
         if(Auth::user()->role->id == 6) {
             //for Country Head User
@@ -1223,7 +1284,7 @@ class SaleController extends Controller
                 $html .= '<td class="mm-txt">'.$sale->branch_name.'</td>';
                 $html .= '<td class="mm-txt">'.$sale->cus_name.'</td>';
                 $html .= '<td class="mm-txt">'.$sale->sale_man.'</td>';
-                $html .= '<td class="mm-txt">'.$sale->office_sale_man.'</td>';              
+                $html .= '<td class="mm-txt">'.$sale->office_sale_man.'</td>';
                 $html .= '<td>'.$sale->product_code.'</td>';
                 $html .= '<td>'.$sale->product_name.'</td>';
                 $html .= '<td>'.$sale->product_quantity.'</td>';
@@ -1234,18 +1295,18 @@ class SaleController extends Controller
                 else {
                     $html .= '<td>FOC</td>';
                 }
-                
+
                 $html .='<td class="text-right">'.$sale->total_amount.'</td>';
                 $html .= '</tr>';
-                
+
                 if($sale->is_foc == 0){
                     $total = $total + $sale->total_amount;
                 }
-                
+
                 $i++;
-            
+
         }
-        
+
         $html .= '<tr><td colspan ="12" style="text-align: right;">Total</td><td class="text-right">'.number_format($total).'</td></tr>';
 
         return response(compact('html'), 200);
@@ -1289,7 +1350,7 @@ class SaleController extends Controller
            'Content-Type' => 'application/pdf',
             'Content-Disposition' =>  'inline; filename="sale_invoice.pdf"',
         ]);
-  
+
         //return $pdf->stream();
 
     }
@@ -1338,7 +1399,7 @@ class SaleController extends Controller
                     ->where('transition_sale_id', $id)
                     ->delete();
 
-           } else { 
+           } else {
             //update approval status in order_approvals table
                 DB::table('order_approvals')
                     ->where('id', $sale->order_approval_id)
@@ -1346,7 +1407,7 @@ class SaleController extends Controller
                 //update transition_sale_id by transition_approval_id in production_transitions table
                 DB::table('product_transitions')
                     ->where('transition_approval_id', $sale->order_approval_id)
-                    ->update(array('transition_sale_id' => NULL, 'updated_at' => time()));  
+                    ->update(array('transition_sale_id' => NULL, 'updated_at' => time()));
 
                 DB::table('product_transitions')
                     ->where('transition_approval_id', $sale->order_approval_id)
@@ -1394,7 +1455,7 @@ class SaleController extends Controller
         }
 
         if($request->inv_from_date != '' && $request->inv_to_date != '')
-        {            
+        {
             $data->whereBetween('invoice_date', array($request->inv_from_date, $request->inv_to_date));
         } else if($request->inv_from_date != '') {
             $data->whereDate('invoice_date', '>=', $request->inv_from_date);
@@ -1404,23 +1465,23 @@ class SaleController extends Controller
         } else {}
 
         if($request->app_from_date != '' && $request->app_to_date != '')
-        {            
+        {
            // $data->whereBetween('invoice_date', array($request->inv_from_date, $request->inv_to_date));
             $data->whereHas('approval', function ($query) use ($request) {
-                //$query->whereBetween('created_at', array($request->app_from_date, $request->app_to_date));  
-                $query->whereDate('created_at', '>=', $request->app_from_date); 
-                $query->whereDate('created_at', '<=', $request->app_to_date);                      
+                //$query->whereBetween('created_at', array($request->app_from_date, $request->app_to_date));
+                $query->whereDate('created_at', '>=', $request->app_from_date);
+                $query->whereDate('created_at', '<=', $request->app_to_date);
             });
         } else if($request->app_from_date != '') {
            // $data->whereDate('invoice_date', '>=', $request->inv_from_date);
             $data->whereHas('approval', function ($query) use ($request) {
-                $query->whereDate('created_at', '>=', $request->app_from_date);                         
+                $query->whereDate('created_at', '>=', $request->app_from_date);
             });
 
         }else if($request->app_to_date != '') {
            // $data->whereDate('invoice_date', '<=', $request->inv_to_date);
             $data->whereHas('approval', function ($query) use ($request) {
-                $query->whereDate('created_at', '<=', $request->app_to_date);                         
+                $query->whereDate('created_at', '<=', $request->app_to_date);
             });
         } else {}
 
@@ -1457,14 +1518,14 @@ class SaleController extends Controller
         }
 
         if($request->approval_no != '')
-        {            
+        {
            // $data->whereBetween('invoice_date', array($request->inv_from_date, $request->inv_to_date));
             $data->whereHas('approval', function ($query) use ($request) {
-                $query->where('approval_no', $request->approval_no);                         
+                $query->where('approval_no', $request->approval_no);
             });
         }
 
-        $data = $data->orderBy('id', 'DESC')->paginate($limit); 
+        $data = $data->orderBy('id', 'DESC')->paginate($limit);
 
         return response(compact('data'), 200);
     }

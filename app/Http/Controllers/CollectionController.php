@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AccountTransition;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
@@ -48,7 +49,7 @@ class CollectionController extends Controller
         }
 
         if($request->from_date != '' && $request->to_date != '')
-        {            
+        {
             $data->whereBetween('collection_date', array($request->from_date, $request->to_date));
         } else if($request->from_date != '') {
             $data->whereDate('collection_date', '>=', $request->from_date);
@@ -63,7 +64,7 @@ class CollectionController extends Controller
             $data->where('customer_id', $request->customer_id);
         }
 
-        $data = $data->orderBy('id', 'DESC')->get(); 
+        $data = $data->orderBy('id', 'DESC')->get();
         return response(compact('data'), 200);
     }
     /**
@@ -98,9 +99,23 @@ class CollectionController extends Controller
         }
 
         $collection->created_by = Auth::user()->id;
-        //$collection->updated_by = Auth::user()->id;        
+        //$collection->updated_by = Auth::user()->id;
         $collection->save();
-
+        $description="Inv ".$collection->collection_no.",Inv Date ".$collection->collection_date." to " .$collection->customer->cus_name;
+        $sub_account_id=10;   /*sub account  id for sale collection*/
+        if($collection){
+            AccountTransition::create([
+                'sub_account_id' => $sub_account_id,
+                'transition_date' => $request->collection_date,
+                'purchase_id' => $collection->id,
+                'is_cashbook' => 1,
+                'description'=>$description,
+                'vochur_no'=>$collection_no,
+                'debit' => $collection->total_paid_amount,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
+            ]);
+        }
         for($i=0; $i<count($request->invoices); $i++) {
         	//add invoices into pivot table
         	$pivot = $collection->sales()->attach($request->invoices[$i],['paid_amount' => $request->payments[$i], 'discount' => $request->discounts[$i]]);
@@ -111,9 +126,9 @@ class CollectionController extends Controller
 		      						->select(DB::raw("SUM(paid_amount)  as total_paid, SUM(discount)  as total_discount"))
 		      						->where('sale_id', $request->invoices[$i])
 		      						->groupBy('sale_id')
-		   							->first(); 
-    		if($collect_qry) { 
-    			$collection_amount = $collect_qry->total_paid + $collect_qry->total_discount;	        	
+		   							->first();
+    		if($collect_qry) {
+    			$collection_amount = $collect_qry->total_paid + $collect_qry->total_discount;
 	        } else {
 	        	$collection_amount = 0;
 	        }
@@ -151,9 +166,28 @@ class CollectionController extends Controller
         $collection->branch_id = $request->branch_id;
 
         $collection->updated_at = time();
-        $collection->updated_by = Auth::user()->id;          
+        $collection->updated_by = Auth::user()->id;
         $collection->save();
-        
+        $sub_account_id=10;    /*sub account id for credit payment */
+        $description="Inv ".$collection->collection_no.",Inv Date ".$collection->collection_date." to " .$collection->customer->cus_name;
+        if($collection){
+            if($collection->total_paid_amount!=0){
+                AccountTransition::where('sale_id',$id)->update([
+                    'sub_account_id' => $sub_account_id,
+                    'transition_date' => $request->collection_date,
+                    'sale_id' => $collection->id,
+                    'vochur_no'=>$request->collection_no,
+                    'description'=>$description,
+                    'is_cashbook' => 1,
+                    'debit' => $collection->total_paid_amount,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
+                ]);
+            }elseif($collection->total_paid_amount==0){
+                AccountTransition::where('sale_id',$id)->delete();
+            }
+
+        }
         //update collection amount for removed sales
     	foreach($request->remove_pivot_id as $key => $val) {
     		//get paid amount and discount value before delete
@@ -187,16 +221,16 @@ class CollectionController extends Controller
 		      						->select(DB::raw("SUM(paid_amount)  as total_paid, SUM(discount)  as total_discount"))
 		      						->where('sale_id', $request->invoices[$i])
 		      						->groupBy('sale_id')
-		   							->first(); 
-    		if($collect_qry) { 
-    			$collection_amount = $collect_qry->total_paid + $collect_qry->total_discount;	       	        	
+		   							->first();
+    		if($collect_qry) {
+    			$collection_amount = $collect_qry->total_paid + $collect_qry->total_discount;
 	        } else {
-	        	$collection_amount = 0;	
+	        	$collection_amount = 0;
 	        }
 	        $sale = Sale::find($request->invoices[$i]);
         	$sale->collection_amount = $collection_amount;
         	$sale->save();
-	        
+
         }
 
         $status = "success";
@@ -265,7 +299,7 @@ class CollectionController extends Controller
         $collection->sales()->detach();
 
         $collection->delete();
-        
+
         return response(['message' => 'delete successful']);
     }
 }
