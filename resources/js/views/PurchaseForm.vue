@@ -1207,7 +1207,7 @@ export default {
             cell9.appendChild(t9);
             var cell10=row.insertCell(5);
             cell10.className = "text-center";
-            var row_action = "<a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>";
+            var row_action = "<a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>    ";
             $(cell10).append(row_action);
             $(".txt_qty").on("keyup", function(e) {
                 app.calTotalAmount($('#qty_'+row_id));

@@ -105,7 +105,7 @@ class PurchaseCollectionController extends Controller
                     'purchase_id' => $p_collection->id,
                     'is_cashbook' => 1,
                     'description'=>$description,
-                    'voucher_no'=>$p_collection->collection_no,
+                    'vochur_no'=>$p_collection->collection_no,
                     'credit' => $total_paid_amount,
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,

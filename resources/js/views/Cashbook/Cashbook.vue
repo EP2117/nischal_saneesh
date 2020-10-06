@@ -321,7 +321,6 @@ export default {
             axios.get('/cashbook/get_all_cashbook?page='+ page + search).then(function (response){
                 $("#loading").hide();
                 let data=response.data.account_transition;
-                // console.log(data);
                 app.cashbook=data;
                 app.cashbook_count=data.length;
             //     app.opening_balance=response.data.opening_balance;
