@@ -35,10 +35,10 @@ class PurchaseInvoiceController extends Controller
         if(isset($request->branch_id) && $request->branch_id != "") {
             $data->where('branch_id', $request->branch_id);
         }
-
-        if($request->office_purchase_man_id != "") {
-            $data->where('office_sale_man_id', $request->office_purchase_man_id);
-        }
+//
+//        if($request->office_purchase_man_id != "") {
+//            $data->where('office_sale_man_id', $request->office_purchase_man_id);
+//        }
 
         if($request->ref_no != "") {
             $data->where('reference_no','LIKE','%'.$request->ref_no.'%');
@@ -61,7 +61,7 @@ class PurchaseInvoiceController extends Controller
         }else{
             $no=$latest->id;
         }
-        $invoice_no = "PI".str_pad((int)$no + 1,8,"0",STR_PAD_LEFT);
+        $invoice_no = "PI".str_pad((int)$no + 1,5,"0",STR_PAD_LEFT);
         $p->invoice_no = $invoice_no;
         $p->branch_id = Auth::user()->branch_id;
         $p->reference_no = $request->reference_no;
@@ -74,7 +74,7 @@ class PurchaseInvoiceController extends Controller
         $p->pay_amount = $request->pay_amount;
         $p->balance_amount = $request->balance_amount;
         if($request->payment_type == 'credit') {
-            $sub_account_id=6;       /*Credit Payment Sub account ID */
+            $sub_account_id=config('global.purchase_advance');       /*Credit Payment Sub account ID */
             if($request->pay_amount!=0){
                 $amount=$request->pay_amount;
             }else{
@@ -84,7 +84,7 @@ class PurchaseInvoiceController extends Controller
             $p->due_date = $request->due_date;
             $p->credit_day = $request->credit_day;
         } else {
-            $sub_account_id=5;        /*Purchase Sub account ID */
+            $sub_account_id=config('global.purchase');        /*Purchase Sub account ID */
             $amount=$request->pay_amount;
             $p->payment_type = 'cash';
         }
@@ -194,14 +194,14 @@ class PurchaseInvoiceController extends Controller
             if($request->pay_amount != 0){
                 $amount=$request->pay_amount;
             }
-            $sub_account_id=6;
+            $sub_account_id=config('global.purchase_advance');
             $p->payment_type = 'credit';
             $p->due_date = $request->due_date;
             $p->credit_day = $request->credit_day;
         } else {
             $p->payment_type = 'cash';
             $amount=$request->sub_total;
-            $sub_account_id=5;        /*Purchase Sub account ID */
+            $sub_account_id=config('global.purchase');        /*Purchase Sub account ID */
         }
 
         $p->updated_at = time();
@@ -346,6 +346,11 @@ class PurchaseInvoiceController extends Controller
 
 
         $p->delete();
+        AccountTransition::where('purchase_id',$id)
+            ->where('sub_account_id',config('global.purchase'))
+            ->orWhere('sub_account_id',config('global.purchase_advance'))
+            ->delete();
+
         return response(['message' => 'delete successful']);
     }
     public function getPreviousBalance($id)

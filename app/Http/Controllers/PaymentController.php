@@ -13,6 +13,15 @@ class PaymentController extends Controller
         if($request->cash_payment_no!=null){
             $payment->where('cash_payment_no',$request->cash_payment_no);
         }
+        if($request->from_date != '' && $request->to_date != '')
+        {
+            $payment->whereBetween('date', array($request->from_date, $request->to_date));
+        } else if($request->from_date != '') {
+            $payment->whereDate('date', '>=', $request->from_date);
+
+        }else if($request->to_date != '') {
+            $payment->whereDate('date', '<=', $request->to_date);
+        }
         if($request->debit!=null){
             $payment->where('debit_id',$request->debit);
         }

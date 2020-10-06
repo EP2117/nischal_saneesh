@@ -319,7 +319,7 @@ class SaleController extends Controller
         $sale->sale_type  = $request->sale_type;
 
         if($request->payment_type == 'credit') {
-            $sub_account_id=9;     /*sub account_id for sale advance*/
+            $sub_account_id=config('global.sale_advance');     /*sub account_id for sale advance*/
             if($request->pay_amount!=0){
                 $amount=$request->pay_amount;
             }
@@ -327,7 +327,7 @@ class SaleController extends Controller
             $sale->due_date = $request->due_date;
             $sale->credit_day = $request->credit_day;
         } else {
-            $sub_account_id=8;     /*sub account_id for sale*/
+            $sub_account_id=config('global.sale');     /*sub account_id for sale*/
             $amount=$request->pay_amount;
             $sale->payment_type = 'cash';
         }
@@ -430,7 +430,7 @@ class SaleController extends Controller
         $sale->sale_type  = $request->sale_type;
 
         if($request->payment_type == 'credit') {
-            $sub_account_id=9;     /*sub account_id for sale advance*/
+            $sub_account_id=config('global.sale_advance');     /*sub account_id for sale advance*/
             if($request->pay_amount!=0){
                 $amount=$request->pay_amount;
             }
@@ -438,7 +438,7 @@ class SaleController extends Controller
             $sale->due_date = $request->due_date;
             $sale->credit_day = $request->credit_day;
         } else {
-            $sub_account_id=8;     /*sub account_id for sale*/
+            $sub_account_id=config('global.sale');     /*sub account_id for sale*/
             $amount=$request->pay_amount;
             $sale->payment_type = 'cash';
         }
@@ -1420,9 +1420,12 @@ class SaleController extends Controller
             }
         }
         $sale->delete();
+        AccountTransition::where('sale_id',$id)
+            ->where('sub_account_id',config('global.sale'))
+            ->orWhere('sub_account_id',config('global.sale_advance'))
+            ->delete();
         return response(['message' => 'delete successful']);
     }
-
     //update delivery approval in sales table
     public function deliveryApproval($sale_id, $status)
     {

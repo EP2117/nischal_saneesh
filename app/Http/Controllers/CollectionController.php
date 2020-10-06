@@ -102,7 +102,7 @@ class CollectionController extends Controller
         //$collection->updated_by = Auth::user()->id;
         $collection->save();
         $description="Inv ".$collection->collection_no.",Inv Date ".$collection->collection_date." to " .$collection->customer->cus_name;
-        $sub_account_id=10;   /*sub account  id for sale collection*/
+        $sub_account_id=config('global.sale_collection');   /*sub account  id for sale collection*/
         if($collection){
             AccountTransition::create([
                 'sub_account_id' => $sub_account_id,
@@ -293,13 +293,16 @@ class CollectionController extends Controller
             $sale = Sale::find($relation->sale_id);
             $collection_amount = $sale->collection_amount - $sale_col_amt;
         	$sale->collection_amount = $collection_amount;
-        	$sale->save();
+            AccountTransition::where('sale_id',$id)->where('sub_account_id',7)->delete();
+            $sale->save();
         }
 
         $collection->sales()->detach();
 
         $collection->delete();
-
+        AccountTransition::where('sale_id',$id)
+            ->where('sub_account_id',config('global.sale_collection'))
+            ->delete();
         return response(['message' => 'delete successful']);
     }
 }

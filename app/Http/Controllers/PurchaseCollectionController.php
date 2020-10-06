@@ -97,7 +97,7 @@ class PurchaseCollectionController extends Controller
             ]);
             $description="P".$p_collection->collection_no.",Inv Date ".$p_collection->collection_date." by " .$p_collection->supplier->name;
 
-            $sub_account_id=7;    /*sub account id for credit payment */
+            $sub_account_id=config('global.credit_payment');    /*sub account id for credit payment */
             if($p_collection){
                 AccountTransition::create([
                     'sub_account_id' => $sub_account_id,
@@ -183,7 +183,7 @@ class PurchaseCollectionController extends Controller
             $collection->updated_at = time();
             $collection->updated_by = Auth::user()->id;
             $collection->save();
-            $sub_account_id=7;    /*sub account id for credit payment */
+            $sub_account_id=config('global.credit_payment');    /*sub account id for credit payment */
             $description="Inv ".$collection->collection_no.",Inv Date ".$collection->collection_date." to " .$collection->supplier->name;
             if($collection){
                 if($collection->total_paid_amount!=0){
@@ -275,10 +275,11 @@ class PurchaseCollectionController extends Controller
             $p->collection_amount = $collection_amount;
             $p->save();
         }
-
         $collection->purchases()->detach();
-
         $collection->delete();
+        AccountTransition::where('purchase_id',$id)
+            ->where('sub_account_id',config('global.credit_payment'))
+            ->delete();
 
         return response(['message' => 'delete successful']);
     }

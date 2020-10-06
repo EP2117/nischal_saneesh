@@ -946,7 +946,7 @@ export default {
             // console.log("Row Id =" +row_id);
             let app = this;
             var table=document.getElementById("product_table");
-            var row=table.insertRow((table.rows.length)-5);
+            var row=table.insertRow((table.rows.length)-4);
             // var cell1=row.insertCell(0);
             row.id = row_id;
             // // brand select
@@ -1686,7 +1686,7 @@ export default {
                             // t2.addEventListener('blur', function(){ app.checkQty(t2); });
                             cell9.appendChild(t9);
 
-                            var cell10=row.insertCell(6);
+                            var cell10=row.insertCell(5);
                             cell10.className = "text-center";
                             if((app.user_role == 'admin' || app.user_role == 'system') && !app.isDisabled)
                             {

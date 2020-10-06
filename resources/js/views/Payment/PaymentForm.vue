@@ -71,7 +71,7 @@
                             <div class="col-lg-6 col-md-offset-2">
                                 <textarea class="form-control" type="text"
                                           id="remark"
-                                          v-model="form.remark" required ></textarea>
+                                          v-model="form.remark"  ></textarea>
                             </div>
                         </div>
                         <div class="form-group row text-right">

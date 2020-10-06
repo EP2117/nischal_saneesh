@@ -4,8 +4,7 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#!"><i class="feather icon-home"></i></a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/'">Home</a></li>
-                <li class="breadcrumb-item" v-if="purchase_type == 1"><a :href="site_path+'/office'">Office Sale</a></li>
-                <li class="breadcrumb-item" v-else><a :href="site_path+'/van'">Van Sale</a></li>
+                <li class="breadcrumb-item" ><a :href="site_path+'/purchase_office'">Office Purchase</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Purchase Invoice</li>
             </ol>
         </nav>
@@ -207,7 +206,7 @@
 <!--                                    </td>-->
 <!--                                </template>-->
 
-                                <td class="text-center">
+                                <td class="text-center" v-if="p.collection_amount==0">
                                     <!-- before delivery -->
                                     <!--<router-link tag="span" :to="'/sale/'+sale_type+'/edit/' + sale.id" >
                                         <a href="#" title="Edit/View" class="">
@@ -541,8 +540,8 @@ export default {
 
     mounted() {
         let app = this;
-        app.initPurchaseMan();
-        app.initOfficePurchaseMan();
+        // app.initPurchaseMan();
+        // app.initOfficePurchaseMan();
         app.initSuppliers();
         app.initBranches();
         //app.calcLStorageSize();
@@ -632,20 +631,20 @@ export default {
 
     methods: {
 
-        initPurchaseMan() {
-            axios.get("/sale_man").then(({ data }) => (this.purchase_mans = data.data));
-            $("#sale_man_id").select2();
-        },
+        // initPurchaseMan() {
+        //     axios.get("/sale_man").then(({ data }) => (this.purchase_mans = data.data));
+        //     $("#sale_man_id").select2();
+        // },
 
         initBranches() {
             axios.get("/branches_byuser").then(({ data }) => (this.branches = data.data));
             $("#branch_id").select2();
         },
 
-        initOfficePurchaseMan() {
-            axios.get("/office_sale_man").then(({ data }) => (this.office_sale_mans = data.data));
-            $("#office_purchase_man_id").select2();
-        },
+        // initOfficePurchaseMan() {
+        //     axios.get("/office_sale_man").then(({ data }) => (this.office_sale_mans = data.data));
+        //     $("#office_purchase_man_id").select2();
+        // },
         initSuppliers() {
             axios.get("/supplier").then(({ data }) => (this.suppliers = data.data));
             $("#supplier_id").select2();

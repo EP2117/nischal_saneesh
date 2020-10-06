@@ -14,6 +14,15 @@ class ReceiptController extends Controller
         if($request->cash_receipt_no!=null){
             $receipt->where('cash_receipt_no',$request->cash_receipt_no);
         }
+        if($request->from_date != '' && $request->to_date != '')
+        {
+            $receipt->whereBetween('date', array($request->from_date, $request->to_date));
+        } else if($request->from_date != '') {
+            $receipt->whereDate('date', '>=', $request->from_date);
+
+        }else if($request->to_date != '') {
+            $receipt->whereDate('date', '<=', $request->to_date);
+        }
         if($request->debit!=null){
             $receipt->where('debit_id',$request->debit);
         }

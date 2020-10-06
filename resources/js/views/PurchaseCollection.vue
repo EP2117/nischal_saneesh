@@ -11,9 +11,9 @@
         </nav>
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h4 class="mb-0 text-gray-800">Collection</h4>
+            <h4 class="mb-0 text-gray-800">Payment</h4>
             <router-link :to="'/purchase_collection/new'" class="d-sm-inline-block btn btn-primary shadow-sm inventory">
-                <i class="fas fa-plus"></i> Add New Collection
+                <i class="fas fa-plus"></i> Add New Payment
             </router-link>
         </div>
 
@@ -74,7 +74,7 @@
         <!-- table start -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Collection List</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Payment List</h6>
             </div>
             <div class="card-body">
                 <div class="table-responsive" v-if="collections.length > 0">
@@ -82,22 +82,22 @@
                         <thead>
                         <tr>
                             <th class="text-center">No.</th>
-                            <th class="text-center">Collection No.</th>
-                            <th class="text-center">Collection Date</th>
+                            <th class="text-center">Payment No.</th>
+                            <th class="text-center">Payment Date</th>
                             <th class="text-center">Branch</th>
                             <th class="text-center">Supplier</th>
-                            <th class="text-center">Collect Amount</th>
+                            <th class="text-center">Payment Amount</th>
                             <th class="text-center">  </th> <!--Kamlesh -->
                         </tr>
                         </thead>
                         <tfoot>
                         <tr>
                             <th class="text-center">No.</th>
-                            <th class="text-center">Collection No.</th>
-                            <th class="text-center">Collection Date</th>
+                            <th class="text-center">Payment No.</th>
+                            <th class="text-center">Payment Date</th>
                             <th class="text-center">Branch</th>
                             <th class="text-center">Supplier</th>
-                            <th class="text-center">Collect Amount</th>
+                            <th class="text-center">Payment Amount</th>
                             <th class="text-center">  </th> <!--Kamlesh -->
                         </tr>
                         </tfoot>

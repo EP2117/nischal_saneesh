@@ -23,6 +23,17 @@
             <div class="card-body">
                 <div class="row">
                     <div class="form-group col-md-4 col-lg-3">
+                        <label for="from_date">From Date</label>
+                        <input type="text" class="form-control datetimepicker" id="from_date" name="from_date"
+                               v-model="search.from_date">
+                    </div>
+
+                    <div class="form-group col-md-4 col-lg-3">
+                        <label for="to_date">To Date</label>
+                        <input type="text" class="form-control datetimepicker" id="to_date" name="to_date"
+                               v-model="search.to_date">
+                    </div>
+                    <div class="form-group col-md-4 col-lg-3">
                         <label>Cash Payment No</label>
                         <input type="text" class="form-control" autocomplete="off" id="sub_account" name="sub_account" v-model="search.cash_payment_no">
                     </div>
@@ -192,6 +203,8 @@ export default {
     data(){
         return{
             search:{
+                from_date:'',
+                to_date:'',
                 cash_payment_no:'',
                 debit:'',
                 credit:'',
@@ -231,6 +244,67 @@ export default {
     mounted() {
         this.initDebit();
         this.initCredit();
+        $("#from_date")
+            .datetimepicker({
+                icons: {
+                    time: "fa fa-clock-o",
+                    date: "fa fa-calendar",
+                    up: "fa fa-chevron-up",
+                    down: "fa fa-chevron-down",
+                    previous: "fa fa-chevron-left",
+                    next: "fa fa-chevron-right",
+                    today: "fa fa-screenshot",
+                    clear: "fa fa-trash",
+                    close: "fa fa-remove"
+                },
+                format:"YYYY-MM-DD",
+                minDate: app.user_year+"-01-01",
+                maxDate: app.user_year+"-12-31",
+            })
+            .on("dp.show", function(e) {
+                var y = new Date().getFullYear();
+                if(app.user_year < y) {
+                    if(app.search.from_date == app.user_year+"-12-31" || app.search.from_date == '') {
+                        app.search.from_date = app.user_year+"-12-31";
+                    }
+                }
+            })
+            .on("dp.change", function(e) {
+                var formatedValue = e.date.format("YYYY-MM-DD");
+                //console.log(formatedValue);
+                app.search.from_date = formatedValue;
+            });
+
+        $("#to_date")
+            .datetimepicker({
+                icons: {
+                    time: "fa fa-clock-o",
+                    date: "fa fa-calendar",
+                    up: "fa fa-chevron-up",
+                    down: "fa fa-chevron-down",
+                    previous: "fa fa-chevron-left",
+                    next: "fa fa-chevron-right",
+                    today: "fa fa-screenshot",
+                    clear: "fa fa-trash",
+                    close: "fa fa-remove"
+                },
+                format:"YYYY-MM-DD",
+                minDate: app.user_year+"-01-01",
+                maxDate: app.user_year+"-12-31",
+            })
+            .on("dp.show", function(e) {
+                var y = new Date().getFullYear();
+                if(app.user_year < y) {
+                    if(app.search.to_date == app.user_year+"-12-31" || app.search.to_date == '') {
+                        app.search.to_date = app.user_year+"-12-31";
+                    }
+                }
+            })
+            .on("dp.change", function(e) {
+                var formatedValue = e.date.format("YYYY-MM-DD");
+                //console.log(formatedValue);
+                app.search.to_date = formatedValue;
+            });
     },
     methods:{
         initDebit(){
@@ -244,6 +318,10 @@ export default {
             // alert(page);
             let app = this;
             var search =
+                "&from_date=" +
+                app.search.from_date +
+                "&to_date=" +
+                app.search.to_date +
                 "&cash_payment_no=" +
                 app.search.cash_payment_no +
                 "&debit=" +
