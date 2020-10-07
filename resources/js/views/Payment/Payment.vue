@@ -222,6 +222,7 @@ export default {
             perPage: 30,
             currentPage: 1,
             rows:'',
+            user_year:'',
             credit:[],
             debit:[],
 
@@ -229,6 +230,8 @@ export default {
     },
     created() {
         // console.log(this.perPage);
+        this.user_year = document.querySelector("meta[name='user-year-likelink']").getAttribute('content');
+
         this.user_role = document.querySelector("meta[name='user-role']").getAttribute('content');
 
         this.site_path = document.querySelector("meta[name='site-path']").getAttribute('content');
@@ -242,6 +245,7 @@ export default {
         this.getPayment();
     },
     mounted() {
+        let app=this;
         this.initDebit();
         this.initCredit();
         $("#from_date")
