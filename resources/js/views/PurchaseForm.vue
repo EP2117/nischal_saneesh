@@ -699,14 +699,10 @@ export default {
                 var date2 = new Date(app.form.due_date);
                 // To calculate the time difference of two dates
                 var Difference_In_Time = date2.getTime() - date1.getTime();
-
                 // To calculate the no. of days between two dates
                 var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
                 app.form.credit_day = Difference_In_Days;
-
             });
-
-
 
         /*$(document).on('click','.add-new',function(evt){
             app.addProduct();
@@ -950,7 +946,7 @@ export default {
             // console.log("Row Id =" +row_id);
             let app = this;
             var table=document.getElementById("product_table");
-            var row=table.insertRow((table.rows.length)-5);
+            var row=table.insertRow((table.rows.length)-4);
             // var cell1=row.insertCell(0);
             row.id = row_id;
             // // brand select
@@ -1211,7 +1207,7 @@ export default {
             cell9.appendChild(t9);
             var cell10=row.insertCell(5);
             cell10.className = "text-center";
-            var row_action = "<a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>";
+            var row_action = "<a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>    ";
             $(cell10).append(row_action);
             $(".txt_qty").on("keyup", function(e) {
                 app.calTotalAmount($('#qty_'+row_id));
@@ -1307,7 +1303,7 @@ export default {
                         if(app.user_role != "Country Head" || (app.user_role == "Country Head")) {
 
                             var table=document.getElementById("product_table");
-                            var row=table.insertRow((table.rows.length) - 5);
+                            var row=table.insertRow((table.rows.length) - 4);
                             row.id = row_id;
 
                             // var cell1=row.insertCell(0);
@@ -1690,7 +1686,7 @@ export default {
                             // t2.addEventListener('blur', function(){ app.checkQty(t2); });
                             cell9.appendChild(t9);
 
-                            var cell10=row.insertCell(6);
+                            var cell10=row.insertCell(5);
                             cell10.className = "text-center";
                             if((app.user_role == 'admin' || app.user_role == 'system') && !app.isDisabled)
                             {

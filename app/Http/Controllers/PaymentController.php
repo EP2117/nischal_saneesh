@@ -13,6 +13,15 @@ class PaymentController extends Controller
         if($request->cash_payment_no!=null){
             $payment->where('cash_payment_no',$request->cash_payment_no);
         }
+        if($request->from_date != '' && $request->to_date != '')
+        {
+            $payment->whereBetween('date', array($request->from_date, $request->to_date));
+        } else if($request->from_date != '') {
+            $payment->whereDate('date', '>=', $request->from_date);
+
+        }else if($request->to_date != '') {
+            $payment->whereDate('date', '<=', $request->to_date);
+        }
         if($request->debit!=null){
             $payment->where('debit_id',$request->debit);
         }
@@ -29,7 +38,7 @@ class PaymentController extends Controller
         }else{
             $no=$latest->id;
         }
-        $invoice_no = "INV".str_pad((int)$no + 1,8,"0",STR_PAD_LEFT);
+        $invoice_no = "CP".str_pad((int)$no + 1,8,"0",STR_PAD_LEFT);
 
         $cash_payment_no = str_pad($invoice_no,5,"0",STR_PAD_LEFT);
         $payment=Payment::create([
@@ -44,8 +53,9 @@ class PaymentController extends Controller
         ]);
         if ($payment) {
             AccountTransition::create([
-                'sub_account_id' => $payment->credit->id,
+                'sub_account_id' => $payment->debit->id,
                 'transition_date' => $payment->date,
+                'vochur_no'=>$cash_payment_no,
                 'payment_id' => $payment->id,
                 'is_cashbook' => 1,
                 'credit' => $payment->amount,
@@ -57,6 +67,7 @@ class PaymentController extends Controller
                 'sub_account_id' => $payment->debit->id,
                 'transition_date' => $payment->date,
                 'payment_id' => $payment->id,
+                'vochur_no'=>$cash_payment_no,
                 'is_cashbook' => 0,
                 'debit' => $payment->amount,
                 'description' => $payment->remark,
@@ -67,6 +78,7 @@ class PaymentController extends Controller
                 'sub_account_id' => $payment->credit->id,
                 'transition_date' => $payment->date,
                 'payment_id' => $payment->id,
+                'vochur_no'=>$cash_payment_no,
                 'is_cashbook' => 0,
                 'credit' => $payment->amount,
                 'description' => $payment->remark,
@@ -103,7 +115,8 @@ class PaymentController extends Controller
         $payment =Payment::whereId($id)->first();
         if($payment){
             AccountTransition::where('payment_id',$id)->update([
-                'sub_account_id' => $payment->credit->id,
+                'sub_account_id' => $payment->debit->id,
+                'vochur_no'=>$payment->cash_receipt_no,
                 'transition_date' => $payment->date,
                 'payment_id' => $payment->id,
                 'is_cashbook' => 1,
@@ -115,6 +128,7 @@ class PaymentController extends Controller
             AccountTransition::where('payment_id',$id)->update([
                 'sub_account_id' => $payment->debit->id,
                 'transition_date' => $payment->date,
+                'vochur_no'=>$payment->cash_receipt_no,
                 'payment_id' => $payment->id,
                 'is_cashbook' => 0,
                 'debit' => $payment->amount,
@@ -126,6 +140,7 @@ class PaymentController extends Controller
                 'sub_account_id' => $payment->credit->id,
                 'transition_date' => $payment->date,
                 'payment_id' => $payment->id,
+                'vochur_no'=>$payment->cash_receipt_no,
                 'is_cashbook' => 0,
                 'credit' => $payment->amount,
                 'description' => $payment->remark,

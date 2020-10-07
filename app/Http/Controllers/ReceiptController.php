@@ -14,6 +14,15 @@ class ReceiptController extends Controller
         if($request->cash_receipt_no!=null){
             $receipt->where('cash_receipt_no',$request->cash_receipt_no);
         }
+        if($request->from_date != '' && $request->to_date != '')
+        {
+            $receipt->whereBetween('date', array($request->from_date, $request->to_date));
+        } else if($request->from_date != '') {
+            $receipt->whereDate('date', '>=', $request->from_date);
+
+        }else if($request->to_date != '') {
+            $receipt->whereDate('date', '<=', $request->to_date);
+        }
         if($request->debit!=null){
             $receipt->where('debit_id',$request->debit);
         }
@@ -30,7 +39,7 @@ class ReceiptController extends Controller
         }else{
             $no=$latest->id;
         }
-        $invoice_no = "INV".str_pad((int)$no + 1,8,"0",STR_PAD_LEFT);
+        $invoice_no = "CR".str_pad((int)$no + 1,8,"0",STR_PAD_LEFT);
         $cash_receipt_no = str_pad($invoice_no,5,"0",STR_PAD_LEFT);
         $receipt=Recepit::create([
             'cash_receipt_no'=>$cash_receipt_no,
@@ -44,10 +53,11 @@ class ReceiptController extends Controller
         ]);
         if($receipt){
             AccountTransition::create([
-                'sub_account_id'=>$receipt->debit->id,
+                'sub_account_id'=>$receipt->credit->id,
                 'transition_date'=>$receipt->date,
                 'receipt_id'=>$receipt->id,
                 'is_cashbook'=>1,
+                'vochur_no'=>$cash_receipt_no,
                 'debit'=>$receipt->amount,
                 'description'=>$receipt->remark,
                 'created_by'=>Auth::user()->id,
@@ -57,6 +67,8 @@ class ReceiptController extends Controller
                 'sub_account_id'=>$receipt->debit->id,
                 'transition_date'=>$receipt->date,
                 'receipt_id'=>$receipt->id,
+                'vochur_no'=>$cash_receipt_no,
+
                 'is_cashbook'=>0,
                 'debit'=>$receipt->amount,
                 'description'=>$receipt->remark,
@@ -67,6 +79,7 @@ class ReceiptController extends Controller
                 'sub_account_id'=>$receipt->credit->id,
                 'transition_date'=>$receipt->date,
                 'receipt_id'=>$receipt->id,
+                'vochur_no'=>$cash_receipt_no,
                 'is_cashbook'=>0,
                 'credit'=>$receipt->amount,
                 'description'=>$receipt->remark,
@@ -102,8 +115,9 @@ class ReceiptController extends Controller
         $receipt=Recepit::whereId($id)->first();
         if($receipt){
             AccountTransition::where('receipt_id',$id)->update([
-                'sub_account_id'=>$receipt->debit->id,
+                'sub_account_id'=>$receipt->credit->id,
                 'transition_date'=>$receipt->date,
+                'vochur_no'=>$receipt->cash_receipt_no,
                 'receipt_id'=>$receipt->id,
                 'is_cashbook'=>1,
                 'debit'=>$receipt->amount,
@@ -115,6 +129,7 @@ class ReceiptController extends Controller
                 'sub_account_id'=>$receipt->debit->id,
                 'transition_date'=>$receipt->date,
                 'receipt_id'=>$receipt->id,
+                'vochur_no'=>$receipt->cash_receipt_no,
                 'is_cashbook'=>0,
                 'debit'=>$receipt->amount,
                 'description'=>$receipt->remark,
@@ -127,6 +142,7 @@ class ReceiptController extends Controller
                 'receipt_id'=>$receipt->id,
                 'is_cashbook'=>0,
                 'credit'=>$receipt->amount,
+                'vochur_no'=>$receipt->cash_receipt_no,
                 'description'=>$receipt->remark,
                 'created_by'=>Auth::user()->id,
                 'updated_by'=>Auth::user()->id,

@@ -1,0 +1,9 @@
+<?php
+  return[
+      'purchase'=>5,
+      'purchase_advance'=>6,
+      'credit_payment'=>7,
+      'sale'=>8,
+      'sale_advance'=>9,
+      'sale_collection'=>10,
+  ];

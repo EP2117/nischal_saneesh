@@ -429,6 +429,15 @@
                         </a>
                     </router-link>
                 @endif
+                    @if(Request::path() != 'van' && (Auth::user()->role->id == 1 || Auth::user()->role->id == 2))
+                        <hr class="sidebar-divider">
+                        <router-link  tag="li" to="/cashbook" class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-receipt"></i>
+                                <span>Cashbook</span>
+                            </a>
+                        </router-link>
+                    @endif
 
 
 
@@ -482,6 +491,13 @@
                 <span>Daily Sale Product Wise Report</span>
             </a>
         </router-link>
+                <hr class="sidebar-divider">
+                <router-link  tag="li" to="/report/daily_purchase_product_report" class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Daily Purchase Product Wise Report</span>
+                    </a>
+                </router-link>
 
         @if(Auth::user()->role->id != 6 && Auth::user()->role->id != 7)
        <!-- <router-link  tag="li" to="/report/ara-daily-sale-rpt" class="nav-item">

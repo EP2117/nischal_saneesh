@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AccountTransition;
 use App\PurchaseCollection;
 use App\PurchaseInvoice;
 use Illuminate\Http\Request;
@@ -94,23 +95,22 @@ class PurchaseCollectionController extends Controller
                 'total_paid_amount'=>$total_paid_amount,
                 'created_by' => Auth::user()->id,
             ]);
+            $description="P".$p_collection->collection_no.",Inv Date ".$p_collection->collection_date." by " .$p_collection->supplier->name;
 
-//            $collection->collection_no 		= $collection_no;
-//            $collection->collection_date 	= $request->collection_date;
-//            $collection->customer_id		= $request->customer_id;
-//            $collection->branch_id = $request->branch_id;
-//            if($request->is_auto == true) {
-//                $collection->auto_payment	= 1;
-//                $collection->total_paid_amount	= $request->pay_amount;
-//            } else {
-//                $collection->auto_payment	= 0;
-//                $collection->total_paid_amount	= $request->total_pay;
-//            }
-//
-//            $collection->created_by = Auth::user()->id;
-//            //$collection->updated_by = Auth::user()->id;
-//            $collection->save();
-
+            $sub_account_id=config('global.credit_payment');    /*sub account id for credit payment */
+            if($p_collection){
+                AccountTransition::create([
+                    'sub_account_id' => $sub_account_id,
+                    'transition_date' => $request->collection_date,
+                    'purchase_id' => $p_collection->id,
+                    'is_cashbook' => 1,
+                    'description'=>$description,
+                    'vochur_no'=>$p_collection->collection_no,
+                    'credit' => $total_paid_amount,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
+                ]);
+            }
             for($i=0; $i<count($request->invoices); $i++) {
                 if($request->discounts[$i]==null){
                     $dsc=0;
@@ -183,6 +183,25 @@ class PurchaseCollectionController extends Controller
             $collection->updated_at = time();
             $collection->updated_by = Auth::user()->id;
             $collection->save();
+            $sub_account_id=config('global.credit_payment');    /*sub account id for credit payment */
+            $description="Inv ".$collection->collection_no.",Inv Date ".$collection->collection_date." to " .$collection->supplier->name;
+            if($collection){
+                if($collection->total_paid_amount!=0){
+                    AccountTransition::where('purchase_id',$c_id)->update([
+                        'sub_account_id' => $sub_account_id,
+                        'transition_date' => $request->collection_date,
+                        'purchase_id' => $collection->id,
+                        'vochur_no'=>$collection->collection_no,
+                        'is_cashbook' => 1,
+                        'description'=>$description,
+                        'credit' => $collection->total_paid_amount,
+                        'created_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id,
+                    ]);
+                }elseif($collection->total_paid_amount==0){
+                    AccountTransition::where('purchase_id',$c_id)->delete();
+                }
+            }
 
             //update collection amount for removed sales
             foreach($request->remove_pivot_id as $key => $val) {
@@ -256,10 +275,11 @@ class PurchaseCollectionController extends Controller
             $p->collection_amount = $collection_amount;
             $p->save();
         }
-
         $collection->purchases()->detach();
-
         $collection->delete();
+        AccountTransition::where('purchase_id',$id)
+            ->where('sub_account_id',config('global.credit_payment'))
+            ->delete();
 
         return response(['message' => 'delete successful']);
     }

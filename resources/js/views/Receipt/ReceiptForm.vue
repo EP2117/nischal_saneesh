@@ -71,7 +71,7 @@
                             <div class="col-lg-6 col-md-offset-2">
                                 <textarea class="form-control" type="text"
                                        id="remark"
-                                          v-model="form.remark" required ></textarea>
+                                          v-model="form.remark"  ></textarea>
                             </div>
                         </div>
                         <div class="form-group row text-right">
@@ -139,6 +139,16 @@ export default {
     },
     mounted() {
         let app=this;
+        $("#debit_id").select2();
+        $("#debit_id").on("select2:select", function(e) {
+            var data = e.params.data;
+            app.form.debit = data.id;
+        });
+        $("#credit_id").select2();
+        $("#credit_id").on("select2:select", function(e) {
+            var data = e.params.data;
+            app.form.credit = data.id;
+        });
         this.initDebit();
         this.initCredit();
         $(".datetimepicker")
@@ -174,9 +184,11 @@ export default {
     methods:{
         initDebit(){
             axios.get('/sub_account/get_sub_account/'+"debit").then(({data})=>(this.debit=data.sub_account));
+            $("#debit").select2();
         },
         initCredit(){
             axios.get('/sub_account/get_sub_account/'+"credit").then(({data})=>(this.credit=data.sub_account));
+            $("#credit_id").select2();
         },
         getReceipt(id){
             let app=this;
