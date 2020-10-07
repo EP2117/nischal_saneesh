@@ -24,7 +24,7 @@
                 <div class="row">
                     <div class="form-group col-md-4 col-lg-3">
                         <label for="from_date">From Date</label>
-                        <input type="text" class="form-control datetimepicker" id="from_date" name="from_date"
+                        <input type="text" autocomplete="off" class="form-control datetimepicker" id="from_date" name="from_date"
                                v-model="search.from_date">
                     </div>
 
@@ -221,6 +221,7 @@ export default {
             receipt_count:0,
             perPage: 30,
             currentPage: 1,
+            user_year:'',
             rows:'',
             credit:[],
             debit:[],
@@ -230,6 +231,7 @@ export default {
     created() {
         // console.log(this.perPage);
         this.user_role = document.querySelector("meta[name='user-role']").getAttribute('content');
+        this.user_year = document.querySelector("meta[name='user-year-likelink']").getAttribute('content');
 
         this.site_path = document.querySelector("meta[name='site-path']").getAttribute('content');
         //this.site_path = this.site_path.substring(this.site_path.lastIndexOf('/')+1);
@@ -242,6 +244,7 @@ export default {
         this.getReceipt();
     },
     mounted() {
+        var app=this;
         this.initDebit();
         this.initCredit();
         $("#from_date")
