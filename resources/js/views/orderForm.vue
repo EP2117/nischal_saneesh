@@ -49,7 +49,7 @@
                             <div class="form-group col-md-4">
                                 <label for="sale_man">Sale Man</label>
                                 <select id="sale_man" class="mm-txt"
-                                    name="sale_man" v-model="form.sale_man_id" style="width:100%" required
+                                    name="sale_man" v-model="form.sale_man_id" style="width:100%"
                                 >
                                     <option value="">Select One</option>
                                     <option v-for="sale_man in sale_men" :value="sale_man.id"  >{{sale_man.sale_man}}</option>
@@ -131,7 +131,7 @@
                                                 </select>
                                             </td>                                                
                                             <td>
-                                                <input type="text" class="form-control num_txt txt_qty" style="width:100px;" name="qty[]"  id="qty_1" @blur="checkQty($event.target)" required />
+                                                <input type="text" class="form-control num_txt txt_qty" style="width:100px;" name="qty[]"  id="qty_1" @blur="calTotalAmount($event.target)" required />
                                             </td>
                                             <td>
                                                 <select class="form-control txt_uom"
@@ -147,7 +147,7 @@
                                                 <input type="text" style="min-width:70px;" class="form-control num_txt" name="discount[]" id="discount_1" @blur="calTotalAmount($event.target)" />
                                             </td>
                                             <td>
-                                                <input type="text" style="min-width:100px;" class="form-control" name="actual_rate[]" id="actual_rate_1" readonly required />
+                                                <input type="text" style="min-width:100px;" class="form-control" name="actual_rate[]" id="actual_rate_1" @blur="calTotalAmount($event.target)" readonly required />
                                             </td>
                                             <td class="text-center">
                                                 <input
@@ -401,7 +401,7 @@
                     selectbox_id.append('<option value="">Select One</option><option value="'+uom_id+'" data-relation="" data-uomqty = "1" data-productuom = "'+uom+'" data-productid="'+data.id+'" data-perprice="'+price+'" data-price="'+price+'" selected>'+uom+'</option>'); 
                 }
                 $(".txt_uom").select2();
-
+                app.calTotalAmount($(this));
                 //app.getSellingUomByProduct(selectbox_id, data.id);
             });
 
@@ -438,14 +438,22 @@
                     swal("Warning!", "At least one product must be added!", "warning")
                 } else {
                     $(this).parents("tr").remove();
-                    var sub_total = 0; 
-                    for(var i=0; i<document.getElementsByName('product[]').length; i++) {
+                     var sub_total = 0;
+                   for(var i=0; i<document.getElementsByName('product[]').length; i++) {
                         if(document.getElementsByName('total_amount[]')[i].value != "") {
-                            sub_total += parseInt(document.getElementsByName('total_amount[]')[i].value);
+                            sub_total += parseFloat(document.getElementsByName('total_amount[]')[i].value);
                         }
-                    }
+                   }
+                   var cash_discount = app.form.cash_discount == '' || app.form.cash_discount == null ? 0 : app.form.cash_discount;
 
-                    app.form.sub_total = sub_total; 
+                   app.form.sub_total = Math.round(sub_total);
+
+                   app.form.net_total = parseInt(app.form.sub_total) - parseInt(cash_discount);
+
+                    var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
+                    var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
+                    app.form.tax_amount = tax_amount;
+                    app.form.balance_amount = parseInt(app.form.net_total) + parseInt(app.form.tax_amount);
                 }
             });
 
@@ -462,14 +470,22 @@
                             swal("Warning!", "At least one product must be added!", "warning")
                         } else {
                             $(this).parents("tr").remove();
-                            var sub_total = 0; 
-                            for(var i=0; i<document.getElementsByName('product[]').length; i++) {
+                           var sub_total = 0;
+                           for(var i=0; i<document.getElementsByName('product[]').length; i++) {
                                 if(document.getElementsByName('total_amount[]')[i].value != "") {
-                                    sub_total += parseInt(document.getElementsByName('total_amount[]')[i].value);
+                                    sub_total += parseFloat(document.getElementsByName('total_amount[]')[i].value);
                                 }
-                            }
+                           }
+                           var cash_discount = app.form.cash_discount == '' || app.form.cash_discount == null ? 0 : app.form.cash_discount;
 
-                            app.form.sub_total = sub_total; 
+                           app.form.sub_total = Math.round(sub_total);
+
+                           app.form.net_total = parseInt(app.form.sub_total) - parseInt(cash_discount);
+
+                            var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
+                            var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
+                            app.form.tax_amount = tax_amount;
+                            app.form.balance_amount = parseInt(app.form.net_total) + parseInt(app.form.tax_amount);
                         }   
                     } else {
                       //
@@ -576,7 +592,7 @@
                     t2.style = "width:100px;";
                     t2.className ="form-control num_txt";
                     $(t2).attr("required", true);
-                    t2.addEventListener('blur', function(){ app.checkQty(t2); });
+                    t2.addEventListener('blur', function(){ app.calTotalAmount(t2); });
                     cell2.appendChild(t2);
                    
                 var cell3=row.insertCell(2);
@@ -587,7 +603,7 @@
                     t3.className = "form_control txt_uom";
                     t3.style = "min-width:150px;";
                     $(t3).attr("required", true);
-                    t3.addEventListener('blur', function(){ app.checkQty(t3); });
+                    //t3.addEventListener('blur', function(){ app.checkQty(t3); });
 
                     var option = document.createElement("option");
                     option.value = '';
@@ -627,6 +643,7 @@
                     actual_rate.className ="form-control num_txt";
                     $(actual_rate).attr("required", true);
                     $(actual_rate).attr("readonly", true);
+                    actual_rate.addEventListener('blur', function(){ app.calTotalAmount(actual_rate); });
                     cell_actual.appendChild(actual_rate);
                 
 
@@ -711,7 +728,7 @@
                         selectbox_id.append('<option value="">Select One</option><option value="'+uom_id+'" data-relation="" data-uomqty = "1" data-productuom = "'+uom+'" data-productid="'+data.id+'" data-perprice="'+price+'" data-price="'+price+'" selected>'+uom+'</option>'); 
                     }
                     $(".txt_uom").select2();
-
+                    app.calTotalAmount($(this));
                     //app.getSellingUomByProduct(selectbox_id, data.id);
                 });
 
@@ -805,7 +822,7 @@
                                     $(t2).attr('readonly', true);
                                 }
 
-                                t2.addEventListener('blur', function(){ app.checkQty(t2); });
+                                t2.addEventListener('blur', function(){ app.calTotalAmount(t2); });
                                 cell2.appendChild(t2);                            
                                
                             var cell3=row.insertCell(2);
@@ -820,7 +837,7 @@
                                 if(app.order_status != 'Draft' && app.order_status != '') {
                                     $(t3).attr('disabled', 'disabled');
                                 }
-                                t3.addEventListener('blur', function(){ app.checkQty(t3); });
+                               // t3.addEventListener('blur', function(){ app.checkQty(t3); });
 
                                 var option = document.createElement("option");
                                 option.value = '';
@@ -903,6 +920,7 @@
                                 actual_rate.className ="form-control num_txt";
                                 $(actual_rate).attr("required", true);
                                 $(actual_rate).attr("readonly", true);
+                                actual_rate.addEventListener('blur', function(){ app.calTotalAmount(actual_rate); });
                                 cell_actual.appendChild(actual_rate);
 
                             
@@ -1009,7 +1027,7 @@
                                     selectbox_id.append('<option value="">Select One</option><option value="'+uom_id+'" data-relation="" data-uomqty = "1" data-productuom = "'+uom+'" data-productid="'+data.id+'" data-perprice="'+price+'" data-price="'+price+'" selected>'+uom+'</option>'); 
                                 }
                                 $(".txt_uom").select2();
-
+                                app.calTotalAmount($(this));
                                 //app.getSellingUomByProduct(selectbox_id, data.id);
                             });
                         }
@@ -1171,10 +1189,11 @@
                 } 
 
                 //claculate total amount
+                app.calTotalAmount(obj);
                 /**var unit_price = $(obj).closest('td').next().next().next().next().find('input').val();
                 var relation_val = $(obj).closest('td').next().find(':selected').attr('data-uomqty');**/
 
-                var actual_rate = $("#actual_rate_"+row_id).val();
+               /*** var actual_rate = $("#actual_rate_"+row_id).val();
                 var other_discount = $("#other_discount_"+row_id).val(); 
 
                 if(obj.value != "" && actual_rate != "") {
@@ -1190,7 +1209,6 @@
                     $("#total_amount_"+row_id).val(Math.round(total_amount));
                 }
 
-                //get all sub total amount
                 var sub_total = 0;
                 for(var i=0; i<document.getElementsByName('product[]').length; i++) {
                     if(document.getElementsByName('total_amount[]')[i].value != "") {
@@ -1198,7 +1216,7 @@
                     }
                 }
 
-                app.form.sub_total = Math.round(sub_total);
+                app.form.sub_total = Math.round(sub_total); ***/
             },   
 
             getSO(product_id) {
@@ -1228,7 +1246,7 @@
                     actual_discount = parseInt(discount)/100 * parseInt(rate);
                     actual_rate = parseInt(rate) - actual_discount;
                } else {
-                    actual_rate = $("#actual_rate_"+row_id).val() == "" ? 0 : $("#actual_rate_"+row_id).val();
+                    actual_rate = $("#rate_"+row_id).val() == "" ? 0 : $("#rate_"+row_id).val();
                }
                $("#actual_rate_"+row_id).val(actual_rate);
                var other_discount = $("#other_discount_"+row_id).val();

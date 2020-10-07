@@ -29,68 +29,99 @@
                                 <label for="invoice_no">Invoice No.</label>
                                 <input type="text" class="form-control" id="invoice_no" name="invoice_no" v-model="form.invoice_no" readonly>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="invoice_date">Date</label>
                                 <input type="text" class="form-control datetimepicker" id="invoice_date" name="invoice_date"
-                                v-model="form.invoice_date" required :readonly="is_readonly">
+                                v-model="form.invoice_date" required :readonly="SOEdit">
                             </div>
                             <div class="form-group col-md-4">
-                                <label for="office_sale_man">Office Sale Man</label>
-                                <input type="text" class="form-control" id="office_sale_man" name="office_sale_man"
-                                v-model="form.office_sale_man" readonly>        
+                                <label for="branch_name">Branch</label>
+                                 <input type="text" class="form-control" id="branch_name" name="branch_name"
+                                v-model="user_branch" readonly>
                             </div>
                         </div>
+                        <div class="row">
+                            
+                            <div class="form-group col-md-4">
+                                <label for="sale_man">Sale Man</label>
+                                <select id="sale_man" class="mm-txt"
+                                    name="sale_man" v-model="form.office_sale_man_id" style="width:100%" required
+                                >
+                                    <option value="">Select One</option>
+                                    <option v-for="sale_man in sale_men" :value="sale_man.id"  >{{sale_man.sale_man}}</option>
+                                </select>
+                            </div>
 
-                        <div class="row mt-3">
-                             <div class="form-group col-md-4">
+                            <div class="form-group col-md-4">
                                 <label for="customer_id">Customer</label>
                                 <select id="customer_id" class="form-control mm-txt"
-                                    name="customer_id" v-model="form.customer_id" style="width:100%" required :disabled="is_readonly"
+                                    name="customer_id" v-model="form.customer_id" style="width:100%" required :disabled="SOEdit"
                                 >
                                     <option value="">Select One</option>
                                     <option v-for="cus in customers" :value="cus.id"  >{{cus.cus_name}}</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-4">
+                            <!--<div class="form-group col-md-4">
                                 <label for="vehicle_warehouse">Vehicle Warehouse</label>
                                  <input type="text" class="form-control" id="vehicle_warehouse" name="vehicle_warehouse"
                                 v-model="user_warehouse" readonly>
-                            </div>
+                            </div>-->
 
-                            <div class="form-group col-md-4" v-if="sale_type == 1">
-                                <label for="reference_no">Reference No.</label>
-                                 <input type="text" class="form-control" id="reference_no" name="reference_no"
-                                v-model="form.reference_no">
-                            </div>
                         </div>
 
                         <div class="row mt-3">
-                             <div class="form-group col-md-4">
+                             
+
+                            <!--<div class="form-group col-md-4" v-if="sale_type == 1">
+                                <label for="reference_no">Reference No.</label>
+                                 <input type="text" class="form-control" id="reference_no" name="reference_no"
+                                v-model="form.reference_no">
+                            </div>-->
+                            <div class="form-group col-md-4">
                                 <label for="payment_type">Payment Type</label>
                                 <select id="payment_type" class="form-control"
-                                    name="payment_type" v-model="form.payment_type" @change='changePayment()' style="width:100%" required :disabled="is_readonly"
+                                    name="payment_type" v-model="form.payment_type" @change='changePayment()' style="width:100%" required :disabled="SOEdit"
                                 >
                                     <option value="">Select One</option>
                                     <option value="cash">Cash</option>
                                     <option value="credit">Credit</option>
                                 </select>
                             </div>
-                             <div class="form-group col-md-4" v-if="form.payment_type == 'credit'">
+                            <div class="form-group col-md-4" v-if="form.payment_type == 'credit'">
                                 <label for="due_date">Due Date</label>
                                 <input type="text" class="form-control datetimepicker" id="due_date" name="due_date"
-                                v-model="form.due_date" :readonly="is_readonly">
+                                v-model="form.due_date" :readonly="SOEdit">
                             </div>
                             <div class="form-group col-md-4" style="display:none;" v-else>
                                 <label for="due_date">Due Date</label>
                                 <input type="text" class="form-control datetimepicker" id="due_date" name="due_date"
-                                v-model="form.due_date" :readonly="is_readonly">
+                                v-model="form.due_date" :readonly="SOEdit">
                             </div>
                             <div class="form-group col-md-4" v-if="form.payment_type == 'credit'">
                                 <label for="credit_day">Credit Days</label>
                                  <input type="text" class="form-control num_txt" id="credit_day" name="credit_day"
-                                v-model="form.credit_day" @blur="calcDueDate()" :readonly="is_readonly">
+                                v-model="form.credit_day" @blur="calcDueDate()" :readonly="SOEdit">
                             </div>
-                        </div>                        
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-2 custom-control custom-switch" style="padding-left:10px;">
+                              <label style='margin-right:50px;' class="ml-0">Sale Order</label>
+                              <input type="checkbox" class="custom-control-input" id="is_so" name="is_so" @change="checkSO($event.target)">                              
+                              <label class="custom-control-label" for="is_so"></label>
+                            </div>   
+                            <div class="form-group col-md-4" style="display:none" id="so_list">
+                                <select id="sale_order" class="form-control"
+                                    name="sale_order" style="width:100%"
+                                >
+                                    <option value="">Select Sale Order</option>
+
+                                    <option v-for="so in sale_orders" :data-saleman= "so.sale_man == null ? '' : so.sale_man.name" :value="so.id"  >{{so.order_no}}</option>
+                                </select>
+                            </div>                     
+                        </div>
 
                         <div class="row mt-4 mb-3">
                             <div class="col-md-12">
@@ -98,17 +129,9 @@
                             </div>
                         </div>
 
-                        <div class="row mt-0">
+                        <div class="row mt-0" v-if="form.sale_order == false || isEdit">
                             <div class="col-md-12 text-right mt-0">
-                                <!--<a class="d-sm-inline-block btn btn-sm btn-primary shadow-sm bg-blue text-white"  v-if="((user_role == 'admin' || user_role == 'system') && !isDisabled) || (!isEdit)"  data-toggle="modal" data-target="#mix_form">
-                                    <i class="fas fa-plus"></i> Add Mixed Product
-                                </a>-->
-
-                                <a class='d-sm-inline-block btn btn-sm btn-primary shadow-sm bg-blue text-white' title='Add Product' @click="addProduct()" v-if="((user_role == 'admin' || user_role == 'system') && !isDisabled) || (!isEdit)" style="verticle-align:middle"><i class='fas fa-plus'></i></a>
-
-                                <!--<a class='blue-icon' title='Add Product' @click="addProduct()" v-if="((user_role == 'admin' || user_role == 'system') && !isDisabled) || (!isEdit)" style="verticle-align:middle"><i class='fas fa-plus-square' style='font-size: 30px;'></i></a>-->
-
-
+                                <a class='blue-icon' title='Add Product' @click="addProduct()" v-if="((user_role == 'system' || user_role == 'office_user') && form.sale_order == false && !isDisabled) || (( user_role == 'system' || user_role == 'office_user') && form.revise_order == true && !isDisabled) || (!isEdit)"><i class='fas fa-plus-square' style='font-size: 30px;'></i></a>
                                 <div style="display:none;">
                                     <select class="form-control txt_product"
                                         id="txt_product" style="min-width:150px;"
@@ -116,108 +139,71 @@
                                         <option value="">Select One</option>
                                         <option v-for="product in products" :data-uom="product.uom_name" 
                                         :data-price="product.product_price"
-                                        :data-retail1="product.retail1_price"
-                                        :data-retail2="product.retail2_price"
-                                        :data-wholesale="product.wholesale_price"
                                         :data-uomid="product.uom_id" :value="product.product_id" 
                                         data-pivotid = "0">{{product.product_name}}</option>
                                     </select>
                                 </div>
-                                <div style="display:none;">
-                                    <select class="form-control brands"
-                                        id="txt_brand" style="min-width:150px;"
-                                    >
-                                        <option value="">Select One</option>
-                                        <option v-for="brand in brands" :value="brand.id">{{brand.brand_name}}</option>
-                                    </select>
-                                </div>
-                                <div style="display:none;">
-                                    <select class="form-control categories"
-                                        id="txt_category" style="min-width:150px;"
-                                    >
-                                        <option value="">Select One</option>
-                                        <option v-for="cat in categories" :value="cat.id">{{cat.category_name}}</option>
-                                    </select>
-                                </div>
                             </div>
-                            <div class="col-md-12 table-responsive mt-3">
+                            <div class="col-md-12 table-responsive">
                                 <table class="table table-bordered" id="product_table">
                                     <thead class="thead-grey">
                                         <tr>
-                                            <th scope="col">Brand</th>
-                                            <th scope="col" >Category</th>
-                                            <th scope="col" class="mm-txt">အမ်ိဳးအမည္</th>
-                                            <th scope="col" class="mm-txt">အ ေရအတ ြက္</th>
-                                            <th scope="col" >Selling Unit</th>
-                                            <th scope="col" class="mm-txt">ပါ၀င္မႈ</th>
-                                            <th scope="col" >Stock Available</th>
-                                            <th scope="col" class="mm-txt">ေစ်းႏႈန္း</th>
-                                            <th scope="col" class="mm-txt">သင့္ေင ြ</th>
+                                            <th scope="col" >Product Name</th>
+                                            <th scope="col" >Quantity</th>
+                                            <th scope="col" >UOM</th>
+                                            <th scope="col" >Rate</th>
+                                            <th scope="col" >Discount (%)</th>
+                                            <th scope="col" >Actual Rate</th>
+                                            <th scope="col" >FOC</th>
+                                            <th scope="col">Other Discount (%)</th>
+                                            <th scope="col" >Amount</th>
                                             <th scope="col" class="text-center"></th>
                                         </tr>
                                     </thead>
                                     <tbody> 
                                         <template v-if="isEdit && ex_products.length > 0">
                                         </template>
-                                        <template v-else>                                      
-                                        <tr id="1">
-                                            <td>
-                                                <select class="form-control brands"
-                                                    name="brand[]" id="brand_1" style="min-width:150px" 
-                                                >
-                                                    <option value="">Select One</option>
-                                                    <option v-for="brand in brands" :value="brand.id">{{brand.brand_name}}</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <select class="form-control categories"
-                                                    name="category[]" id="category_1" style="min-width:150px;" 
-                                                >
-                                                    <option value="">Select One</option>
-                                                    <option v-for="cat in categories" :value="cat.id">{{cat.category_name}}</option>
-                                                </select>
-                                            </td>
-                                            <td>
+                                        <template v-if="!isEdit && ex_products.length <= 0">                                      
+                                        <tr id="1" v-if="form.sale_order == false">
+                                            <td>                                               
                                                 <select class="form-control txt_product"
                                                     name="product[]" id="product_1" style="min-width:150px;" required
                                                 >
                                                     <option value="">Select One</option>
                                                     <option v-for="product in products" :data-uom="product.uom_name" 
-                                                    :data-price="product.product_price"
-                                                    :data-retail1="product.retail1_price"
-                                                    :data-retail2="product.retail2_price"
-                                                    :data-wholesale="product.wholesale_price"
+                                                    :data-price="product.selling_price"
                                                     :data-uomid="product.uom_id" :value="product.product_id" 
                                                     data-pivotid = "0">{{product.product_name}}</option>
                                                 </select>
                                             </td>                                                
                                             <td>
-                                                <input type="text" class="form-control decimal_no txt_qty" style="width:150px;" name="qty[]" id="qty_1" @blur="checkQty($event.target)" required />
+                                                <input type="text" class="form-control num_txt txt_qty" style="width:100px;" name="qty[]"  id="qty_1" @blur="checkQty($event.target)" required />
                                             </td>
                                             <td>
                                                 <select class="form-control txt_uom"
-                                                    name="uom[]" id="uom_1" style="min-width:100px;" data-uom="" required
+                                                    name="uom[]" id="uom_1" style="min-width:150px;" data-uom="" required
                                                 >
                                                     <option value="">Select One</option>
                                                 </select>
                                             </td>
                                             <td>
-                                                <input type="text" style="min-width:120px;" class="form-control txt_relation" name="relation[]" id="relation_1" readonly />
-                                            </td>
-                                            <td class="text-center">
-                                                <!--<input
-                                                    type="checkbox"
-                                                    name="chk_foc[]"
-                                                    @change="checkFoc($event.target)"
-                                                >-->
-                                                <input type="text" style="min-width:100px;" class="form-control txt_available" name="stock_available[]" id="stock_available_1" readonly />
+                                                <input type="text" style="min-width:100px;" class="form-control" name="rate[]" id="rate_1" @blur="calTotalAmount($event.target)" required />
                                             </td>
                                             <td>
-                                                <!-- <input type="text" class="form-control float_num" style="width:100px;" name="unit_price[]" @blur="calTotalAmount($event.target)" required /> -->
-
-                                                <select class="form-control float_num unit_price_select" style="width:90px;" name="unit_price[]" id="unit_price_1" required >
-                                                    <option value="">Select One</option>
-                                                </select>
+                                                <input type="text" style="min-width:70px;" class="form-control num_txt" name="discount[]" id="discount_1" @blur="calTotalAmount($event.target)" />
+                                            </td>
+                                            <td>
+                                                <input type="text" style="min-width:100px;" class="form-control" name="actual_rate[]" id="actual_rate_1" readonly required />
+                                            </td>
+                                            <td class="text-center">
+                                                <input
+                                                    type="checkbox"
+                                                    name="chk_foc[]" id="foc_1"
+                                                    @change="checkFoc($event.target)"
+                                                >
+                                            </td>
+                                            <td>
+                                                <input type="text" style="width:70px;" class="form-control num_txt" name="other_discount[]" id="other_discount_1" @blur="calTotalAmount($event.target)" />
                                             </td>
                                             <td>
                                                 <input type="text" class="form-control num_txt" readonly style="width:100px;" name="total_amount[]" id="total_amount_1" required />
@@ -226,40 +212,45 @@
                                                 <a class='remove-row red-icon' title='Remove' v-if="user_role != 'admin'"><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>
                                             </td>
                                         </tr>
-                                        </template>
+                                        
                                         <tr class="total_row">
-                                            <td colspan="8" class="text-right mm-txt">စုစုေပါင္း</td>
-                                            <td colspan="2">
+                                            <td colspan="7" class="text-right">Total Amount</td>
+                                            <td></td>
+                                            <td colspan="2" class="text-right">
                                                 <input type="text" v-model="form.sub_total" class="form-control num_txt" readonly style="width:150px;" required />
+                                            </td>
+                                        </tr>
+                                        <tr class="total_row">
+                                            <td colspan="7" class="text-right">Cash Discount</td>
+                                            <td></td>
+                                            <td colspan="2">
+                                                <input type="text" v-model="form.cash_discount" class="form-control num_txt" style="width:150px;" @blur="changeCashDiscount()" />
                                             </td>
                                         </tr> 
                                         <tr class="total_row">
-                                            <td colspan="8" class="text-right mm-txt">ေလ်ာ့ေင ြ</td>
+                                            <td colspan="7" class="text-right">Net Total</td>
+                                            <td></td>
                                             <td colspan="2">
-                                                <input type="text" v-model="form.discount" class="form-control num_txt" style="width:150px;" @keyup="changeDiscount($event.target)" />
-                                            </td> 
-                                        </tr>                                       
-                                        <tr class="total_row">
-                                            <td colspan="8" class="text-right mm-txt">လက္ခံရရိွေင ြ</td>
-                                            <td colspan="2" v-if="form.payment_type == 'credit'">
-                                                <input type="text" v-model="form.pay_amount" class="form-control num_txt" style="width:150px;" @keyup="calBalance($event.target)" />
+                                                <input type="text" v-model="form.net_total" class="form-control num_txt" readonly style="width:150px;" required />
                                             </td>
-                                            <td colspan="2" v-else>
-                                                <input type="text" v-model="form.pay_amount" class="form-control num_txt" style="width:150px;" @keyup="calBalance($event.target)" readonly />
+                                        </tr> 
+                                        <tr class="total_row">
+                                            <td colspan="7" class="text-right">Tax</td>
+                                            <td><input type="text" v-model="form.tax" class="form-control num_txt" style="width:70px;" placeholder='%' @blur="changeTax()"/></td>
+                                            <td colspan="2">
+                                                <input type="text" v-model="form.tax_amount" class="form-control num_txt" readonly style="width:150px;" />
                                             </td>
                                         </tr>
                                         <tr class="total_row">
-                                            <td colspan="8" class="text-right mm-txt">ယခင္လက္က်န္ေင ြ</td>
-                                            <td colspan="2">
-                                                <input type="text" v-model="form.previous_balance" class="form-control num_txt" readonly style="width:150px;"/>
-                                            </td>
-                                        </tr>
-                                        <tr class="total_row">
-                                            <td colspan="8" class="text-right mm-txt">လက္က်န္ေင ြစုစုေပါင္း</td>
+                                            <td colspan="4" class="text-right">Previous Balance :</td>
+                                            <td>{{form.previous_balance}}</td>
+                                            <td colspan="2" class="text-right">Balance Amount</td>
+                                            <td></td>
                                             <td colspan="2">
                                                 <input type="text" v-model="form.balance_amount" class="form-control num_txt" readonly style="width:150px;" required />
                                             </td>
-                                        </tr>                                        
+                                        </tr>  
+                                        </template>                                       
                                     </tbody>
                                 </table>
 
@@ -268,12 +259,89 @@
 
                         </div>
 
+                        <!-- for sale order product -->
+                        <div class="row mt-4" v-else>
+                            <div class="col-md-12 text-right mt-0">
+                                <a class='blue-icon' title='Add Product' @click="addProduct()" v-if="((user_role == 'system' || user_role == 'office_user') && form.revise_order == true && !isDisabled) || (!isEdit && (form.sale_order == false || form.revise_order == true))"><i class='fas fa-plus-square' style='font-size: 30px;'></i></a>
+                                <div style="display:none;">
+                                    <select class="form-control txt_product"
+                                        id="txt_product" style="min-width:150px;"
+                                    >
+                                        <option value="">Select One</option>
+                                        <option v-for="product in products" :data-uom="product.uom_name" 
+                                        :data-price="product.product_price"
+                                        :data-uomid="product.uom_id" :value="product.product_id" 
+                                        data-pivotid = "0">{{product.product_name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12 table-responsive">
+                                <table class="table table-bordered" id="order_product_table">
+                                    <thead class="thead-grey">
+                                        <tr>
+                                            <th scope="col" >Product Name</th>
+                                            <th scope="col" >SO QTY</th>
+                                            <th scope="col" >Accept QTY</th>
+                                            <th scope="col" >UOM</th>
+                                            <th scope="col" >Rate</th>
+                                            <th scope="col" >Discount (%)</th>
+                                            <th scope="col" >Actual Rate</th>
+                                            <th scope="col" >FOC</th>
+                                            <th scope="col">Other Discount (%)</th>
+                                            <th scope="col" >Amount</th>
+                                            <th scope="col" class="text-center"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="total_row">
+                                            <td colspan="8" class="text-right">Total Amount</td>
+                                            <td>&nbsp;</td>
+                                            <td colspan="2" class="text-right">
+                                                <input type="text" v-model="form.sub_total" class="form-control num_txt" readonly style="width:150px;" required />
+                                            </td>
+                                        </tr>
+                                        <tr class="total_row">
+                                            <td colspan="8" class="text-right">Cash Discount</td>
+                                            <td></td>
+                                            <td colspan="2">
+                                                <input type="text" v-model="form.cash_discount" class="form-control num_txt" style="width:150px;" @blur="changeCashDiscount()" />
+                                            </td>
+                                        </tr> 
+                                        <tr class="total_row">
+                                            <td colspan="8" class="text-right">Net Total</td>
+                                            <td></td>
+                                            <td colspan="2">
+                                                <input type="text" v-model="form.net_total" class="form-control num_txt" readonly style="width:150px;" required />
+                                            </td>
+                                        </tr> 
+                                        <tr class="total_row">
+                                            <td colspan="8" class="text-right">Tax</td>
+                                            <td><input type="text" v-model="form.tax" class="form-control num_txt" style="width:70px;" placeholder='%' @blur="changeTax()"/></td>
+                                            <td colspan="2">
+                                                <input type="text" v-model="form.tax_amount" class="form-control num_txt" readonly style="width:150px;" />
+                                            </td>
+                                        </tr>
+                                        <tr class="total_row">
+                                            <td colspan="5" class="text-right">Previous Balance :</td>
+                                            <td>{{form.previous_balance}}</td>
+                                            <td colspan="2" class="text-right">Balance Amount</td>
+                                            <td></td>
+                                            <td colspan="2">
+                                                <input type="text" v-model="form.balance_amount" class="form-control num_txt" readonly style="width:150px;" required />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- end -->
+
                         <div class="row">
-                            <div class="col-md-12" v-if="!isEdit">
+                            <div class="col-md-12" v-if="user_role != 'office_order_user' && !isEdit">
                                 <input type="submit" class="btn btn-primary btn-sm" value="Save Entry" id="save_btn" :disabled = "isDisabled">
                             </div>
 
-                            <div class="col-md-12" v-if="(user_role == 'system' || user_role == 'admin') && isEdit && !isDisabled"> 
+                            <div class="col-md-12" v-if="(user_role == 'system' || user_role == 'office_user') && isEdit && !isDisabled"> 
                                 <input type="submit" class="btn btn-primary btn-sm" value="Update" id="save_btn">
                             </div>
 
@@ -282,110 +350,6 @@
                     </form>                    
                 <!-- form end -->  
                 </div>
-                <!-- Mix Product form Modal Start -->
-                <div class="modal" id="mix_form">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-
-                          <!-- Modal Header -->
-                          <div class="modal-header">
-                            <h4 class="modal-title">Create Mixed Product</h4>
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                          </div>
-
-                          <!-- Modal body -->
-                          <div class="modal-body mix-body">
-                                <div class="col-md-12 table-responsive">
-                                    <table class="table table-bordered" id="mixed_product_tbl">
-                                        <thead class="thead-grey">
-                                            <tr>
-                                                <td colspan='5' style="background-color:#bddffc;"><strong>Mixed Product Details</strong></td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="col" >Description</th>
-                                                <th scope="col" >Qty</th>
-                                                <th scope="col" >UOM</th>
-                                                <th scope="col" >Unit Price</th>
-                                                <th scope="col" >Total Amount</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <input type="text" class="form-control" style="min-width:200px;" id="mix_description" required />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control num_txt" style="width:100px;" id="mix_qty" required />
-                                                </td>
-                                                <td>
-                                                    <select class="form-control txt_uom"
-                                                        id="mix_uom" style="min-width:100px;" data-uom="" required
-                                                    >
-                                                        <option value="">Select One</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control num_txt" style="width:100px;" id="mix_unit_price" required />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control num_txt" style="width:100px;" id="mix_total_amount" readonly required />
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <!-- used product start -->
-                                <div class="col-md-12 table-responsive mt-2">
-                                    <table class="table table-bordered" id="used_product_tbl">
-                                        <thead class="thead-grey">
-                                            <tr>
-                                                <td colspan='3' style="background-color:#bddffc;">
-                                                    <div class="float-left">
-                                                        <strong>Used Product Details</strong>
-                                                    </div>
-                                                    <div class="text-right">
-                                                        <a class='d-sm-inline-block btn btn-sm btn-primary shadow-sm bg-blue text-white' title='Add Product' @click="addUsedProduct()"><i class='fas fa-plus'></i></a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="col" >Product</th>
-                                                <th scope="col" >Qty</th>
-                                                <th scope="col" >UOM</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <input type="text" class="form-control" style="min-width:200px;" id="mix_description" required />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control num_txt" style="width:100px;" id="mix_qty" required />
-                                                </td>
-                                                <td>
-                                                    <select class="form-control txt_uom"
-                                                        id="mix_uom" style="min-width:150px;" data-uom="" required
-                                                    >
-                                                        <option value="">Select One</option>
-                                                    </select>
-                                                </td>
-                                            </tr>
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <!-- used product end -->
-                          </div>
-
-                          <!-- Modal footer -->
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                          </div>
-
-                        </div>
-                    </div>
-                </div>
-                <!-- mix product form END -->
 
             </div>
         </div>
@@ -419,13 +383,22 @@
                 uom_id: "",
                 price_variants: [],
                 sale_type: '',
+                sale_order: false,
+                order_id: '',
+                approval_id: '',
                 reference_no: '',
                 payment_type: 'cash',
                 credit_day: '',
                 due_date: '',
+                sale_man: '',
+                revise_order: false,
                 duplicate_ref_no: false,
-                discount: 0,
+                discount: '',
                 previous_balance: '',
+                cash_discount: '',
+                net_total: '',
+                tax: '',
+                tax_amount: '',                
 
               }),              
               isEdit: false,
@@ -441,6 +414,7 @@
               sale_type: '',
               user_role: '',
               user_year: '',
+              sale_orders: [],
               is_readonly: false,
               required_val : false,
               isDisabled: false,
@@ -448,7 +422,9 @@
               edit_form: '',
               site_path: '',
               storage_path: '',
-
+              SOEdit: false,
+              user_branch: '',
+              sale_men: [],
             };
         },
 
@@ -465,8 +441,10 @@
             this.sale_type = this.$route.params.sale_type;
             this.user_warehouse = document.querySelector("meta[name='user-wh']").getAttribute('content');
 
-            this.form.office_sale_man = document.querySelector("meta[name='user-name-likelink']").getAttribute('content');
-            this.form.office_sale_man_id = document.querySelector("meta[name='user-id-likelink']").getAttribute('content');
+            this.user_branch = document.querySelector("meta[name='user-branch']").getAttribute('content');
+
+            //this.form.office_sale_man = document.querySelector("meta[name='user-name-likelink']").getAttribute('content');
+            //this.form.office_sale_man_id = document.querySelector("meta[name='user-id-likelink']").getAttribute('content');
 
             this.user_role = document.querySelector("meta[name='user-role']").getAttribute('content');
             if(this.user_role == "office_order_user") {
@@ -502,6 +480,16 @@
 
             app.initCustomers();
 
+            app.initSaleMen();
+
+            $("#sale_man").select2();
+
+            $("#sale_man").on("select2:select", function(e) {
+
+                var data = e.params.data;
+                app.form.office_sale_man_id = data.id;
+            });
+
             app.initBrands();          
             app.initCategories();
             app.initUoms();
@@ -516,6 +504,12 @@
                 //get customer's previous balance
                 axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
 
+                app.sale_orders = [];  
+                app.sale_order_approvals = [];
+               // $('#order_product_table tbody tr').slice(0, -3).remove();
+                axios.get("/customer_sale_orders/"+data.id).then(({ data }) => (app.sale_orders = data.data));
+                $("#sale_order").select2();
+
             });
 
             $(".unit_price_select").select2();
@@ -524,6 +518,24 @@
 
                 var data = e.params.data;
                 app.calTotalAmount($(this));
+            });
+
+            $("#sale_order").select2();
+            $("#sale_order").on("select2:select", function(e) {  
+                app.form.sale_man =  e.target.options[e.target.options.selectedIndex].dataset.saleman;
+               // $('#order_product_table tbody tr').slice(0, -3).remove();       
+                var data = e.params.data;
+                if(data.id != '') {
+                    app.getOrder(data.id);
+                } else {
+                    $('#order_product_table tbody tr').slice(0, -5).remove();  
+                    app.form.cash_discount = '';
+                    app.form.net_total = '';
+                    app.form.tax = '';
+                    app.form.tax_amount = ''; 
+                    app.form.sub_total = '';
+                    app.form.balance_amount = '';
+                }
             });
 
             $(".brands").select2({ width: 'resolve' });
@@ -730,30 +742,24 @@
                     swal("Warning!", "At least one product must be added!", "warning")
                 } else {
                     $(this).parents("tr").remove();
-                    var sub_total = 0; 
-                    for(var i=0; i<document.getElementsByName('product[]').length; i++) {
+                    var sub_total = 0;
+                   for(var i=0; i<document.getElementsByName('product[]').length; i++) {
                         if(document.getElementsByName('total_amount[]')[i].value != "") {
-                            sub_total += parseInt(document.getElementsByName('total_amount[]')[i].value);
+                            sub_total += parseFloat(document.getElementsByName('total_amount[]')[i].value);
                         }
-                    }
+                   }
+                   var cash_discount = app.form.cash_discount == '' || app.form.cash_discount == null ? 0 : app.form.cash_discount;
 
-                    app.form.sub_total = sub_total;
-                    var discount = 0;
-                    if(app.form.discount == '' || sub_total == 0 || sub_total == '') {
-                        discount = 0;
-                    } else {
-                        discount = app.form.discount;
+                   app.form.sub_total = Math.round(sub_total);
+
+                   app.form.net_total = parseInt(app.form.sub_total) - parseInt(cash_discount);
+
+                    var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
+                    var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
+                    app.form.tax_amount = tax_amount;
+                    app.form.balance_amount = parseInt(app.form.net_total) + parseInt(app.form.tax_amount);
+       
                     }
-                    if(app.form.payment_type == 'cash') {
-                        app.form.pay_amount = parseInt((app.form.sub_total) - parseInt(discount));
-                    } else {
-                        if(app.form.pay_amount == '') {
-                            app.form.pay_amount = 0;
-                        }
-                    }
-                    app.form.balance_amount  = sub_total - (parseInt(app.form.pay_amount) + parseInt(discount)); 
-   
-                }
             });
 
             $(document).on('click','.remove-exrow',function(evt) {
@@ -769,31 +775,22 @@
                             swal("Warning!", "At least one product must be added!", "warning")
                         } else {
                             $(this).parents("tr").remove();
-                            var sub_total = 0; 
-                            for(var i=0; i<document.getElementsByName('product[]').length; i++) {
+                            var sub_total = 0;
+                           for(var i=0; i<document.getElementsByName('product[]').length; i++) {
                                 if(document.getElementsByName('total_amount[]')[i].value != "") {
-                                    sub_total += parseInt(document.getElementsByName('total_amount[]')[i].value);
+                                    sub_total += parseFloat(document.getElementsByName('total_amount[]')[i].value);
                                 }
-                            }
+                           }
+                           var cash_discount = app.form.cash_discount == '' || app.form.cash_discount == null ? 0 : app.form.cash_discount;
 
-                            app.form.sub_total = sub_total;
-                            var discount = 0;
-                            if(app.form.discount == '' || sub_total == 0 || sub_total == '') {
-                                discount = 0;
-                            } else {
-                                discount = app.form.discount;
-                            }
-                            if(app.form.payment_type == 'cash') {
-                                app.form.pay_amount = parseInt((app.form.sub_total) - parseInt(discount));
-                            } else {
-                                if(app.form.pay_amount == '') {
-                                    app.form.pay_amount = 0;
-                                }
-                            }
-                            app.form.balance_amount  = sub_total - (parseInt(app.form.pay_amount) + parseInt(discount)); 
+                           app.form.sub_total = Math.round(sub_total);
 
-                            //app.form.sub_total = sub_total;
-                            //app.form.balance_amount  = sub_total - parseInt(app.form.pay_amount);  
+                           app.form.net_total = parseInt(app.form.sub_total) - parseInt(cash_discount);
+
+                            var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
+                            var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
+                            app.form.tax_amount = tax_amount;
+                            app.form.balance_amount = parseInt(app.form.net_total) + parseInt(app.form.tax_amount);  
                         }   
                     } else {
                       //
@@ -804,6 +801,310 @@
         },
 
         methods: {
+
+            initSaleMen() {
+              axios.get("/sale_men").then(({ data }) => (this.sale_men = data.data));
+              $("#sale_man").select2();
+            },
+
+            getOrder(id) {
+                $("#loading").show();
+                $('#order_product_table tbody tr').slice(0, -5).remove();
+              let app = this;
+              axios
+                .get("/order/" + id)
+                .then(function(response) {   
+                    app.ex_products = response.data.order.products;
+
+                    //add  products dynamically
+                    var subTotal = 0;
+                    var row_id = 0;
+
+                    $.each(app.ex_products, function( key, product ) {  
+                        row_id = row_id+1;                      
+                        if(app.user_role != "Country Head" || (app.user_role == "Country Head" && response.data.access_brands.indexOf(product.brand_id) > -1)) {
+                            var table=document.getElementById("order_product_table");
+                            var row=table.insertRow((table.rows.length) - 5);
+                            row.id = row_id;
+                            var cell1=row.insertCell(0);
+
+                            var t1=document.createElement("select");
+                                t1.name = "product[]";
+                                t1.id = "product_"+row_id;
+                                t1.className = "form-control txt_product";
+                                t1.style = "min-width:150px;";
+                                $(t1).attr("required", true);
+                                $(t1).attr('readonly', true);
+
+                               var option = document.createElement("option");
+                               option.value = product.id;
+                               option.className ="form-control";
+                               $(option).attr('data-uom',product.uom.uom_name);
+                               $(option).attr('data-uomid',product.uom.uom_id);
+                               $(option).attr('data-price','');
+                               $(option).attr('data-pivotid',product.pivot.id);
+                               option.text = product.product_name;
+                               t1.append(option);
+
+                                cell1.appendChild(t1);
+
+                            var cell2=row.insertCell(1);
+                            var t2=document.createElement("input");
+                                t2.name = "qty[]";
+                                t2.id = "qty_"+row_id;
+                                t2.value = product.pivot.product_quantity;
+                                t2.style = "width:100px;";
+                                t2.className ="form-control num_txt";
+                                $(t2).attr("required", true);
+
+                                if(app.order_status != 'Draft' && app.order_status != '') {
+                                    $(t2).attr('readonly', true);
+                                }
+
+                               // t2.addEventListener('blur', function(){ app.checkQty(t2); });
+                                cell2.appendChild(t2);
+
+                            var cell_accept_qty=row.insertCell(2);
+                            var accept_qty=document.createElement("input");
+                                accept_qty.name = "accept_qty[]";
+                                accept_qty.id = "accept_qty_"+row_id;
+                                accept_qty.value = '';
+                                accept_qty.style = "width:100px;";
+                                accept_qty.className ="form-control num_txt";
+                                $(accept_qty).attr("required", true);
+
+                                accept_qty.addEventListener('blur', function(){ app.checkQty(accept_qty); });
+                                cell_accept_qty.appendChild(accept_qty);                            
+                               
+                            var cell3=row.insertCell(3);
+
+                            var t3=document.createElement("select");
+                                t3.name = "uom[]";
+                                t3.id = "uom_"+row_id;
+                                t3.className = "form-control txt_uom";
+                                t3.style = "width:150px;";
+                                $(t3).attr("required", true);
+
+                                /**if(app.order_status != 'Draft' && app.order_status != '') {
+                                    $(t3).attr('disabled', 'disabled');
+                                }**/
+                                t3.addEventListener('blur', function(){ app.checkQty(t3); });
+
+                                var option = document.createElement("option");
+                                option.value = '';
+                                option.text = "Select One";
+                                $(option).attr('data-relation',"");
+                                $(option).attr('data-price', "");
+                                $(option).attr('data-perprice', "");
+                                t3.append(option);
+
+                                var option = document.createElement("option");
+                                option.value = product.uom_id;
+                                option.text = product.uom.uom_name;
+                                $(option).attr("data-relation","");
+                                $(option).attr("data-uomqty","1");
+                                $(option).attr("data-price",product.product_price);
+                                $(option).attr("data-perprice",product.product_price);
+                                $(option).attr("data-productuom", product.uom.uom_name);
+                                $(option).attr("data-productid", product.id);
+                                if(product.pivot.uom_id == product.uom_id) {
+                                    option.selected = "selected";
+                                }
+                                t3.append(option);
+
+                                var relation_val = "";
+
+                                $.each(product.selling_uoms, function( key, suom ) {
+                                    var option = document.createElement("option");
+                                    option.value = suom.pivot.uom_id;
+                                    option.text = suom.uom_name;
+                                    var uom_relation = "1 "+suom.uom_name+" = "+ suom.pivot.relation +" "+ product.uom.uom_name;
+                                    if(product.pivot.uom_id == suom.pivot.uom_id) {
+                                        option.selected = "selected";
+                                        relation_val = "1 "+suom.uom_name+" = "+ suom.pivot.relation +" "+product.uom.uom_name;
+                                    }
+                                    $(option).attr("data-relation",uom_relation);
+                                    $(option).attr("data-uomqty",suom.pivot.relation);
+                                    $(option).attr("data-price",suom.pivot.product_price);
+                                    $(option).attr("data-perprice",suom.pivot.per_warehouse_uom_price);
+                                    $(option).attr("data-productuom",product.uom.uom_name);
+                                    $(option).attr("data-productid", product.id);
+                                    t3.append(option);
+                                });
+
+                             cell3.appendChild(t3);
+
+
+                            var cell4=row.insertCell(4);
+                            var rate=document.createElement("input");
+                                rate.name = "rate[]";
+                                rate.id = "rate_"+row_id;
+                                rate.style = "width:100px;";
+                                rate.value = product.pivot.rate;
+                                rate.className ="form-control num_txt";
+                                $(rate).attr("required", true);
+                                if(product.pivot.is_foc == 1) {
+                                    $(rate).attr("readonly", true);
+                                }
+                                rate.addEventListener('blur', function(){ app.calTotalAmount(rate); });
+                                cell4.appendChild(rate);
+
+                            var cell_discount=row.insertCell(5);
+                            var discount=document.createElement("input");
+                                discount.name = "discount[]";
+                                discount.id = "discount_"+row_id;
+                                discount.value = product.pivot.discount == null ? '' : product.pivot.discount;
+                                discount.style = "width:70px;";
+                                discount.className ="form-control num_txt";
+                                if(product.pivot.is_foc == 1) {
+                                    $(discount).attr("readonly", true);
+                                }
+                                discount.addEventListener('blur', function(){ app.calTotalAmount(discount); });
+                                cell_discount.appendChild(discount);
+
+                            var cell_actual=row.insertCell(6);
+                            var actual_rate=document.createElement("input");
+                                actual_rate.name = "actual_rate[]";
+                                actual_rate.id = "actual_rate_"+row_id;
+                                actual_rate.value = product.pivot.actual_rate;
+                                actual_rate.style = "width:100px;";
+                                actual_rate.className ="form-control num_txt";
+                                $(actual_rate).attr("required", true);
+                                $(actual_rate).attr("readonly", true);
+                                cell_actual.appendChild(actual_rate);
+
+                            
+
+                            $(".txt_product").select2();
+
+                            $(".txt_uom").select2();
+
+                            $("#customer_id").select2();
+                            $("#customer_id").on("select2:select", function(e) {
+
+                                var data = e.params.data;
+                                app.form.customer_id = data.id;
+
+                                //get customer's previous balance
+                                axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
+                            });                            
+
+                            var cell5=row.insertCell(7);
+                                cell5.className = "text-center";
+                            var t5=document.createElement("input");
+                                t5.type = "checkbox";
+                                t5.name = "chk_foc[]";
+                                t5.id = "foc_"+row_id;
+                                if(product.pivot.is_foc == '1') {
+                                    $(t5). prop("checked", true);
+                                }
+                                $(t5).attr('disabled','disabled');
+                                /**if(app.order_status != 'Draft' && app.order_status != '') {
+                                    $(t5).attr('disabled','disabled');
+                                }**/
+                                t5.addEventListener('change', function(){ app.checkFoc(t5); });
+                                cell5.appendChild(t5);
+
+                            var cell_other_disc=row.insertCell(8);
+                            var other_discount=document.createElement("input");
+                                other_discount.name = "other_discount[]";
+                                other_discount.id = "other_discount_"+row_id;
+                                other_discount.style = "width:70px;";
+                                other_discount.value = product.pivot.other_discount == null ? '' : product.pivot.other_discount;
+                                if(product.pivot.is_foc == 1) {
+                                    $(other_discount).attr("readonly", true);
+                                }
+                                other_discount.className ="form-control num_txt";
+                                other_discount.addEventListener('blur', function(){ app.calTotalAmount(other_discount); });
+                                cell_other_disc.appendChild(other_discount);
+
+                            var cell7=row.insertCell(9);
+                            var t7=document.createElement("input");
+                                t7.name = "total_amount[]";
+                                t7.id = "total_amount_"+row_id;
+                                t7.style = "width:100px;";
+                                if(product.pivot.total_amount != 0 && product.pivot.total_amount != null) {
+                                    t7.value = product.pivot.total_amount;
+                                    subTotal += parseInt(product.pivot.total_amount);
+                                }
+                                t7.className ="form-control num_txt";
+                                $(t7).attr("required", true);
+                                $(t7).attr("readonly", true);
+                               // t2.addEventListener('blur', function(){ app.checkQty(t2); });
+                                cell7.appendChild(t7);
+
+                            var cell8=row.insertCell(10);
+                            cell8.className = "text-center";
+                            /**if(app.user_role != 'admin' && (app.order_status == 'Draft' || app.order_status == ''))
+                            {**/
+                                var row_action = "<a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>";
+                            //}
+                            $(cell8).append(row_action);
+
+                            $(".txt_product").on("select2:select", function(e) {
+
+                                var data = e.params.data;
+
+                                app.selling_uoms = [];
+
+                                var row_id = $(this).closest('tr').attr('id');
+
+                               var uom      = e.target.options[e.target.options.selectedIndex].dataset.uom;
+                               var uom_id   = e.target.options[e.target.options.selectedIndex].dataset.uomid;
+                               var price    = e.target.options[e.target.options.selectedIndex].dataset.price;
+
+                                //$(this).closest('td').next().next().find('.txt_uom').attr('data-uom',uom);
+                                $("#uom_"+row_id).attr('data-uom',uom);
+
+                                //auto add new product row
+                                /**if($(this).closest('tr').next().hasClass("total_row")) {
+                                    app.addProduct();
+                                }**/
+
+                               //add Warehouse UOM Selling Price
+                               // $(this).closest('td').next().next().next().next().next().find('input').val(price);
+                               $("#rate_"+row_id).val(price);
+                               $("#actual_rate_"+row_id).val(price);
+
+                                //var selectbox_id = $(this).closest('td').next().next().find('.txt_uom');
+                                var selectbox_id = $("#uom_"+row_id);
+
+                                selectbox_id.find('option').remove();
+
+                                //add pre-defined product uom 
+
+                                if(selectbox_id.find('option[value="'+uom_id+'"]').text() == "") {
+                                    selectbox_id.append('<option value="">Select One</option><option value="'+uom_id+'" data-relation="" data-uomqty = "1" data-productuom = "'+uom+'" data-productid="'+data.id+'" data-perprice="'+price+'" data-price="'+price+'" selected>'+uom+'</option>'); 
+                                }
+                                $(".txt_uom").select2();
+
+                                //app.getSellingUomByProduct(selectbox_id, data.id);
+                            });
+                        }
+                    });
+
+                    $('#sale_man').val(response.data.order.sale_man_id).trigger('change');
+
+                    app.form.sub_total  = response.data.order.total_amount;
+                    app.form.cash_discount  = response.data.order.cash_discount;
+                    app.form.net_total     = response.data.order.net_total;
+                    app.form.tax           = response.data.order.tax;
+                    app.form.tax_amount    = response.data.order.tax_amount;
+                    app.form.balance_amount= response.data.order.balance_amount;
+                    app.form.previous_balance = response.data.previous_balance;
+                    $("#loading").hide();
+
+                })
+                .catch(function(error) {
+                  // handle error
+                  console.log(error);
+                })
+                .then(function() {
+                  // always executed
+                });
+
+                $(".txt_uom").select2();
+            },
 
             initBrands() {
               axios.get("/brands").then(({ data }) => (this.brands = data.data));
@@ -823,6 +1124,18 @@
             initUoms() {
               axios.get("/uoms").then(({ data }) => (this.uoms = data.data));
 
+            },
+
+            checkSO(obj) {
+                let app = this;
+                var is_so = $(obj).prop("checked");
+                if(is_so){
+                    app.form.sale_order = true;
+                    $("#so_list").show();
+                    $("#sale_order").attr("required", true);
+                } else {
+                    location.reload();
+                }
             },
 
             changePayment() {
@@ -1089,6 +1402,12 @@
 
                     //get customer's previous balance
                     axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
+
+                    app.sale_orders = [];  
+                    app.sale_order_approvals = [];
+                   // $('#order_product_table tbody tr').slice(0, -3).remove();
+                    axios.get("/customer_sale_orders/"+data.id).then(({ data }) => (app.sale_orders = data.data));
+                    $("#sale_order").select2();
                 });
 
                 $(".txt_product").on("select2:select", function(e) {
@@ -1509,6 +1828,12 @@
                                 app.form.customer_id = data.id;
                                 //get customer's previous balance
                                  axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
+
+                                app.sale_orders = [];  
+                                app.sale_order_approvals = [];
+                                //$('#order_product_table tbody tr').slice(0, -3).remove();
+                                axios.get("/customer_sale_orders/"+data.id).then(({ data }) => (app.sale_orders = data.data));
+                                $("#sale_order").select2();
                             });
 
                             $(".txt_product").on("select2:select", function(e) {
@@ -1794,10 +2119,20 @@
 
             checkQty(obj) { 
                 let app = this; 
+                var row_id = $(obj).closest('tr').attr('id');
+                if(app.form.sale_order == true) {
+                    var so_qty = $("#qty_"+row_id).val();
+                    var accept_qty = $("#accept_qty_"+row_id).val();
+                    if(accept_qty > so_qty) {
+                        swal("Warning!", "Accept quantity is more than Order quantity!", "warning");
+                        $("#accept_qty_"+row_id).val('');
+                        $("#accept_qty_"+row_id).focus();
+                        return false;
+                    }
+                }
                 if(typeof obj.name !== 'undefined') {
 
-                    //For quantity box onBlur Event                    
-                    var row_id = $(obj).closest('tr').attr('id');
+                    //For quantity box onBlur Event
 
                     var product_id = $("#product_"+row_id).find(':selected').val();
                     var transfer_qty = obj.value;
@@ -1819,7 +2154,12 @@
                             if(product_id == $(this).val()) {
                                 p_uom_val  = $("#uom_"+row_no).find(':selected').attr('data-uomqty');
                                 p_uom_name = $("#uom_"+row_no).find(':selected').attr('data-productuom');
-                                p_qty =  $("#qty_"+row_no).val();
+                                if(app.form.sale_order == true) {
+                                    p_qty =  $("#accept_qty_"+row_no).val();
+                                } else {
+                                    p_qty =  $("#qty_"+row_no).val();
+                                }
+                                
                                 if(typeof p_uom_val !== "undefined" && typeof p_uom_name != "undefined" != "" && p_qty != "") {
 
                                     product_qty = parseFloat(product_qty) + (parseFloat(p_qty) * parseFloat(p_uom_val));
@@ -1836,7 +2176,7 @@
                         var available_qty = parseFloat(this.products[key].in_count) - parseFloat(this.products[key].out_count);
                         console.log(product_qty);
                         console.log("Available"+available_qty);
-                        if(parseFloat(product_qty) > parseFloat(available_qty)) {
+                        if(parseInt(product_qty) > parseInt(available_qty)) {
 
                             swal("Warning!", "Not enough quantity! Availabel quantity is "+available_qty+" "+uom_name+".", "warning");
 
@@ -1906,7 +2246,11 @@
                             if(product_id == $(this).val()) {
                                 p_uom_val  = $("#uom_"+row_no).find(':selected').attr('data-uomqty');
                                 p_uom_name = $("#uom_"+row_no).find(':selected').attr('data-productuom');
-                                p_qty =  $("#qty_"+row_no).val();
+                                if(app.form.sale_order == true) {
+                                    p_qty =  $("#accept_qty_"+row_no).val();
+                                } else {
+                                    p_qty =  $("#qty_"+row_no).val();
+                                }
                                 if(typeof p_uom_val !== "undefined" && typeof p_uom_name != "undefined" != "" && p_qty != "") {
 
                                     product_qty = parseFloat(product_qty) + (parseFloat(p_qty) * parseFloat(p_uom_val));
@@ -1956,24 +2300,38 @@
 
             calTotalAmount(obj) {
                let app = this;
-               var price = $(obj).val();
+
                var row_id = $(obj).closest('tr').attr('id');
 
-               var qty = $("#qty_"+row_id).val();
-
-               //check price variant
-              /* var product_id = $(obj).closest('td').prev().prev().prev().prev().prev().find(':selected').val();
-               var key = app.products.findIndex(x => x.product_id == product_id);               
-               var product_price = app.products[key].product_price; */
-
-               if(app.sale_type == 2) {
-                //Van Sale
-                    var product_price = $("#uom_"+row_id).find(':selected').attr('data-price');
-
+               var qty = $("#qty_"+row_id).val() == "" ? 0 : $("#qty_"+row_id).val();
+               var rate = $("#rate_"+row_id).val();
+               var discount = $("#discount_"+row_id).val();
+               var actual_discount = 0;
+               var actual_rate = '';
+               if(discount != '') {
+                    actual_discount = parseInt(discount)/100 * parseInt(rate);
+                    actual_rate = parseInt(rate) - actual_discount;
                } else {
-                //office Sale
-                    var product_price = $("#uom_"+row_id).find(':selected').attr('data-perprice');
+                    actual_rate = $("#rate_"+row_id).val() == "" ? 0 : $("#rate_"+row_id).val();
                }
+               $("#actual_rate_"+row_id).val(actual_rate);
+               var other_discount = $("#other_discount_"+row_id).val();
+               var amount = parseInt(qty) * parseInt(actual_rate);
+               var discount_amount = 0;
+                if(other_discount != "") {
+                    discount_amount = parseInt(other_discount)/100 * amount;
+                }
+                    
+               amount = parseInt(amount) - parseInt(discount_amount);
+
+                $("#total_amount_"+row_id).val(Math.round(amount));
+
+                //Van Sale
+                //var product_price = $(obj).closest('td').prev().prev().prev().find(':selected').attr('data-price');
+
+                //office Sale
+                //var product_price = $(obj).closest('td').prev().prev().prev().find(':selected').attr('data-perprice');
+                var product_price = $("#uom_"+row_id).find(':selected').attr('data-perprice');
 
                /***if(product_price != '') {
                     var price_variant =  parseFloat(price) - parseFloat(product_price);
@@ -1997,43 +2355,44 @@
                         });
                     }
                }***/
-               if(price != "" && qty != "") {
-                    /****if(app.sale_type == 2) {
-                        var total = parseInt(qty) * parseFloat(price);
-                    } else {
-                        var relation_val = $("#uom_"+row_id).find(':selected').attr('data-uomqty');
-                        var total = parseInt(qty) * parseInt(relation_val) * parseFloat(price);
-                    }****/
-
-                    var total = parseFloat(qty) * parseInt(price);
-                    $("#total_amount_"+row_id).val(Math.round(total));
-               } else {
-                    $("#total_amount_"+row_id).val('');    
-               }
 
                //get all sub total amount
                var sub_total = 0;
                for(var i=0; i<document.getElementsByName('product[]').length; i++) {
                     if(document.getElementsByName('total_amount[]')[i].value != "") {
-                        sub_total += parseInt(document.getElementsByName('total_amount[]')[i].value);
+                        sub_total += parseFloat(document.getElementsByName('total_amount[]')[i].value);
                     }
                }
+               var cash_discount = app.form.cash_discount == '' || app.form.cash_discount == null ? 0 : app.form.cash_discount;
 
-               app.form.sub_total = sub_total;
-               var discount = 0;
-                if(app.form.discount == '') {
-                    discount = 0;
-                } else {
-                    discount = app.form.discount;
-                }
-                if(app.form.payment_type == 'cash') {
-                    app.form.pay_amount = parseInt((app.form.sub_total) - parseInt(discount));
-                } else {
-                    if(app.form.pay_amount == '') {
-                        app.form.pay_amount = 0;
-                    }
-                }
-               app.form.balance_amount  = sub_total - (parseInt(app.form.pay_amount) + parseInt(discount));
+               app.form.sub_total = Math.round(sub_total);
+
+               app.form.net_total = parseInt(app.form.sub_total) - parseInt(cash_discount);
+
+                var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
+                var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
+                app.form.tax_amount = tax_amount;
+                app.form.balance_amount = parseInt(app.form.net_total) + parseInt(app.form.tax_amount);
+            },
+
+            changeCashDiscount() {
+                let app = this;
+                var cash_discount = app.form.cash_discount == '' || app.form.cash_discount == null ? 0 : app.form.cash_discount;
+
+                app.form.net_total = parseInt(app.form.sub_total) - parseInt(cash_discount);
+
+                var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
+                var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
+                app.form.tax_amount = tax_amount;
+                app.form.balance_amount = parseInt(app.form.net_total) + parseInt(app.form.tax_amount);
+            },
+
+            changeTax() {
+                let app = this;
+                var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
+                var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
+                app.form.tax_amount = tax_amount;
+                app.form.balance_amount = parseInt(app.form.net_total) + parseInt(app.form.tax_amount);
             },
 
             calBalance(obj) {

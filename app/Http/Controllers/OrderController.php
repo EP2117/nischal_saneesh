@@ -294,37 +294,12 @@ class OrderController extends Controller
     public function getSaleOrders($cus_id)
     {
         $login_year = Session::get('loginYear');
-
-        if(Auth::user()->role->id == 1) {
-            //can access all for system role
-            $data = Order::with('sale_man')->orderBy('id', 'DESC')
-                    ->where('order_status','!=','Draft')
-                    ->where('customer_id', $cus_id);
-            $data->whereBetween('order_date', array($login_year.'-01-01', $login_year.'-12-31'));
-            $data = $data->get();
-        } else {
-
-            $data = Order::with('sale_man')->orderBy('id', 'DESC')
-                    ->where('order_status','!=','Draft')
-                    ->where('customer_id', $cus_id);
-            $data->whereBetween('order_date', array($login_year.'-01-01', $login_year.'-12-31'));
-            
-            //for Country Head and Admin roles (can access multiple branch)
-            if(Auth::user()->role->id == 6 || Auth::user()->role->id == 2) {
-                $branches = Auth::user()->branches;
-                $branch_arr = array();
-                foreach($branches as $branch) {
-                    array_push($branch_arr, $branch->id);
-                }
-                $data->whereIn('branch_id',$branch_arr);
-            } else {
-                //other roles can access only one branch
-                $branch = Auth::user()->branch_id;
-                $data->where('branch_id',$branch);
-            }
-
-            $data = $data->get();
-        }
+        //can access all for system role
+        $data = Order::with('sale_man')->orderBy('id', 'DESC')
+                ->where('order_status','=','Draft')
+                ->where('customer_id', $cus_id);
+        $data->whereBetween('order_date', array($login_year.'-01-01', $login_year.'-12-31'));
+        $data = $data->get();
         return response(compact('data'), 200);
     }
 
