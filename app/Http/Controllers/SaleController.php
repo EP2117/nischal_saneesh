@@ -1420,9 +1420,13 @@ class SaleController extends Controller
             }
         }
         $sale->delete();
+        if($sale->payment_type=='cash'){
+            $sub_account_id=config('global.sale');
+        }else{
+            $sub_account_id=config('global.sale_advance');
+        }
         AccountTransition::where('sale_id',$id)
-            ->where('sub_account_id',config('global.sale'))
-            ->orWhere('sub_account_id',config('global.sale_advance'))
+            ->where('sub_account_id',$sub_account_id)
             ->delete();
         return response(['message' => 'delete successful']);
     }
@@ -1519,7 +1523,6 @@ class SaleController extends Controller
                 $data->where('branch_id',$branch);
             }
         }
-
         if($request->approval_no != '')
         {
            // $data->whereBetween('invoice_date', array($request->inv_from_date, $request->inv_to_date));

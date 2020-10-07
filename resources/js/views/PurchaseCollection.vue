@@ -109,7 +109,7 @@
                             <td v-if="collection.branch != null">{{collection.branch.branch_name}}</td>
                             <td v-else></td>
                             <td class="mm-txt">{{collection.supplier.name}}</td>
-                            <td class="text-right">{{numberWithCommas(collection.total_paid_amount)}}</td>
+                            <td class="text-center">{{numberWithCommas(collection.total_paid_amount)}}</td>
 
                             <!--<td class="text-center">
                                 <router-link tag="span" :to="'/collection/edit/' + collection.id" >

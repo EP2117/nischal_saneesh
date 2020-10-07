@@ -4,15 +4,15 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#!"><i class="feather icon-home"></i></a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/'">Home</a></li>
-                <li class="breadcrumb-item"><a :href="site_path+'/office'">Office Sale</a></li>
-                <li class="breadcrumb-item"><router-link tag="span" to="/collection" class="font-weight-normal"><a href="#">Collection</a></router-link></li>
-                <li class="breadcrumb-item active" aria-current="page">Collection Form</li>
+                <li class="breadcrumb-item"><a :href="site_path+'/office_purchase'">Office Purchase</a></li>
+                <li class="breadcrumb-item"><router-link tag="span" to="/purchase_collection" class="font-weight-normal"><a href="#">Credit Payment</a></router-link></li>
+                <li class="breadcrumb-item active" aria-current="page">Credit Payment Form</li>
 
             </ol>
         </nav>
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h4 class="mb-0 text-gray-800">Collection Form</h4>
+            <h4 class="mb-0 text-gray-800">Credit Payment Form</h4>
         </div>
 
         <div class="card shadow mb-4">
@@ -25,7 +25,7 @@
                     <form class="form" method="post" @submit.prevent="onSubmit" @keydown="form.errors.clear($event.target.name)">
                         <div class="row">
                             <div class="form-group col-md-4">
-                                <label>Collection No.</label>
+                                <label>Payment No.</label>
                                 <input type="text" class="form-control" id="collection_no" name="collection_no" v-model="form.collection_no" readonly>
                             </div>
                         </div>

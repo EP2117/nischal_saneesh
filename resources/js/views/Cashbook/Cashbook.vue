@@ -4,7 +4,7 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#!"><i class="feather icon-home"></i></a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/'">Home</a></li>
-                <li class="breadcrumb-item"><a :href="site_path+'/master'">Master</a></li>
+                <li class="breadcrumb-item"><a :href="site_path+'/account'">Account</a></li>
                 <li class="breadcrumb-item active" aria-current="page">CashBook</li>
             </ol>
         </nav>
@@ -318,7 +318,7 @@ export default {
                 app.search.from_date +
                 "&to_date=" +
                 app.search.to_date;
-            axios.get('/cashbook/get_all_cashbook?page='+ page + search).then(function (response){
+            axios.get('/report/get_all_cashbook?page='+ page + search).then(function (response){
                 $("#loading").hide();
                 let data=response.data.account_transition;
                 app.cashbook=data;

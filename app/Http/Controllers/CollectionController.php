@@ -107,7 +107,7 @@ class CollectionController extends Controller
             AccountTransition::create([
                 'sub_account_id' => $sub_account_id,
                 'transition_date' => $request->collection_date,
-                'purchase_id' => $collection->id,
+                'sale_id' => $collection->id,
                 'is_cashbook' => 1,
                 'description'=>$description,
                 'vochur_no'=>$collection_no,

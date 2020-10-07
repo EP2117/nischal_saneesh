@@ -198,7 +198,8 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
         Route::patch('update/{id}','PaymentController@update');
         Route::delete('destroy/{id}','PaymentController@destroy');
     });
-    Route::group(['prefix' => 'cashbook'], function () {
+    Route::group(['prefix' => 'report'], function () {
         Route::get('get_all_cashbook','AccountTransitionController@getAllCashbook');
+        Route::get('/daily_purchase_product_report/', ['App\Http\Controllers\PurchaseInvoiceController','getDailyPurchaseProductReport']);
     });
 });

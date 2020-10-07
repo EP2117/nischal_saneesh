@@ -6,6 +6,7 @@ use App\AccountTransition;
 use App\Product;
 use App\ProductTransition;
 use App\PurchaseInvoice;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -346,9 +347,14 @@ class PurchaseInvoiceController extends Controller
 
 
         $p->delete();
+        if($p->payment_type=='cash'){
+            $sub_account_id=config('global.purchase');
+        }else{
+            $sub_account_id=config('global.purchase_advance');
+
+        }
         AccountTransition::where('purchase_id',$id)
-            ->where('sub_account_id',config('global.purchase'))
-            ->orWhere('sub_account_id',config('global.purchase_advance'))
+            ->where('sub_account_id',$sub_account_id)
             ->delete();
 
         return response(['message' => 'delete successful']);
@@ -368,4 +374,223 @@ class PurchaseInvoiceController extends Controller
         return compact('previous_balance');
 
     }
+    public function getDailyPurchaseProductReport(Request $request)
+    {
+        ini_set('memory_limit','512M');
+        ini_set('max_execution_time', 240);
+
+        //$sales =    Sale::with('products','order','order.sale_man','customer','warehouse','products.selling_uoms','products.uom','office_sale_man');
+        $purchases = DB::table("product_purchase")
+            ->select(DB::raw("product_purchase.*, purchase_invoices.invoice_date, purchase_invoices.invoice_no, purchase_invoices.order_id, purchase_invoices.branch_id, purchase_invoices.warehouse_id, purchase_invoices.supplier_id, products.product_code, products.product_name, products.brand_id, brands.brand_name, suppliers.name, uoms.uom_name,branches.branch_name"))
+
+            ->leftjoin('purchase_invoices', 'purchase_invoices.id', '=', 'product_purchase.purchase_id')
+//            ->leftjoin('orders', 'orders.id', '=', 'sales.order_id')
+            ->leftjoin('products', 'products.id', '=', 'product_purchase.product_id')
+
+            ->leftjoin('brands', 'brands.id', '=', 'products.brand_id')
+
+            ->leftjoin('suppliers', 'suppliers.id', '=', 'purchase_invoices.supplier_id')
+
+            ->leftjoin('uoms', 'uoms.id', '=', 'product_purchase.uom_id')
+
+//            ->leftjoin('users as u1', 'u1.id', '=', 'sales.office_sale_man_id')
+//
+//            ->leftjoin('users as u2', 'u2.id', '=', 'orders.sale_man_id')
+
+            ->leftjoin('branches', 'branches.id', '=', 'purchase_invoices.branch_id');
+
+        if($request->invoice_no != "") {
+            $purchases->where('purchase_invoices.invoice_no', $request->invoice_no);
+        }
+
+        if($request->from_date != '' && $request->to_date != '')
+        {
+            $purchases->whereBetween('purchase_invoices.invoice_date', array($request->from_date, $request->to_date));
+        } else if($request->from_date != '') {
+            $purchases->whereDate('purchase_invoices.invoice_date', '>=', $request->from_date);
+
+        }else if($request->to_date != '') {
+            $purchases->whereDate('purchase_invoices.invoice_date', '<=', $request->to_date);
+        } else {}
+
+        if($request->warehouse_id != "") {
+            $purchases->where('purchase_invoices.warehouse_id', $request->warehouse_id);
+        }
+
+        if(isset($request->branch_id) && $request->branch_id != "") {
+            $purchases->where('purchase_invoices.branch_id', $request->branch_id);
+        }
+
+        //for Country Head and Admin roles (can access multiple branch)
+        if(Auth::user()->role->id == 6 || Auth::user()->role->id == 2) {
+            $branches = Auth::user()->branches;
+            $branch_arr = array();
+            foreach($branches as $branch) {
+                array_push($branch_arr, $branch->id);
+            }
+            $purchases->whereIn('purchase_invoices.branch_id',$branch_arr);
+        } else {
+            //other roles can access only one branch
+            if(Auth::user()->role->id != 1) { //system can access all branches
+                $branch = Auth::user()->branch_id;
+                $purchases->where('purchase_invoices.branch_id',$branch);
+            }
+        }
+        if($request->supplier_id != "") {
+            $purchases->where('purchase_invoices.supplier_id', $request->supplier_id);
+        }
+
+        if($request->product_name != "") {
+            //$products->where('products.product_name', 'LIKE', "%$request->product_name%");
+            $binds = array(strtolower($request->product_name));
+            $purchases->whereRaw('lower(products.product_name) like lower(?)', ["%{$request->product_name}%"]);
+        }
+
+        /*if($request->brand_id != "") {
+            $sales->whereHas('products', function ($query) use ($request) {
+                $query->where('brand_id', $request->brand_id);
+            });
+        }*/
+        if($request->brand_id != "") {
+            $purchases->where('products.brand_id', $request->brand_id);
+        } else {
+            if(Auth::user()->role->id == 6) {
+                //for Country Head User
+                $access_brands = array();
+                foreach(Auth::user()->brands as $brand) {
+                    array_push($access_brands, $brand->id);
+                }
+
+                $purchases->whereIn('products.brand_id',$access_brands);
+            }
+        }
+        /*if($request->sale_man_id != "") {
+            $sales->whereHas('order', function ($query) use ($request) {
+                $query->where('sale_man_id', $request->sale_man_id);
+            });
+        }*/
+//        if($request->sale_man_id != "") {
+//            $sales->where('orders.sale_man_id', $request->sale_man_id);
+//        }
+//
+//        if($request->office_sale_man_id != "") {
+//            $sales->where('sales.office_sale_man_id', $request->office_sale_man_id);
+//        }
+
+        if(Auth::user()->role->id == 6) {
+            //for Country Head User
+            $access_users = array();
+//            $office_sale_man_arr = array();
+            foreach(Auth::user()->country_head_children as $ls) {
+                array_push($access_users, $ls->id);
+                $ls_query = User::with('local_supervisor_children')->find($ls->id);
+                foreach($ls_query->local_supervisor_children as $sm) {
+                    array_push($access_users, $sm->id);
+                }
+            }
+//            foreach(Auth::user()->office_sale_mans as $osm) {
+//                array_push($office_sale_man_arr, $osm->id);
+//            }
+
+            //get order user's order id
+            $orders = DB::table('orders')
+                ->whereIn('created_by',$access_users)
+                ->pluck('id')->toArray();
+
+            // $sales->whereIn('order_id',$orders);
+//            $sales->where(function($query) use ($orders, $office_sale_man_arr) {
+//                $query->whereIn('order_id',$orders)
+//                    ->orWhereIn('office_sale_man_id',$office_sale_man_arr);
+//            });
+        }
+
+        if(Auth::user()->role->id == 7) {
+            //for Local Supervisor user
+            $ls_access_users = array();
+            array_push($ls_access_users, Auth::user()->id);
+            foreach(Auth::user()->local_supervisor_children as $sm) {
+                array_push($ls_access_users, $sm->id);
+            }
+
+            //get order user's order id
+            $orders = DB::table('orders')
+                ->whereIn('created_by',$ls_access_users)
+                ->pluck('id')->toArray();
+
+            $purchases->whereIn('order_id',$orders);
+        }
+
+        if(Auth::user()->role->id == 4) {
+            //for office order user
+            //get order user's order id
+            $orders = DB::table('orders')
+                ->where('created_by',Auth::user()->id)
+                ->pluck('id')->toArray();
+
+            $purchases->whereIn('order_id',$orders);
+        }
+
+        if($request->order == "") {
+            $order = "ASC";
+        } else {
+            $order = $request->order;
+        }
+        if($request->sort_by != "") {
+            if($request->sort_by == "invoice_no") {
+                $purchases->orderBy('purchase_invoices.invoice_no', $order);
+            }
+            else {}
+        } else {
+            $purchases->orderBy('purchase_invoices.invoice_date', 'DESC');
+        }
+        // $data    =  $sales->orderBy('invoice_date', 'DESC')->get();
+        $data = $purchases->get();
+//        dd($data);
+        /*$access_brands = array();
+
+        if(Auth::user()->role->id == 6) {
+            //for Country Head User
+            foreach(Auth::user()->brands as $brand) {
+                array_push($access_brands, $brand->id);
+            }
+        }
+
+        $brands = DB::table('brands')
+                    ->whereIn('id',$access_brands)
+                    ->pluck('id')->toArray();*/
+
+        $total = 0;
+        $i = 1;
+        $html = '';
+        foreach($data as $purchase) {
+            $html .= '<tr><td class="text-right"></td><td>'.$purchase->invoice_no.'</td><td>'.$purchase->invoice_date.'</td>';
+            $html .= '<td class="mm-txt">'.$purchase->branch_name.'</td>';
+            $html .= '<td class="mm-txt">'.$purchase->name.'</td>';
+            $html .= '<td>'.$purchase->product_code.'</td>';
+            $html .= '<td>'.$purchase->product_name.'</td>';
+            $html .= '<td>'.$purchase->product_quantity.'</td>';
+            $html .= '<td>'.$purchase->uom_name.'</td>';
+            if($purchase->is_foc == 0) {
+                $html .= '<td class="text-right">'.$purchase->price.'</td>';
+            }
+            else {
+                $html .= '<td>FOC</td>';
+            }
+
+            $html .='<td class="text-right">'.$purchase->total_amount.'</td>';
+            $html .= '</tr>';
+
+            if($purchase->is_foc == 0){
+                $total = $total + $purchase->total_amount;
+            }
+
+            $i++;
+
+        }
+
+        $html .= '<tr><td colspan ="10" style="text-align: right;"><strong>Total</strong></td><td class="text-right">'.number_format($total).'</td></tr>';
+
+        return response(compact('html'), 200);
+    }
+
 }

@@ -266,11 +266,11 @@
                                                 </a>
                                             </a>
 
-                                            <a class="dropdown-item">
-                                                <a title="Print" class="text-primary" @click="generatePDF(p.id)" v-if="purchase_type == 1 && user_role != 'Country Head' && user_role != 'Local Supervisor' && user_role != 'office_order_user'">
-                                                    <i class="fas fa-print"></i>
-                                                </a>
-                                            </a>
+<!--                                            <a class="dropdown-item">-->
+<!--                                                <a title="Print" class="text-primary" @click="generatePDF(p.id)" v-if="purchase_type == 1 && user_role != 'Country Head' && user_role != 'Local Supervisor' && user_role != 'office_order_user'">-->
+<!--                                                    <i class="fas fa-print"></i>-->
+<!--                                                </a>-->
+<!--                                            </a>-->
 
                                             <a class="dropdown-item">
                                                 <a title="Delete" class="text-danger" @click="removePurchase(p.id)" v-if="(user_role == 'system' || user_role == 'office_user') ">

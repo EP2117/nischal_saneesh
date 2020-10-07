@@ -95,6 +95,8 @@ import ReceiptForm from "./views/Receipt/ReceiptForm";
 import Payment from "./views/Payment/Payment";
 import PaymentForm from "./views/Payment/PaymentForm";
 import Cashbook from "./views/Cashbook/Cashbook";
+import DailyPurchaseProductReport from "./views/PurchaseReport/DailyPurchaseProductReport";
+
 const routes = [
     {
       name: 'home',
@@ -452,6 +454,11 @@ const routes = [
         path: '/cashbook',
         component: Cashbook
     },
+    {
+        name:'daily_purchase_product_report',
+        path:'/report/daily_purchase_product_report',
+        component: DailyPurchaseProductReport
+    }
 
 ];
 
