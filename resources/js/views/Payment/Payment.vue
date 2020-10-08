@@ -80,6 +80,7 @@
                         <tr>
                             <th class="text-center">No.</th>
                             <th class="text-center">Cash Payment No</th>
+                            <th class="text-center">Date</th>
                             <th class="text-center">Debit</th>
                             <th class="text-center">Credit</th>
                             <th class="text-center">Amount</th>
@@ -93,6 +94,7 @@
                         <tr>
                             <th class="text-center">No.</th>
                             <th class="text-center">Cash Payment No</th>
+                            <th class="text-center">Date</th>
                             <th class="text-center">Debit</th>
                             <th class="text-center">Credit</th>
                             <th class="text-center">Amount</th>
@@ -106,6 +108,7 @@
                             <!--                            <td></td>-->
                             <td class="text-center">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                             <td class="text-center">{{p.cash_payment_no}}</td>
+                            <td class="text-center">{{p.date}}</td>
                             <td class="text-center">{{p.debit.sub_account_name}}</td>
                             <td class="text-center">{{p.credit.sub_account_name}}</td>
                             <td class="text-center">{{p.amount}}</td>

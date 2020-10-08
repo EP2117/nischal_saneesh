@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 class PaymentController extends Controller
 {
     public function getAll(Request $request){
-        $payment=Payment::orderBy('id','desc');
+        $payment=Payment::orderBy('id','asc');
         if($request->cash_payment_no!=null){
             $payment->where('cash_payment_no',$request->cash_payment_no);
         }
@@ -114,7 +114,9 @@ class PaymentController extends Controller
         ]);
         $payment =Payment::whereId($id)->first();
         if($payment){
-            AccountTransition::where('payment_id',$id)->update([
+            AccountTransition::where('payment_id',$id)
+                ->where('is_cashbook',1)
+                ->update([
                 'sub_account_id' => $payment->debit->id,
                 'vochur_no'=>$payment->cash_receipt_no,
                 'transition_date' => $payment->date,
@@ -125,28 +127,29 @@ class PaymentController extends Controller
                 'created_by' => Auth::user()->id,
                 'updated_by' => Auth::user()->id,
             ]);
-            AccountTransition::where('payment_id',$id)->update([
-                'sub_account_id' => $payment->debit->id,
-                'transition_date' => $payment->date,
-                'vochur_no'=>$payment->cash_receipt_no,
-                'payment_id' => $payment->id,
-                'is_cashbook' => 0,
-                'debit' => $payment->amount,
-                'description' => $payment->remark,
-                'created_by' => Auth::user()->id,
-                'updated_by' => Auth::user()->id,
-            ]);
-            AccountTransition::where('payment_id',$id)->update([
-                'sub_account_id' => $payment->credit->id,
-                'transition_date' => $payment->date,
-                'payment_id' => $payment->id,
-                'vochur_no'=>$payment->cash_receipt_no,
-                'is_cashbook' => 0,
-                'credit' => $payment->amount,
-                'description' => $payment->remark,
-                'created_by' => Auth::user()->id,
-                'updated_by' => Auth::user()->id,
-            ]);
+//              For leger
+//            AccountTransition::where('payment_id',$id)->update([
+//                'sub_account_id' => $payment->debit->id,
+//                'transition_date' => $payment->date,
+//                'vochur_no'=>$payment->cash_receipt_no,
+//                'payment_id' => $payment->id,
+//                'is_cashbook' => 0,
+//                'debit' => $payment->amount,
+//                'description' => $payment->remark,
+//                'created_by' => Auth::user()->id,
+//                'updated_by' => Auth::user()->id,
+//            ]);
+//            AccountTransition::where('payment_id',$id)->update([
+//                'sub_account_id' => $payment->credit->id,
+//                'transition_date' => $payment->date,
+//                'payment_id' => $payment->id,
+//                'vochur_no'=>$payment->cash_receipt_no,
+//                'is_cashbook' => 0,
+//                'credit' => $payment->amount,
+//                'description' => $payment->remark,
+//                'created_by' => Auth::user()->id,
+//                'updated_by' => Auth::user()->id,
+//            ]);
         }
         return response()->json([
             'status'=>'success',

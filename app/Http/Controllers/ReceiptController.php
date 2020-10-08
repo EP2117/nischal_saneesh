@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class ReceiptController extends Controller
 {
     public function getAll(Request $request){
-        $receipt=Recepit::orderBy('id','desc');
+        $receipt=Recepit::orderBy('id','asc');
         if($request->cash_receipt_no!=null){
             $receipt->where('cash_receipt_no',$request->cash_receipt_no);
         }
@@ -114,7 +114,9 @@ class ReceiptController extends Controller
         ]);
         $receipt=Recepit::whereId($id)->first();
         if($receipt){
-            AccountTransition::where('receipt_id',$id)->update([
+            AccountTransition::where('receipt_id',$id)
+                ->where('is_cashbook',1)
+                ->update([
                 'sub_account_id'=>$receipt->credit->id,
                 'transition_date'=>$receipt->date,
                 'vochur_no'=>$receipt->cash_receipt_no,
@@ -125,28 +127,29 @@ class ReceiptController extends Controller
                 'created_by'=>Auth::user()->id,
                 'updated_by'=>Auth::user()->id,
             ]);
-            AccountTransition::where('receipt_id',$id)->update([
-                'sub_account_id'=>$receipt->debit->id,
-                'transition_date'=>$receipt->date,
-                'receipt_id'=>$receipt->id,
-                'vochur_no'=>$receipt->cash_receipt_no,
-                'is_cashbook'=>0,
-                'debit'=>$receipt->amount,
-                'description'=>$receipt->remark,
-                'created_by'=>Auth::user()->id,
-                'updated_by'=>Auth::user()->id,
-            ]);
-            AccountTransition::where('receipt_id',$id)->update([
-                'sub_account_id'=>$receipt->credit->id,
-                'transition_date'=>$receipt->date,
-                'receipt_id'=>$receipt->id,
-                'is_cashbook'=>0,
-                'credit'=>$receipt->amount,
-                'vochur_no'=>$receipt->cash_receipt_no,
-                'description'=>$receipt->remark,
-                'created_by'=>Auth::user()->id,
-                'updated_by'=>Auth::user()->id,
-            ]);
+            /* For leger*/
+//            AccountTransition::where('receipt_id',$id)->update([
+//                'sub_account_id'=>$receipt->debit->id,
+//                'transition_date'=>$receipt->date,
+//                'receipt_id'=>$receipt->id,
+//                'vochur_no'=>$receipt->cash_receipt_no,
+//                'is_cashbook'=>0,
+//                'debit'=>$receipt->amount,
+//                'description'=>$receipt->remark,
+//                'created_by'=>Auth::user()->id,
+//                'updated_by'=>Auth::user()->id,
+//            ]);
+//            AccountTransition::where('receipt_id',$id)->update([
+//                'sub_account_id'=>$receipt->credit->id,
+//                'transition_date'=>$receipt->date,
+//                'receipt_id'=>$receipt->id,
+//                'is_cashbook'=>0,
+//                'credit'=>$receipt->amount,
+//                'vochur_no'=>$receipt->cash_receipt_no,
+//                'description'=>$receipt->remark,
+//                'created_by'=>Auth::user()->id,
+//                'updated_by'=>Auth::user()->id,
+//            ]);
         }
         return response()->json([
             'status'=>'success',
