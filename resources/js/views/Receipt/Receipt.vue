@@ -80,6 +80,7 @@
                         <tr>
                             <th class="text-center">No.</th>
                             <th class="text-center">Cash Receipt No</th>
+                            <th class="text-center">Date</th>
                             <th class="text-center">Debit</th>
                             <th class="text-center">Credit</th>
                             <th class="text-center">Amount</th>
@@ -93,6 +94,7 @@
                         <tr>
                             <th class="text-center">No.</th>
                             <th class="text-center">Cash Receipt No</th>
+                            <th class="text-center">Date</th>
                             <th class="text-center">Debit</th>
                             <th class="text-center">Credit</th>
                             <th class="text-center">Amount</th>

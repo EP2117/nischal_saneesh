@@ -95,7 +95,7 @@ class PurchaseCollectionController extends Controller
                 'total_paid_amount'=>$total_paid_amount,
                 'created_by' => Auth::user()->id,
             ]);
-            $description="P".$p_collection->collection_no.",Inv Date ".$p_collection->collection_date." by " .$p_collection->supplier->name;
+            $description="C".$p_collection->collection_no.",Inv Date ".$p_collection->collection_date." by " .$p_collection->supplier->name;
 
             $sub_account_id=config('global.credit_payment');    /*sub account id for credit payment */
             if($p_collection){
