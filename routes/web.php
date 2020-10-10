@@ -201,5 +201,7 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
     Route::group(['prefix' => 'report'], function () {
         Route::get('get_all_cashbook','AccountTransitionController@getAllCashbook');
         Route::get('/daily_purchase_product_report/', ['App\Http\Controllers\PurchaseInvoiceController','getDailyPurchaseProductReport']);
+        Route::get('get_credit_payment_report',['App\Http\Controllers\PurchaseCollectionController','getCreditPaymentReport']);
+
     });
 });

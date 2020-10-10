@@ -96,6 +96,7 @@ import Payment from "./views/Payment/Payment";
 import PaymentForm from "./views/Payment/PaymentForm";
 import Cashbook from "./views/Cashbook/Cashbook";
 import DailyPurchaseProductReport from "./views/PurchaseReport/DailyPurchaseProductReport";
+import CreditPaymentReport from "./views/PurchaseReport/CreditPaymentReport";
 
 const routes = [
     {
@@ -458,6 +459,11 @@ const routes = [
         name:'daily_purchase_product_report',
         path:'/report/daily_purchase_product_report',
         component: DailyPurchaseProductReport
+    },
+    {
+        name:'credit_payment_report',
+        path:'/report/credit_payment_report',
+        component: CreditPaymentReport
     }
 
 ];

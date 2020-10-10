@@ -198,10 +198,10 @@ export default {
                 app.form.cash_payment_no=r.cash_payment_no;
                 app.form.amount=r.amount;
                 app.form.remark=r.remark;
-                app.form.debit=r.credit_id;
+                app.form.debit=r.debit_id;
                 app.form.date = moment(r.date).format('YYYY-MM-DD');
                 $('#debit_id').val(app.form.debit).trigger('change');
-                app.form.credit=r.debit_id;
+                app.form.credit=r.credit_id;
                 $('#credit_id').val(app.form.credit).trigger('change');
             });
         },

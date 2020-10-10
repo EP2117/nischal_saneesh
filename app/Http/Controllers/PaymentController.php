@@ -38,7 +38,7 @@ class PaymentController extends Controller
         }else{
             $no=$latest->id;
         }
-        $invoice_no = "CP".str_pad((int)$no + 1,8,"0",STR_PAD_LEFT);
+        $invoice_no = "CP".str_pad((int)$no + 1,5,"0",STR_PAD_LEFT);
 
         $cash_payment_no = str_pad($invoice_no,5,"0",STR_PAD_LEFT);
         $payment=Payment::create([

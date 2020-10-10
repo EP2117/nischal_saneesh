@@ -8,13 +8,6 @@
                 <li class="breadcrumb-item active" aria-current="page">CashBook</li>
             </ol>
         </nav>
-        <!-- Page Heading -->
-<!--        <div class="d-sm-flex align-items-center justify-content-between mb-4">-->
-<!--            <h4 class="mb-0 text-gray-800">Purchase Invoice</h4>-->
-<!--            <router-link :to="'/purchase/'+purchase_type+'/create'" class="d-sm-inline-block btn btn-primary shadow-sm inventory" v-if="user_role == 'system' || user_role == 'office_user' || user_role == 'van_user'">-->
-<!--                <i class="fas fa-plus"></i> Add New Invoice-->
-<!--            </router-link>-->
-<!--        </div>-->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Search By</h6>
@@ -30,15 +23,11 @@
                         <input type="text" autocomplete="off" class="form-control datetimepicker" id="from_date" name="from_date"
                                v-model="search.from_date">
                     </div>
-
                     <div class="form-group col-md-4 col-lg-3">
                         <label for="to_date">To Date</label>
                         <input type="text" class="form-control datetimepicker" id="to_date" name="to_date"
                                v-model="search.to_date">
                     </div>
-
-
-
                     <div class="form-group col-md-4 col-lg-3">
                         <label for="supplier_id">Sub Account</label>
                         <select id="supplier_id" class="form-control mm-txt"
@@ -89,62 +78,71 @@
                         </tr>
                         </tfoot>
                         <template v-for="(at ,index) in cashbook">
-                        <tbody>
-                        <tr class="total_row"   v-if="at.opening_balance != 0 " >
-                            <td colspan="5" class="text-right mm-txt"><strong>Opening Balance</strong></td>
-                            <td class="text-center" colspan="1" v-if="at.opening_balance > 0 ">
-                                {{at.opening_balance}}
-                            </td>
-                            <td class="text-center" colspan="1" v-if="at.opening_balance < 0 ">
-                            </td>
-                            <td class="text-center" colspan="1" v-if="at.opening_balance < 0 ">
-                                {{at.opening_balance*(-1)}}
-                            </td>
-                            <td class="text-center" colspan="1" v-if="at.opening_balance >0 ">
-                            </td>
-                        </tr>
-                        <tr v-for="(c,index) in at.cashbook">
-                                                        <td></td>
+                            <tbody id="c_body">
+                            <tr class="total_row"   v-if="at.opening_balance != 0 " >
+                                <td colspan="5" class="text-right mm-txt"><strong>Opening Balance</strong></td>
+                                <td class="text-center" colspan="1" v-if="at.opening_balance > 0 ">
+                                    {{at.opening_balance}}
+                                </td>
+                                <td class="text-center" colspan="1" v-if="at.opening_balance < 0 ">
+                                </td>
+                                <td class="text-center" colspan="1" v-if="at.opening_balance < 0 ">
+                                    {{at.opening_balance*(-1)}}
+                                </td>
+                                <td class="text-center" colspan="1" v-if="at.opening_balance >0 ">
+                                </td>
+                            </tr>
+                            <template v-if="at.cashbook_list.length>0">
 
-<!--                            <td class="text-right">{{// ((currentPage * perPage) - perPage) + (index+1)}}</td>-->
-                            <td class="text-center">{{c.vochur_no}}</td>
-                            <td class="text-center">{{c.transition_date}}</td>
-<!--                            <td class="text-center">{{c.vochur_no}}</td>-->
-                            <td class="text-center">{{c.description}}</td>
-                            <td class="text-center" style="right: 4px ">{{c.sub_account.sub_account_name}}</td>
-                            <td class="text-center">{{c.debit!=''? c.debit : ''}} </td>
-                            <td class="text-center">{{c.credit!=''? c.credit : ''}} </td>
-                        </tr>
-                        <tr class="total_row"   >
-                            <td colspan="5" class="text-right mm-txt"><strong>DailyTotal</strong></td>
-                            <td class="text-center" colspan="1">
-                                {{at.total_debit}}
-                            </td>
-                            <td class="text-center" colspan="1">
-                                {{at.total_credit}}
-                            </td>
+                                <tr v-for="(c,key) in at.cashbook_list">
+                                    <td class="text-right"></td>
+                                    <td class="text-center">{{c.vochur_no}}</td>
+                                    <td class="text-center">{{c.transition_date}}</td>
+                                    <!--                            <td class="text-center">{{c.vochur_no}}</td>-->
+                                    <td class="text-center">{{c.description}}</td>
+                                    <td class="text-center" style="right: 4px ">{{c.sub_account.sub_account_name}}</td>
+                                    <td class="text-center">{{c.debit!=''? c.debit : ''}} </td>
+                                    <td class="text-center">{{c.credit!=''? c.credit : ''}} </td>
 
-                        </tr>
-                        <tr>
-                        <tr class="total_row">
-                            <td colspan="5" class="text-right mm-text"><strong>Closing Balance</strong></td>
-                            <td class="text-center " colspan="1" v-if="at.closing_balance>0">
-                                {{at.closing_balance}}
-<!--                                121222-->
-                            </td>
-                            <td class="text-center " colspan="1" v-else-if="at.closing_balance<0">
-                                <!--                                121222-->
-                            </td>
-                            <td class="text-center " colspan="1" v-if="at.closing_balance < 0">
-                                {{at.closing_balance*(-1)}}
-                                <!--                                121222-->
-                            </td>
-                            <td class="text-center " colspan="1" v-else-if="at.closing_balance > 0">
-                            </td>
-                        </tr>
-                        <br>
-                        </tbody>
-                    </template>
+                                </tr>
+                            </template>
+                            <template v-else-if="at.cashbook_list.length<=0">
+                                <tr>
+                                    <td class="text-right"></td>
+                                    <td class="text-center"></td>
+                                    <td >{{at.date}}</td>
+                                </tr>
+                            </template>
+                            <tr class="total_row"    v-if="at.cashbook_list.lenght>0">
+                                <td colspan="5" class="text-right mm-txt"><strong>DailyTotal</strong></td>
+                                <td class="text-center" colspan="1">
+                                    {{at.total_debit}}
+                                </td>
+                                <td class="text-center" colspan="1">
+                                    {{at.total_credit}}
+                                </td>
+
+                            </tr>
+                            <tr>
+                            <tr class="total_row">
+                                <td colspan="5" class="text-right mm-text"><strong>Closing Balance</strong></td>
+                                <td class="text-center " colspan="1" v-if="at.closing_balance>0">
+                                    {{at.closing_balance}}
+                                    <!--                                121222-->
+                                </td>
+                                <td class="text-center " colspan="1" v-else-if="at.closing_balance<0">
+                                    <!--                                121222-->
+                                </td>
+                                <td class="text-center " colspan="1" v-if="at.closing_balance < 0">
+                                    {{at.closing_balance*(-1)}}
+                                    <!--                                121222-->
+                                </td>
+                                <td class="text-center " colspan="1" v-else-if="at.closing_balance > 0">
+                                </td>
+                            </tr>
+                            <br>
+                            </tbody>
+                        </template>
                     </table>
                 </div>
                 <div v-else>
@@ -214,10 +212,12 @@ export default {
             perPage: 30,
             currentPage: 1,
             cashbook_count: 0,
+            count_of_days:0,
             total_debit:'',
             total_credit:'',
             user_year:'',
             rows:'',
+            row_no:'',
         }
     },
     created(){
@@ -287,13 +287,13 @@ export default {
                 minDate: app.user_year+"-01-01",
                 maxDate: app.user_year+"-12-31",
             }).on("dp.show", function(e) {
-                var y = new Date().getFullYear();
-                // if(app.user_year < y) {
-                //     if(app.search.to_date == app.user_year+"-12-31" || app.search.to_date == '') {
-                //         app.search.to_date = app.user_year+"-12-31";
-                //     }
-                // }
-            })
+            var y = new Date().getFullYear();
+            // if(app.user_year < y) {
+            //     if(app.search.to_date == app.user_year+"-12-31" || app.search.to_date == '') {
+            //         app.search.to_date = app.user_year+"-12-31";
+            //     }
+            // }
+        })
             .on("dp.change", function(e) {
                 var formatedValue = e.date.format("YYYY-MM-DD");
                 //console.log(formatedValue);
@@ -320,33 +320,42 @@ export default {
                 app.search.to_date;
             axios.get('/report/get_all_cashbook?page='+ page + search).then(function (response){
                 $("#loading").hide();
-                let data=response.data.account_transition;
+                // var a=$("#c_body tr").length;
+                // var rows = document.getElementById("dataTable").rows.length;
+
+                // var rows = document.getElementById('dataTable').getElementsByTagName("tr").length;
+                console.log(response.data.cashbook);
+                let data=response.data.cashbook;
                 app.cashbook=data;
                 app.cashbook_count=data.length;
-            //     app.opening_balance=response.data.opening_balance;
-            //     if(response.data.closing_balance < 0){
-            //         console.log('a');
-            //     }else if(response.data.closing_balance >0);
-            //     app.closing_balance=response.data.closing_balance;
-            //     app.total_debit=response.data.total_debit;
-            //     app.total_credit=response.data.total_credit;
-            //     app.cashbook=data.data;
-            //     app.cashbook_count = app.cashbook.length;
-            //     app.pagination.last_page = data.last_page;
-            //     app.pagination.next = data.next_page_url;
-            //     app.pagination.prev = data.prev_page_url;
-            //     app.pagination.total = data.total;
-            //     app.pagination.current_page = data.current_page;
-            //     app.pagination.next_page_url = data.next_page_url;
-            //     app.currentPage = data.current_page;
-            //     app.rows = data.total;
+                // app.count_of_days=response.data.count_of_days;
+
+
+
+
+                //     app.opening_balance=response.data.opening_balance;
+                //     if(response.data.closing_balance < 0){
+                //         console.log('a');
+                //     }else if(response.data.closing_balance >0);
+                //     app.closing_balance=response.data.closing_balance;
+                //     app.total_debit=response.data.total_debit;
+                //     app.total_credit=response.data.total_credit;
+                //     app.cashbook=data.data;
+                //     app.cashbook_count = app.cashbook.length;
+                //     app.pagination.last_page = data.last_page;
+                //     app.pagination.next = data.next_page_url;
+                //     app.pagination.prev = data.prev_page_url;
+                //     app.pagination.total = data.total;
+                //     app.pagination.current_page = data.current_page;
+                //     app.pagination.next_page_url = data.next_page_url;
+                //     app.currentPage = data.current_page;
+                //     app.rows = data.total;
             });
+
         }
 
     }
 }
 </script>
 
-<style scoped>
 
-</style>

@@ -108,18 +108,11 @@
                             <!--                            <td></td>-->
                             <td class="text-center">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                             <td class="text-center">{{r.cash_receipt_no}}</td>
+                            <td class="text-center">{{r.date}}</td>
                             <td class="text-center">{{r.debit.sub_account_name}}</td>
                             <td class="text-center">{{r.credit.sub_account_name}}</td>
                             <td class="text-center">{{r.amount}}</td>
                             <td class="text-center">{{r.remark}}</td>
-
-                            <!--                            <td class="text-center" v-if="sa.is_active == 1">-->
-<!--                                <span class="badge badge-success">Active</span>-->
-<!--                            </td>-->
-<!--                            <td class="text-center" v-else>-->
-<!--                                <span class="badge badge-danger">Inactive</span>-->
-<!--                            </td>-->
-<!--                            <td class="text-center"></td>-->
                             <td class="text-left">
                                 <div class="dropdown">
                                     <a class="btn btn-sm btn-icon-only text-danger " href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

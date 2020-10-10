@@ -449,8 +449,6 @@ class SaleController extends Controller
         $description="Inv ".$sale->invoice_no.",Inv Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
         if($sale){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
-                $at=AccountTransition::find($id);
-                if($at){
                     AccountTransition::where('purchase_id',$id)->update([
                         'sub_account_id' => $sub_account_id,
                         'transition_date' => $sale->invoice_date,
@@ -463,20 +461,6 @@ class SaleController extends Controller
                         'created_by' => Auth::user()->id,
                         'updated_by' => Auth::user()->id,
                     ]);
-                }else{
-                    AccountTransition::create([
-                        'sub_account_id' => $sub_account_id,
-                        'transition_date' => $sale->invoice_date,
-                        'sale_id' => $sale->id,
-                        'is_cashbook' => 1,
-                        'description'=>$description,
-                        'vochur_no'=>$request->invoice_no,
-                        'credit' => $amount,
-                        'created_by' => Auth::user()->id,
-                        'updated_by' => Auth::user()->id,
-                    ]);
-
-                }
             }elseif($request->payment_type=='credit' && $request->pay_amount==0){
                 AccountTransition::where('purchase_id',$id)->delete();
             }
