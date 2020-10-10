@@ -760,7 +760,7 @@ export default {
                             $("#loading").hide();
                             swal({
                                 title: "Success!",
-                                text: 'Collection is saved.',
+                                text: 'Credit Payment is saved.',
                                 icon: "success",
                                 button: true
                             }).then(function() {
@@ -802,7 +802,7 @@ export default {
                             $('#loading').hide();
                             swal({
                                 title: "Success!",
-                                text: 'Collection is updated.',
+                                text: 'Credit Payment is updated.',
                                 icon: "success",
                                 button: true
                             }).then(function() {

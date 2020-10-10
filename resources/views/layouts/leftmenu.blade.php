@@ -491,14 +491,14 @@
             </a>
         </router-link>
                 <hr class="sidebar-divider">
-                <router-link  tag="li" to="/report/daily_purchase_product_report" class="nav-item">
+                <router-link  tag="li" to="/report/credit_payment_report" class="nav-item">
                     <a class="nav-link" href="#">
                         <i class="fas fa-chart-bar"></i>
                         <span>Credit Purchase PaymentReport</span>
                     </a>
                 </router-link>
                 <hr class="sidebar-divider">
-                <router-link  tag="li" to="/report/credit_payment_report" class="nav-item">
+                <router-link  tag="li" to="/report/daily_purchase_product_report" class="nav-item">
                     <a class="nav-link" href="#">
                         <i class="fas fa-chart-bar"></i>
                         <span>Daily Purchase Product Wise Report</span>

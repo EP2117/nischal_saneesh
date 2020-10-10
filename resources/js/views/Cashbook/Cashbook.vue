@@ -106,7 +106,7 @@
 
                                 </tr>
                             </template>
-                            <template v-else-if="at.cashbook_list.length<=0">
+                            <template v-else-if="at.cashbook_list.length<=0 && !at.hide">
                                 <tr>
                                     <td class="text-right"></td>
                                     <td class="text-center"></td>
@@ -124,7 +124,7 @@
 
                             </tr>
                             <tr>
-                            <tr class="total_row">
+                            <tr class="total_row" v-if="!at.hide">
                                 <td colspan="5" class="text-right mm-text"><strong>Closing Balance</strong></td>
                                 <td class="text-center " colspan="1" v-if="at.closing_balance>0">
                                     {{at.closing_balance}}

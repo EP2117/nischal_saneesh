@@ -118,7 +118,7 @@ class PaymentController extends Controller
                 ->where('is_cashbook',1)
                 ->update([
                 'sub_account_id' => $payment->debit->id,
-                'vochur_no'=>$payment->cash_receipt_no,
+                'vochur_no'=>$request->cash_payment_no,
                 'transition_date' => $payment->date,
                 'payment_id' => $payment->id,
                 'is_cashbook' => 1,

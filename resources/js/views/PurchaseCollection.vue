@@ -139,7 +139,7 @@
                                                 </a>&nbsp;
                                             </router-link>
                                         </a>
-                                        <a class="dropdown-item" v-if="p.collection_amount==0 && p.payment_type=='credit' ">
+                                        <a class="dropdown-item" v-if="collection.collection_amount==0 && p.payment_type=='credit' ">
                                             <a title="Delete" class="text-danger" @click="removeCollection(collection.id)" v-if="user_role == 'admin' || user_role == 'system'">
                                                 <i class="fas fa-trash"></i>
                                             </a>&nbsp;

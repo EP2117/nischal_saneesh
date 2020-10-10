@@ -109,7 +109,6 @@ trait GetReport{
         }
         return $date_arr;
     }
-
     public function getOpening($request,$a){
         $opening=AccountTransition::whereDate('transition_date','<',$a)->where('is_cashbook',1);
         if($request->sub_account!=null){
@@ -161,4 +160,62 @@ trait GetReport{
 
 
     }
+    public function getCashBookList($request){
+        $date_arr=$this->getDateArr($request);
+        foreach($date_arr as $key=>$d){
+            $cashbook[$key]=new \stdClass();
+            $account_transition=AccountTransition::whereDate('transition_date',$d)->where('is_cashbook',1);
+            if($request->vochur_no!= null){
+                $account_transition->where('vochur_no',$request->vochur_no);
+            }if($request->sub_account!=null) {
+                $account_transition->where('sub_account_id',$request->sub_account);
+            }
+            if($request->vochur_no !=null || $request->sub_account!=null) {
+                $cashbook[$key]->hide=true;
+            }
+                $account_transition=$account_transition->get();
+            if($account_transition->isNotEmpty()){
+                $opening_balance = $this->getOpening($request,$d);
+                $total_credit = 0;
+                $total_debit = 0;
+                foreach($account_transition as $k=>$at){
+                    $total_debit += $at->debit;
+                    $total_credit += $at->credit;
+
+                }
+//                $account_transition[$k]->total_credit=$total_credit;
+//                $account_transition[$k]->total_debit=$total_debit;
+//                dd($account_transition);
+                $cashbook[$key]->total_credit=$total_credit;
+                $cashbook[$key]->total_debit=$total_debit;
+                $cashbook[$key]->date=$d;
+                $cashbook[$key]->opening_balance =$opening_balance;
+                $cashbook[$key]->closing_balance = $this->getClosing($request,$d, $opening_balance);
+
+
+                $cashbook[$key]->cashbook_list= $account_transition;
+            } elseif($account_transition->isNotEmpty() && count($date_arr)>1){
+
+                $cashbook[$key]->date=$d;
+                $cashbook[$key]->opening_balance =$cashbook[$key-1]->closing_balance;
+                $cashbook[$key]->closing_balance = $cashbook[$key-1]->closing_balance;
+                $cashbook[$key]->cashbook_list= [];
+            }else{
+//                is from_date'data is null in database
+//                $is_from_date=AccountTransition::whereDate('transition_date','<',$d)->where('is_cashbook',1)->latest()->first();
+                $is_from_date=AccountTransition::whereDate('transition_date','<',$d)->where('is_cashbook',1)->latest()->first();
+                $opening_balance = $this->getOpening($request,$d);
+                $total_debit=0;
+                $total_credit=0;
+                $cashbook[$key]->date=$d;
+                $cashbook[$key]->opening_balance =$opening_balance;
+                    $cashbook[$key]->closing_balance = $opening_balance;
+                $cashbook[$key]->cashbook_list= [];
+
+
+            }
+        }
+        return $cashbook;
+    }
+
 }
