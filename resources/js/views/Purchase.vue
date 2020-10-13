@@ -181,8 +181,8 @@
                                 <td v-else></td>
                                 <td>{{p.warehouse.warehouse_name}}</td>
                                 <td class="text-right">{{p.total_amount}}</td>
-                                <td class="text-right">{{p.pay_amount}}</td>
-                                <td class="text-right">{{p.balance_amount}}</td>
+                                <td class="text-right">{{p.pay_amount+p.collection_amount}}</td>
+                                <td class="text-right">{{p.balance_amount-p.collection_amount}}</td>
                                 <td>{{localTime(p.created_at)}}</td>
                                 <td>{{localTime(p.updated_at)}}</td>
 <!--                                <template v-if="sale_type == 1">-->

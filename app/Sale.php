@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model
 {
+    protected $with=['customer'];
     public function products()
     {
         return $this->belongsToMany('App\Product', 'product_sale', 'sale_id', 'product_id')->withPivot('id','uom_id','product_quantity','delivered_quantity','price','price_variant','total_amount','is_foc','rate','actual_rate','discount','other_discount','order_product_pivot_id');

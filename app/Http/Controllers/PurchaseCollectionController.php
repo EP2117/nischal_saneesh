@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\AccountTransition;
+use App\Http\Traits\Report\GetReport;
 use App\PurchaseCollection;
 use App\PurchaseInvoice;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Session;
 
 class PurchaseCollectionController extends Controller
 {
+    use GetReport;
     public function getPurchaseCollection(Request  $request){
         $login_year = Session::get('loginYear');
         $data = PurchaseCollection::with('branch');
@@ -78,7 +80,7 @@ class PurchaseCollectionController extends Controller
             } else {
                 $max_id = 1;
             }
-            $collection_no = "C".str_pad($max_id,5,"0",STR_PAD_LEFT);
+            $collection_no = "P".str_pad($max_id,5,"0",STR_PAD_LEFT);
             if($request->is_auto == true) {
                 $auto_payment	= 1;
                 $total_paid_amount	= $request->pay_amount;
@@ -282,6 +284,12 @@ class PurchaseCollectionController extends Controller
             ->delete();
 
         return response(['message' => 'delete successful']);
+    }
+    public function getCreditPaymentReport(Request  $request){
+        ini_set('memory_limit','512M');
+        ini_set('max_execution_time', 240);
+        $html=$this->getPaymentReport($request);
+        return response(compact('html'), 200);
     }
 
 }

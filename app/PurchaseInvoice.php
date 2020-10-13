@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class PurchaseInvoice extends Model
 {
     protected $table='purchase_invoices';
+    protected $with=['products','products.uom', 'warehouse','supplier','products.selling_uoms','office_purchase_man','branch'];
+
 //    protected $fillable=['invoice_no','reference_no','invoice_date','supplier_id']
     public function products()
     {

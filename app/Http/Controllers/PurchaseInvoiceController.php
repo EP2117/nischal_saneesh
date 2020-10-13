@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\AccountTransition;
+use App\Http\Traits\Report\GetReport;
 use App\Product;
 use App\ProductTransition;
 use App\PurchaseInvoice;
@@ -13,8 +14,9 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseInvoiceController extends Controller
 {
+    use GetReport;
     public function index(Request  $request){
-        $data=PurchaseInvoice::with('products','products.uom', 'warehouse','supplier','products.selling_uoms','office_purchase_man','branch');
+        $data=PurchaseInvoice::where('is_opening',0);
         if($request->invoice_no != "") {
             $data->where('invoice_no', $request->invoice_no);
         }
@@ -211,8 +213,6 @@ class PurchaseInvoiceController extends Controller
         $description="Inv ".$p->invoice_no.",Inv Date ".$p->invoice_date." to " .$p->supplier->name;
         if($p){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
-                $at=AccountTransition::find($id);
-                if($at){
                     AccountTransition::where('purchase_id',$id)->update([
                         'sub_account_id' => $sub_account_id,
                         'transition_date' => $p->invoice_date,
@@ -224,20 +224,6 @@ class PurchaseInvoiceController extends Controller
                         'created_by' => Auth::user()->id,
                         'updated_by' => Auth::user()->id,
                     ]);
-                }else{
-                    AccountTransition::create([
-                        'sub_account_id' => $sub_account_id,
-                        'transition_date' => $p->invoice_date,
-                        'purchase_id' => $p->id,
-                        'is_cashbook' => 1,
-                        'description'=>$description,
-                        'vochur_no'=>$request->invoice_no,
-                        'credit' => $amount,
-                        'created_by' => Auth::user()->id,
-                        'updated_by' => Auth::user()->id,
-                    ]);
-
-                }
             }elseif($request->payment_type=='credit' && $request->pay_amount==0){
                 AccountTransition::where('purchase_id',$id)->delete();
             }
@@ -591,6 +577,13 @@ class PurchaseInvoiceController extends Controller
         $html .= '<tr><td colspan ="10" style="text-align: right;"><strong>Total</strong></td><td class="text-right">'.number_format($total).'</td></tr>';
 
         return response(compact('html'), 200);
+    }
+    public function getCreditPaymentReport(Request  $request){
+        ini_set('memory_limit','512M');
+        ini_set('max_execution_time', 240);
+        $html=$this->getPaymentReport($request);
+        return response(compact('html'), 200);
+
     }
 
 }

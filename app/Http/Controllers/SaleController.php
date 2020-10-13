@@ -78,7 +78,7 @@ class SaleController extends Controller
             //get specific order invoics
             $data = Sale::with('order','sale_man','products','collections','products.uom', 'warehouse','customer','products.selling_uoms','deliveries','branch')
                         ->where('warehouse_id',Auth::user()->warehouse_id)
-                        ->where('sale_type', $request->sale_type);
+                        ->where('sale_type', $request->sale_type)->where('is_opening',0);
             $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
             $data->whereIn('order_id',$orders);
 
@@ -142,9 +142,8 @@ class SaleController extends Controller
             $data = $data->orderBy('id', 'DESC')->paginate($limit);
 
         } else {
-
-            $data = Sale::with('order','sale_man','products','collections','products.uom', 'warehouse','customer','products.selling_uoms','deliveries','branch')
-                    ->where('sale_type', $request->sale_type);
+            $data = Sale::with('order','order.sale_man','products','collections','products.uom', 'warehouse','customer','products.selling_uoms','office_sale_man','deliveries','branch')
+                    ->where('sale_type', $request->sale_type)->where('is_opening',0);
 
             if($request->sale_man_id != "") {
                 $data->where('office_sale_man_id', $request->sale_man_id);
@@ -496,8 +495,6 @@ class SaleController extends Controller
         $description="Inv ".$sale->invoice_no.",Inv Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
         if($sale){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
-                $at=AccountTransition::find($id);
-                if($at){
                     AccountTransition::where('purchase_id',$id)->update([
                         'sub_account_id' => $sub_account_id,
                         'transition_date' => $sale->invoice_date,
@@ -510,20 +507,6 @@ class SaleController extends Controller
                         'created_by' => Auth::user()->id,
                         'updated_by' => Auth::user()->id,
                     ]);
-                }else{
-                    AccountTransition::create([
-                        'sub_account_id' => $sub_account_id,
-                        'transition_date' => $sale->invoice_date,
-                        'sale_id' => $sale->id,
-                        'is_cashbook' => 1,
-                        'description'=>$description,
-                        'vochur_no'=>$request->invoice_no,
-                        'credit' => $amount,
-                        'created_by' => Auth::user()->id,
-                        'updated_by' => Auth::user()->id,
-                    ]);
-
-                }
             }elseif($request->payment_type=='credit' && $request->pay_amount==0){
                 AccountTransition::where('purchase_id',$id)->delete();
             }
