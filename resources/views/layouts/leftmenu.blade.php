@@ -125,6 +125,21 @@
                     <span>Supplier</span>
                 </a>
             </router-link>
+            <hr class="sidebar-divider">
+
+            <router-link  tag="li" to="/supplier_ob" class="nav-item">
+                <a class="nav-link" >
+                    <i class="fas fa-users"></i>
+                    <span>Supplier Opening Balance</span>
+                </a>
+            </router-link>
+            <hr class="sidebar-divider">
+            <router-link  tag="li" to="/customer_ob" class="nav-item">
+                <a class="nav-link" >
+                    <i class="fas fa-users"></i>
+                    <span>Customer Opening Balance</span>
+                </a>
+            </router-link>
 
         <!--<hr class="sidebar-divider">-->
 

@@ -36,7 +36,7 @@
                         <select id="supplier_id" class="form-control"
                                 v-model="search.supplier_id" style="width:100%">
                             <option value="">Select One</option>
-                            <option v-for="sup in suppliers" :value="sup.id"  >{{sup.name}}</option>
+                            <option v-for="sup in suppliers" :key="sup.id"  >{{sup.name}}</option>
                         </select>
                     </div>
                     <div class="form-group col-md-3 col-lg-2">
@@ -84,7 +84,7 @@
                         </tr>
                         </tfoot>
                         <tbody>
-                        <tr v-for="(p,index) in supplier_ob">
+                        <tr v-for="(p,index) in supplier_ob" :key="p.id">
                             <!--                            <td></td>-->
                             <td class="text-center">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                             <td class="text-center">{{p.invoice_no}}</td>
@@ -138,7 +138,7 @@
                     </table>
                 </div>
                 <div v-else>
-                    <h5 class="text-center m-5">No Payment found!</h5>
+                    <h5 class="text-center m-5">No Supplier Opening Balance found!</h5>
                 </div>
             </div>
 
