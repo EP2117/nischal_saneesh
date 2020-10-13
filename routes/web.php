@@ -204,4 +204,18 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
         Route::get('get_credit_payment_report',['App\Http\Controllers\PurchaseCollectionController','getCreditPaymentReport']);
 
     });
+    Route::group(['prefix' => 'supplier_ob'], function () {
+        Route::get('',['\App\Http\Controllers\SupplierOpeningBalanceController','index']);
+        Route::get('edit/{id}',['\App\Http\Controllers\SupplierOpeningBalanceController','edit']);
+        Route::post('store',['\App\Http\Controllers\SupplierOpeningBalanceController','store']);
+        Route::patch('update/{id}',['\App\Http\Controllers\SupplierOpeningBalanceController','update']);
+        Route::delete('{id}/destroy',['\App\Http\Controllers\SupplierOpeningBalanceController','destroy']);
+    });
+    Route::group(['prefix' => 'customer_ob'], function () {
+        Route::get('',['\App\Http\Controllers\CustomerOpeningBalanceController','index']);
+        Route::get('edit/{id}',['\App\Http\Controllers\CustomerOpeningBalanceController','edit']);
+        Route::post('store',['\App\Http\Controllers\CustomerOpeningBalanceController','store']);
+        Route::patch('update/{id}',['\App\Http\Controllers\CustomerOpeningBalanceController','update']);
+        Route::delete('{id}/destroy',['\App\Http\Controllers\CustomerOpeningBalanceController','destroy']);
+    });
 });

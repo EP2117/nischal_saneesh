@@ -157,8 +157,6 @@ trait GetReport{
             $closing_balance=0;
         }
         return $closing_balance;
-
-
     }
     public function getCashBookList($request){
         $date_arr=$this->getDateArr($request);
