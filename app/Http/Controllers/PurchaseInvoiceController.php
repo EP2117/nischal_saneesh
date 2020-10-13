@@ -16,7 +16,7 @@ class PurchaseInvoiceController extends Controller
 {
     use GetReport;
     public function index(Request  $request){
-        $data=PurchaseInvoice::with('products','products.uom', 'warehouse','supplier','products.selling_uoms','office_purchase_man','branch');
+        $data=PurchaseInvoice::where('is_opening',0);
         if($request->invoice_no != "") {
             $data->where('invoice_no', $request->invoice_no);
         }

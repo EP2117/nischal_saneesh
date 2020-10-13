@@ -78,7 +78,7 @@ class SaleController extends Controller
             //get specific order invoics
             $data = Sale::with('order','order.sale_man','products','collections','products.uom', 'warehouse','customer','products.selling_uoms','office_sale_man','deliveries','branch')
                         ->where('warehouse_id',Auth::user()->warehouse_id)
-                        ->where('sale_type', $request->sale_type);
+                        ->where('sale_type', $request->sale_type)->where('is_opening',0);
             $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
             $data->whereIn('order_id',$orders);
 
@@ -149,7 +149,7 @@ class SaleController extends Controller
         } else {
 
             $data = Sale::with('order','order.sale_man','products','collections','products.uom', 'warehouse','customer','products.selling_uoms','office_sale_man','deliveries','branch')
-                    ->where('sale_type', $request->sale_type);
+                    ->where('sale_type', $request->sale_type)->where('is_opening',0);
 
             if($request->sale_man_id != "") {
                 $data->whereHas('order', function ($query) use ($request) {

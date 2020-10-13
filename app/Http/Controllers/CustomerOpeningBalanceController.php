@@ -42,6 +42,7 @@ class CustomerOpeningBalanceController extends Controller
         $customer_ob->warehouse_id = Auth::user()->warehouse_id;
         $customer_ob->invoice_date=$request->opening_date;
         $customer_ob->is_opening=1;
+        $customer_ob->sale_type=1;
         $customer_ob->payment_type='credit';
         $customer_ob->customer_id=$request->customer_id;
         $customer_ob->total_amount=$request->amount;
