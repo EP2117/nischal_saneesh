@@ -67,11 +67,11 @@
                             name="sale_man_id" v-model="search.sale_man_id" style="width:100%" required
                         >
                             <option value="">Select One</option>
-                            <option v-for="sale_man in sale_mans" :value="sale_man.id"  >{{sale_man.name}}</option>
+                            <option v-for="sale_man in sale_men" :value="sale_man.id"  >{{sale_man.sale_man}}</option>
                         </select>
                     </div>
 
-                    <div class="form-group col-md-4 col-lg-3 mm-txt"  v-if="(user_role == 'system' || user_role == 'admin' || user_role == 'office_user' || user_role == 'Country Head') && sale_type == 1">
+                    <!--<div class="form-group col-md-4 col-lg-3 mm-txt"  v-if="(user_role == 'system' || user_role == 'admin' || user_role == 'office_user' || user_role == 'Country Head') && sale_type == 1">
                         <label for="office_sale_man_id">Office Sale Man</label>
                         <select id="office_sale_man_id" class="form-control mm-txt"
                             name="office_sale_man_id" v-model="search.office_sale_man_id" style="width:100%" required
@@ -84,7 +84,7 @@
                     <div class="form-group col-md-4 col-lg-3">
                         <label for="ref_no">Reference No.</label>
                         <input type="text" class="form-control" id="ref_no" name="ref_no" v-model="search.ref_no">
-                    </div>
+                    </div>-->
 
                     <div class="form-group col-md-4 col-lg-3" v-if="sale_type == 1">
                         <label for="invoice_type">Invoice Type</label>
@@ -92,8 +92,8 @@
                             name="invoice_type" v-model="search.invoice_type" style="width:100%" required
                         >
                             <option value="">Select One</option>
-                            <option value="approval">Approval Invoice</option>
                             <option value="direct">Direct Invoice</option>
+                            <option value="order">Order Invoice</option>
                         </select>
                     </div>
 
@@ -132,18 +132,16 @@
                             <tr>
                                 <th class="text-center">No.</th>
                                 <th class="text-center">Invoice No.</th>
-                                <th class="text-center">Reference No.</th>
+                                <!--<th class="text-center">Reference No.</th>-->
                                 <th class="text-center">Invoice Date</th>
                                 <th class="text-center">Branch</th>
                                 <th class="text-center">Customer</th>
                                 <th class="text-center">Sale Man</th>
-                                <th class="text-center">Office Sale Man</th>
-                                <th class="text-center">Sale Warehouse</th>
-                                <th class="text-center">Sub Total</th>
-                                <th class="text-center">Pay Amount</th>
-                                <th class="text-center">Balance</th>
-                                <th class="text-center">Created Time</th>
-                                <th class="text-center">Updated Time</th>
+                                <!--<th class="text-center">Office Sale Man</th>
+                                <th class="text-center">Sale Warehouse</th>-->
+                                <!--<th class="text-center">Net Total</th>
+                                <th class="text-center">Pay Amount</th>-->
+                                <th class="text-center">Net Total</th>
                                 <th class="text-center" v-if="sale_type == 1">Delivery Approve</th>
                                 <th class="text-center"></th>
                             </tr>
@@ -152,18 +150,13 @@
                             <tr>
                                 <th class="text-center">No.</th>
                                 <th class="text-center">Invoice No.</th>
-                                <th class="text-center">Reference No.</th>
                                 <th class="text-center">Invoice Date</th>
                                 <th class="text-center">Branch</th>
                                 <th class="text-center">Customer</th>
                                 <th class="text-center">Sale Man</th>
-                                <th class="text-center">Office Sale Man</th>
-                                <th class="text-center">Sale Warehouse</th>
-                                <th class="text-center">Sub Total</th>
-                                <th class="text-center">Pay Amount</th>
-                                <th class="text-center">Balance</th>
-                                <th class="text-center">Created Time</th>
-                                <th class="text-center">Updated Time</th>
+                                <!--<th class="text-center">Sub Total</th>
+                                <th class="text-center">Pay Amount</th>-->
+                                <th class="text-center">Net Total</th>
                                 <th class="text-center" v-if="sale_type == 1">Delivery Approve</th>
                                 <th class="text-center"></th>
                             </tr>
@@ -173,21 +166,15 @@
                             <tr>
                                 <td class="text-right">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                                 <td class="textalign">{{sale.invoice_no}}</td>
-                                <td class="textalign">{{sale.reference_no}}</td>
                                 <td class="textalign">{{sale.invoice_date}}</td>
                                 <td v-if="sale.branch != null">{{sale.branch.branch_name}}</td>
                                 <td v-else></td>
                                 <td class="mm-txt">{{sale.customer.cus_name}}</td>
-                                <td class="mm-txt" v-if="sale.order != null && sale.order.sale_man != null">{{sale.order.sale_man.name}}</td>
+                                <td class="mm-txt" v-if="sale.office_sale_man_id != null">{{sale.sale_man.sale_man}}</td>
                                 <td v-else></td>
-                                <td class="mm-txt" v-if="sale.office_sale_man_id != null">{{sale.office_sale_man.name}}</td>
-                                <td v-else></td>
-                                <td>{{sale.warehouse.warehouse_name}}</td>
-                                <td class="text-right">{{sale.total_amount}}</td>
-                                <td class="text-right">{{sale.pay_amount}}</td>
-                                <td class="text-right">{{sale.balance_amount}}</td>
-                                <td>{{localTime(sale.created_at)}}</td>
-                                <td>{{localTime(sale.updated_at)}}</td>
+                                <!--<td class="text-right">{{sale.total_amount}}</td>
+                                <td class="text-right">{{sale.pay_amount}}</td>-->
+                                <td class="text-right">{{sale.net_total}}</td>
                                 <template v-if="sale_type == 1">
                                 <td class="text-center" v-if="(user_role == 'system' || user_role == 'admin') && sale.delivery_status == 'Draft'">
                                     <input
@@ -512,6 +499,7 @@
                 branches: [],
                 site_path: '',
                 storage_path: '',
+                sale_men: [],
             };
         },
 
@@ -542,7 +530,8 @@
 
         mounted() {
             let app = this;
-            app.initSaleMan();
+            //app.initSaleMan();
+            app.initSaleMen();
             app.initOfficeSaleMan();
             app.initCustomers();
             app.initBranches();
@@ -637,9 +626,14 @@
 
         methods: {
 
+            initSaleMen() {
+              axios.get("/sale_men").then(({ data }) => (this.sale_men = data.data));              
+              $("#sale_man_id").select2();
+            },
+
             initSaleMan() {
               axios.get("/sale_man").then(({ data }) => (this.sale_mans = data.data));
-              $("#sale_man_id").select2();
+              //$("#sale_man_id").select2();
             },
 
             initBranches() {

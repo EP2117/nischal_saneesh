@@ -781,7 +781,7 @@
                     var subTotal = 0;
                     var row_id = 0;
 
-                    $.each(app.ex_products, function( key, product ) {  
+                    $.each(app.ex_products, function( key, product ) {
                         row_id = row_id+1;                      
                         if(app.user_role != "Country Head" || (app.user_role == "Country Head" && response.data.access_brands.indexOf(product.brand_id) > -1)) {
                             var table=document.getElementById("product_table");
@@ -1258,7 +1258,11 @@
                     
                amount = parseInt(amount) - parseInt(discount_amount);
 
-                $("#total_amount_"+row_id).val(Math.round(amount));
+                if($("#foc_"+row_id).prop("checked")) {
+                    $("#total_amount_"+row_id).val('0');
+                } else {
+                    $("#total_amount_"+row_id).val(Math.round(amount));
+                }
 
                 //Van Sale
                 //var product_price = $(obj).closest('td').prev().prev().prev().find(':selected').attr('data-price');
@@ -1312,6 +1316,12 @@
             changeCashDiscount() {
                 let app = this;
                 var cash_discount = app.form.cash_discount == '' || app.form.cash_discount == null ? 0 : app.form.cash_discount;
+
+                if(parseInt(cash_discount) > parseInt(app.form.sub_total)) {
+                    swal("Warning!", "Cash discount is greater than total amount", "warning");
+                    app.form.cash_discount = 0;
+                    return false;
+                }
 
                 app.form.net_total = parseInt(app.form.sub_total) - parseInt(cash_discount);
 
