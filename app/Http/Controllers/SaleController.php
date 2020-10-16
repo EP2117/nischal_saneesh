@@ -76,7 +76,7 @@ class SaleController extends Controller
                             ->where('created_by',Auth::user()->id)
                             ->pluck('id')->toArray();
             //get specific order invoics
-            $data = Sale::with('order','order.sale_man','products','collections','products.uom', 'warehouse','customer','products.selling_uoms','office_sale_man','deliveries','branch')
+            $data = Sale::with('order','sale_man','products','collections','products.uom', 'warehouse','customer','products.selling_uoms','deliveries','branch')
                         ->where('warehouse_id',Auth::user()->warehouse_id)
                         ->where('sale_type', $request->sale_type)->where('is_opening',0);
             $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
@@ -88,9 +88,9 @@ class SaleController extends Controller
 
             if($request->invoice_type != "") {
                 if($request->invoice_type == "direct") {
-                    $data->whereNull('order_approval_id');
+                    $data->whereNull('order_id');
                 } else {
-                    $data->whereNotNull('order_approval_id');
+                    $data->whereNotNull('order_id');
                 }
             }
 
@@ -120,14 +120,9 @@ class SaleController extends Controller
                 $data->where('branch_id', $request->branch_id);
             }
 
-            if($request->office_sale_man_id != "") {
-                $data->where('office_sale_man_id', $request->office_sale_man_id);
+            if($request->sale_man_id != "") {
+                $data->where('office_sale_man_id', $request->sale_man_id);
             }
-
-            if($request->ref_no != "") {
-                $data->where('reference_no','LIKE','%'.$request->ref_no.'%');
-            }
-
             //for Country Head and Admin roles (can access multiple branch)
             if(Auth::user()->role->id == 6 || Auth::user()->role->id == 2) {
                 $branches = Auth::user()->branches;
@@ -147,14 +142,11 @@ class SaleController extends Controller
             $data = $data->orderBy('id', 'DESC')->paginate($limit);
 
         } else {
-
-            $data = Sale::with('order','order.sale_man','products','collections','products.uom', 'warehouse','customer','products.selling_uoms','office_sale_man','deliveries','branch')
+            $data = Sale::with('order','sale_man','products','collections','products.uom', 'warehouse','customer','products.selling_uoms','deliveries','branch')
                     ->where('sale_type', $request->sale_type)->where('is_opening',0);
 
             if($request->sale_man_id != "") {
-                $data->whereHas('order', function ($query) use ($request) {
-                    $query->where('sale_man_id', $request->sale_man_id);
-                });
+                $data->where('office_sale_man_id', $request->sale_man_id);
             }
 
             if($request->invoice_no != "") {
@@ -179,19 +171,11 @@ class SaleController extends Controller
                 $data->where('branch_id', $request->branch_id);
             }
 
-            if($request->office_sale_man_id != "") {
-                $data->where('office_sale_man_id', $request->office_sale_man_id);
-            }
-
-            if($request->ref_no != "") {
-                $data->where('reference_no','LIKE','%'.$request->ref_no.'%');
-            }
-
             if($request->invoice_type != "") {
                 if($request->invoice_type == "direct") {
-                    $data->whereNull('order_approval_id');
+                    $data->whereNull('order_id');
                 } else {
-                    $data->whereNotNull('order_approval_id');
+                    $data->whereNotNull('order_id');
                 }
             }
 
@@ -285,11 +269,11 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
+        /**if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
             $validatedData = $request->validate([
                 'reference_no' => 'max:255|unique:sales',
             ]);
-        }
+        }**/
 
         $sale = new Sale;
 
@@ -305,18 +289,26 @@ class SaleController extends Controller
 
         $sale->invoice_no = $invoice_no;
         $sale->branch_id = Auth::user()->branch_id;
-        $sale->reference_no = $request->reference_no;
+        //$sale->reference_no = $request->reference_no;
         $sale->invoice_date = $request->invoice_date;
-        $sale->warehouse_id = Auth::user()->warehouse_id;
+        //$sale->warehouse_id = Auth::user()->warehouse_id;
         $sale->customer_id = $request->customer_id;
         //$sale->delivery_approve = 0;
         $sale->office_sale_man_id = $request->office_sale_man_id;
+        
+        if($request->sale_order == true) {
+            $sale->order_id = $request->order_id;
+        }
+
+        $sale->pay_amount = $request->pay_amount;
+        $sale->sale_type  = $request->sale_type;
 
         $sale->total_amount = $request->sub_total;
-        $sale->discount = $request->discount;
-        $sale->pay_amount = $request->pay_amount;
+        $sale->cash_discount = $request->cash_discount;
+        $sale->net_total = $request->net_total;
+        $sale->tax = $request->tax;
+        $sale->tax_amount = $request->tax_amount;
         $sale->balance_amount = $request->balance_amount;
-        $sale->sale_type  = $request->sale_type;
 
         if($request->payment_type == 'credit') {
             $sub_account_id=config('global.sale_advance');     /*sub account_id for sale advance*/
@@ -359,12 +351,53 @@ class SaleController extends Controller
             $main_uom_id = $product_result->uom_id;
 
             //add product into pivot table
-            $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
+            /**$pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);**/
+            if($request->sale_order == true) {
+                $pivot = $sale->products()->attach($request->product[$i],['order_product_pivot_id' => $request->order_product_id[$i],'uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]); 
+            } else {
+                $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
+            }
 
             //get last pivot insert id
             $last_row=DB::table('product_sale')->orderBy('id', 'DESC')->first();
 
             $pivot_id = $last_row->id;
+
+            if($request->sale_order == true) {
+                //update quantiy in product_order table
+                $accepted_qty = 0; 
+                $po_result = DB::table('product_order')
+                                ->select('accepted_quantity')
+                                ->where('id',$request->order_product_id[$i])
+                                ->first(); 
+                if($po_result->accepted_quantity == NULL) {
+                    $accepted_qty = $request->qty[$i];
+                } else {
+                    $accepted_qty = $po_result->accepted_quantity + $request->qty[$i]; 
+                } 
+        
+
+                DB::table('product_order')
+                        ->where('id', $request->order_product_id[$i])
+                        ->update(array('accepted_quantity' => $accepted_qty));
+
+                //Check order status is done or not
+                 $chk_order = DB::table("product_order")
+
+                            ->select(DB::raw("SUM(CASE  WHEN product_quantity IS NOT NULL THEN product_quantity  ELSE 0 END)  as product_qty, SUM(CASE  WHEN accepted_quantity IS NOT NULL THEN accepted_quantity  ELSE 0 END)  as accepted_qty"))
+                            ->where('order_id','=',$request->order_id)
+                            ->groupBy('order_id')
+                            ->first();
+                //update order status
+                $order = Order::find($request->order_id);
+                if($chk_order->product_qty == $chk_order->accepted_qty) {
+                    $status = "Done";
+                    //change status in order table;
+                    $order->order_status = $status;
+                    $order->save();
+                }
+                
+            }
 
             //calculate quantity for product pre-defined UOM
             $uom_relation = DB::table('product_selling_uom')
@@ -411,23 +444,36 @@ class SaleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
+        /**if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
             $validatedData = $request->validate([
                 'reference_no' => 'max:255|unique:sales,reference_no,'.$id,
             ]);
-        }
+        }**/
 
         $sale = Sale::find($id);
         $sale->invoice_no = $request->invoice_no;
-        $sale->reference_no = $request->reference_no;
-        $sale->invoice_date = $request->invoice_date;
-        $sale->warehouse_id = Auth::user()->warehouse_id;
         $sale->customer_id = $request->customer_id;
-        $sale->total_amount = $request->sub_total;
-        $sale->discount = $request->discount;
+        $sale->branch_id = Auth::user()->branch_id;
+        //$sale->reference_no = $request->reference_no;
+        $sale->invoice_date = $request->invoice_date;
+        //$sale->warehouse_id = Auth::user()->warehouse_id;
+        $sale->customer_id = $request->customer_id;
+        //$sale->delivery_approve = 0;
+        $sale->office_sale_man_id = $request->office_sale_man_id;
+        
+        if($request->sale_order == true) {
+            $sale->order_id = $request->order_id;
+        }
+
         $sale->pay_amount = $request->pay_amount;
-        $sale->balance_amount = $request->balance_amount;
         $sale->sale_type  = $request->sale_type;
+
+        $sale->total_amount = $request->sub_total;
+        $sale->cash_discount = $request->cash_discount;
+        $sale->net_total = $request->net_total;
+        $sale->tax = $request->tax;
+        $sale->tax_amount = $request->tax_amount;
+        $sale->balance_amount = $request->balance_amount;
 
         if($request->payment_type == 'credit') {
             $sub_account_id=config('global.sale_advance');     /*sub account_id for sale advance*/
@@ -489,7 +535,7 @@ class SaleController extends Controller
                 //update existing product in pivot and transition tables
                 DB::table('product_sale')
                     ->where('id', $request->product_pivot[$i])
-                    ->update(array('uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]));
+                    ->update(array('uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]));
 
                 //get product pre-defined UOM
                 $product_result = Product::select('uom_id')->find($request->product[$i]);
@@ -522,7 +568,9 @@ class SaleController extends Controller
                 $main_uom_id = $product_result->uom_id;
 
                 //add product into pivot table
-                $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
+                /*$pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);*/
+
+                $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
 
                 //get last pivot insert id
                 $last_row=DB::table('product_sale')->orderBy('id', 'DESC')->first();
@@ -575,7 +623,7 @@ class SaleController extends Controller
     public function show($id)
     {
         $access_brands = array();
-        $sale = Sale::with('products','collections','deliveries','warehouse','customer','products.brand','products.category','products.uom','products.selling_uoms','order','order.sale_man','order_approval','office_sale_man','branch')->find($id);
+        $sale = Sale::with('products','collections','deliveries','warehouse','customer','products.brand','products.category','products.uom','products.selling_uoms','order','sale_man','branch')->find($id);
         if(Auth::user()->role->id == 6) {
             //for Country Head User
             foreach(Auth::user()->brands as $brand) {
@@ -1361,48 +1409,49 @@ class SaleController extends Controller
     public function destroy($id)
     {
         $sale = Sale::find($id);
+       
+        if($sale->order_id != NULL) {
+
+            foreach($sale->products as $product) {
+                //update quantiy in product_order table
+                $accepted_qty = $product->pivot->product_quantity; 
+                $po_result = DB::table('product_order')
+                                ->select('accepted_quantity')
+                                ->where('id',$product->pivot->order_product_pivot_id)
+                                ->first(); 
+                $accepted_qty = $po_result->accepted_quantity -  $accepted_qty; 
+
+                DB::table('product_order')
+                        ->where('id', $product->pivot->order_product_pivot_id)
+                        ->update(array('accepted_quantity' => $accepted_qty));
+
+                //Check order status is done or not
+                 $chk_order = DB::table("product_order")
+
+                            ->select(DB::raw("SUM(CASE  WHEN product_quantity IS NOT NULL THEN product_quantity  ELSE 0 END)  as product_qty, SUM(CASE  WHEN accepted_quantity IS NOT NULL THEN accepted_quantity  ELSE 0 END)  as accepted_qty"))
+                            ->where('order_id','=',$sale->order_id)
+                            ->groupBy('order_id')
+                            ->first();
+                //update order status
+                $order = Order::find($sale->order_id);
+                if($chk_order->product_qty == $chk_order->accepted_qty) {
+                    $status = "Done";
+                } else {
+                    $status = "Draft";
+                }
+                //change status in order table;
+                $order->order_status = $status;
+                $order->save();
+            } 
+            
+        } 
+
         $sale->products()->detach();
-        if($sale->order_id == NULL) {
-            //delete in transition
-            DB::table('product_transitions')
+
+        DB::table('product_transitions')
                 ->where('transition_sale_id', $id)
                 ->delete();
-        } else {
-           if($sale->is_revise == 1) {
-                //update approval status in order_approvals table
-                DB::table('order_approvals')
-                    ->where('id', $sale->order_approval_id)
-                    ->update(array('status' => 0, 'updated_at' => time()));
 
-                DB::table('product_transitions')
-                    ->where('transition_approval_id', $sale->order_approval_id)
-                    ->where('transition_type','in')
-                    ->delete();
-
-                DB::table('product_transitions')
-                    ->where('transition_sale_id', $id)
-                    ->delete();
-
-           } else {
-            //update approval status in order_approvals table
-                DB::table('order_approvals')
-                    ->where('id', $sale->order_approval_id)
-                    ->update(array('status' => 0, 'updated_at' => time()));
-                //update transition_sale_id by transition_approval_id in production_transitions table
-                DB::table('product_transitions')
-                    ->where('transition_approval_id', $sale->order_approval_id)
-                    ->update(array('transition_sale_id' => NULL, 'updated_at' => time()));
-
-                DB::table('product_transitions')
-                    ->where('transition_approval_id', $sale->order_approval_id)
-                    ->where('transition_type','in')
-                    ->delete();
-
-                DB::table('product_transitions')
-                    ->where('transition_sale_id', $id)
-                    ->delete();
-            }
-        }
         $sale->delete();
         if($sale->payment_type=='cash'){
             $sub_account_id=config('global.sale');

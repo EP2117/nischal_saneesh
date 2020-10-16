@@ -18,20 +18,23 @@
                                 <label for="invoice_no">Invoice No.</label>
                                 <input type="text" class="form-control" id="invoice_no" name="invoice_no" v-model="form.invoice_no" readonly>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="invoice_date">Date</label>
                                 <input type="text" class="form-control datetimepicker" id="invoice_date" name="invoice_date"
                                 v-model="form.invoice_date" required :readonly="SOEdit">
-                            </div>
-                            <div class="form-group col-md-4" v-if="!form.sale_order">
-                                <label for="office_sale_man">Office Sale Man</label>
-                                <input type="text" class="form-control" id="office_sale_man" name="office_sale_man"
-                                v-model="form.office_sale_man" readonly>        
-                            </div>
+                            </div>                            
                         </div>
 
                         <div class="row mt-3">
-                             <div class="form-group col-md-4">
+                            <div class="form-group col-md-4" v-if="!form.sale_order">
+                                <label for="office_sale_man">Sale Man</label>
+                                <input type="text" class="form-control" id="office_sale_man" name="office_sale_man"
+                                v-model="form.office_sale_man" readonly>        
+                            </div>
+
+                            <div class="form-group col-md-4">
                                 <label for="customer_id">Customer</label>
                                 <select id="customer_id" class="form-control mm-txt"
                                     name="customer_id" v-model="form.customer_id" style="width:100%" required :disabled="SOEdit"
@@ -40,7 +43,7 @@
                                     <option v-for="cus in customers" :value="cus.id"  >{{cus.cus_name}}</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-4">
+                            <!--<div class="form-group col-md-4">
                                 <label for="vehicle_warehouse">Vehicle Warehouse</label>
                                  <input type="text" class="form-control" id="vehicle_warehouse" name="vehicle_warehouse"
                                 v-model="user_warehouse" readonly>
@@ -50,7 +53,7 @@
                                 <label for="reference_no">Reference No.</label>
                                  <input type="text" class="form-control" id="reference_no" name="reference_no"
                                 v-model="form.reference_no">
-                            </div>
+                            </div>-->
                         </div>
 
                         <div class="row mt-3">
@@ -1039,6 +1042,12 @@
 
                     //get customer's previous balance
                     axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
+
+                    app.sale_orders = [];  
+                    app.sale_order_approvals = [];
+                    $('#order_product_table tbody tr').slice(0, -3).remove();
+                    axios.get("/customer_sale_orders/"+data.id).then(({ data }) => (app.sale_orders = data.data));
+                    $("#sale_order").select2();
                 });
 
                 $(".txt_product").on("select2:select", function(e) {
@@ -1467,6 +1476,12 @@
                                 app.form.customer_id = data.id;
                                 //get customer's previous balance
                                  axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
+
+                                app.sale_orders = [];  
+                                app.sale_order_approvals = [];
+                                $('#order_product_table tbody tr').slice(0, -3).remove();
+                                axios.get("/customer_sale_orders/"+data.id).then(({ data }) => (app.sale_orders = data.data));
+                                $("#sale_order").select2();
                             });
 
                             $(".txt_product").on("select2:select", function(e) {

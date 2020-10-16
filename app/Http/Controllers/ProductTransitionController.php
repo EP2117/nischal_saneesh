@@ -23,7 +23,7 @@ class ProductTransitionController extends Controller
 	public function getProductsByUserWarehouse() {
 		$data = DB::table("product_transitions")
 
-	    		->select(DB::raw("product_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.brand_id, products.category_id,products.product_price,uom_id,uoms.uom_name,SUM(CASE  WHEN transition_type = 'in' THEN product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN transition_type = 'out' THEN product_quantity  ELSE 0 END)  as out_count"))
+	    		->select(DB::raw("product_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.brand_id, products.category_id,products.selling_price,uom_id,uoms.uom_name,SUM(CASE  WHEN transition_type = 'in' THEN product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN transition_type = 'out' THEN product_quantity  ELSE 0 END)  as out_count"))
 
 	    		->leftjoin('products', 'products.id', '=', 'product_transitions.product_id')
 
@@ -56,7 +56,7 @@ class ProductTransitionController extends Controller
                     ->where("product_transitions.warehouse_id",Auth::user()->warehouse_id);***/
             $data = DB::table("products")
 
-                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code , ' - ', brands.brand_name) as product_name,products.product_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (product_transitions.transition_sale_id != ".$id." OR product_transitions.transition_sale_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
+                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code , ' - ', brands.brand_name) as product_name,products.selling_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (product_transitions.transition_sale_id != ".$id." OR product_transitions.transition_sale_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
 
                     ->leftjoin('product_transitions', 'product_transitions.product_id', '=', 'products.id')
 
@@ -76,7 +76,7 @@ class ProductTransitionController extends Controller
                     ->where("product_transitions.warehouse_id",Auth::user()->warehouse_id); ***/
             $data = DB::table("products")
 
-                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.product_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (product_transitions.transition_transfer_id != ".$id." OR product_transitions.transition_transfer_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
+                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.selling_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (product_transitions.transition_transfer_id != ".$id." OR product_transitions.transition_transfer_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
 
                     ->leftjoin('product_transitions', 'product_transitions.product_id', '=', 'products.id')
 
@@ -96,7 +96,7 @@ class ProductTransitionController extends Controller
                     ->where("product_transitions.warehouse_id",Auth::user()->warehouse_id);// Main Warehouse is default for order products ***/
             $data = DB::table("products")
 
-                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.product_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (.product_transitions.transition_approval_id != ".$id." OR product_transitions.transition_approval_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
+                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.selling_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (.product_transitions.transition_approval_id != ".$id." OR product_transitions.transition_approval_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
 
                     ->leftjoin('product_transitions', 'product_transitions.product_id', '=', 'products.id')
 
@@ -116,7 +116,7 @@ class ProductTransitionController extends Controller
                     ->where("product_transitions.warehouse_id",Auth::user()->warehouse_id);  */
             $data = DB::table("products")
 
-                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.product_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
+                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.selling_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
 
                     ->leftjoin('product_transitions', 'product_transitions.product_id', '=', 'products.id')
 
@@ -242,7 +242,7 @@ class ProductTransitionController extends Controller
                     ->where("product_transitions.warehouse_id",Auth::user()->warehouse_id); ***/
             $data = DB::table("products")
 
-                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.product_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (product_transitions.transition_sale_id != ".$id." OR product_transitions.transition_sale_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
+                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.selling_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (product_transitions.transition_sale_id != ".$id." OR product_transitions.transition_sale_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
 
                     ->leftjoin('product_transitions', 'product_transitions.product_id', '=', 'products.id')
 
@@ -263,7 +263,7 @@ class ProductTransitionController extends Controller
 
             $data = DB::table("products")
 
-                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.product_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (product_transitions.transition_transfer_id != ".$id." OR product_transitions.transition_transfer_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
+                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.selling_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (product_transitions.transition_transfer_id != ".$id." OR product_transitions.transition_transfer_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
 
                     ->leftjoin('product_transitions', 'product_transitions.product_id', '=', 'products.id')
 
@@ -283,7 +283,7 @@ class ProductTransitionController extends Controller
                     ->where("product_transitions.warehouse_id",Auth::user()->warehouse_id);// Main Warehouse is default for order products***/
             $data = DB::table("products")
 
-                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.product_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (product_transitions.transition_approval_id != ".$id." OR product_transitions.transition_approval_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
+                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.selling_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' AND (product_transitions.transition_approval_id != ".$id." OR product_transitions.transition_approval_id IS NULL) THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
 
                     ->leftjoin('product_transitions', 'product_transitions.product_id', '=', 'products.id')
 
@@ -303,7 +303,7 @@ class ProductTransitionController extends Controller
                     ->where("product_transitions.warehouse_id",Auth::user()->warehouse_id); ***/
             $data = DB::table("products")
 
-                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.product_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
+                    ->select(DB::raw("products.id as product_id, products.brand_id, products.category_id, CONCAT(products.product_name, ' - ', products.product_code, ' - ', brands.brand_name) as product_name,products.selling_price,uom_id,uoms.uom_name,SUM(CASE  WHEN product_transitions.transition_type = 'in' THEN product_transitions.product_quantity  ELSE 0 END)  as in_count, SUM(CASE  WHEN product_transitions.transition_type = 'out' THEN product_transitions.product_quantity  ELSE 0 END)  as out_count"))
 
                     ->leftjoin('product_transitions', 'product_transitions.product_id', '=', 'products.id')
 
