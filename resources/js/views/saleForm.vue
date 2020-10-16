@@ -805,8 +805,14 @@
                     var row_id = 0;
 
                     $.each(app.ex_products, function( key, product ) {  
-                        row_id = row_id+1;                      
-                        if(app.user_role != "Country Head" || (app.user_role == "Country Head" && response.data.access_brands.indexOf(product.brand_id) > -1)) {
+                        row_id = row_id+1;  
+                        var bal_product = 0;
+                        var p_qty = product.pivot.product_quantity;                        
+                        var accept_qty = product.pivot.accepted_quantity == null ? 0 : product.pivot.accepted_quantity;
+
+                        bal_product = parseInt(p_qty) - parseInt(accept_qty); 
+
+                        if((app.user_role != "Country Head" || (app.user_role == "Country Head" && response.data.access_brands.indexOf(product.brand_id) > -1)) && bal_product > 0) {
                             var table=document.getElementById("order_product_table");
                             var row=table.insertRow((table.rows.length) - 6);
                             row.id = row_id;
@@ -1475,6 +1481,13 @@
                     app.form.invoice_no = response.data.sale.invoice_no;
                     //app.form.reference_no = response.data.sale.reference_no;
                     app.form.payment_type = response.data.sale.payment_type;
+
+                    if(response.data.sale.payment_type == 'credit') {
+                        $("#pay_amount").attr('readonly',false);
+                        
+                    } else {
+                        $("#pay_amount").attr('readonly',true);     
+                    }
                    // app.form.previous_balance = response.data.previous_balance;
                     app.form.due_date = response.data.sale.due_date;
                     app.form.credit_day = response.data.sale.credit_day;
@@ -2241,7 +2254,7 @@
                                 if(app.sale_type == 1)
                                 {
                                     var baseurl = window.location.origin;
-                                    window.open(app.site_path+'/generate_invoice/'+data.sale_id);
+                                    //window.open(app.site_path+'/generate_invoice/'+data.sale_id);
                                 }
                             });
                         } else {
@@ -2283,10 +2296,10 @@
                     //Edit entry details
                     app.edit_form = $("#sale_form").serialize();
                    
-                    if(app.edit_form == app.original_form) {
+                    /**if(app.edit_form == app.original_form) {
                         swal("Warning!", "Please edit at least one field", "warning");
                         $("#loading").hide();
-                    } else {
+                    } else { **/
                         app.form.product_pivot = [];
 
                         app.form.product = [];
@@ -2377,7 +2390,7 @@
                             //swal("Warning!", error, "warning");
 
                         });
-                    }
+                    //}
                 }
             },
 

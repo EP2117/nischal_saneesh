@@ -128,8 +128,8 @@
                                 <td v-if="order.branch != null" class="textalign">{{order.branch.branch_name}}</td>
                                 <td v-else></td>
                                 <td class="mm-txt">{{order.customer.cus_name}}</td>
-                                <td class="mm-txt">{{order.sale_man.name}}</td>
-                                <td class="text-right">{{order.total_amount}}</td>
+                                <td class="mm-txt">{{order.sale_man != null ? order.sale_man.sale_man : ''}}</td>
+                                <td class="text-right">{{order.net_total}}</td>
                                 <td class="mm-txt">{{order.remark}}</td>
                                 <td>{{localTime(order.created_at)}}</td>
                                 <td>{{localTime(order.updated_at)}}</td>

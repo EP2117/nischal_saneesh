@@ -142,7 +142,7 @@ class SaleController extends Controller
             $data = $data->orderBy('id', 'DESC')->paginate($limit);
 
         } else {
-            $data = Sale::with('order','order.sale_man','products','collections','products.uom', 'warehouse','customer','products.selling_uoms','office_sale_man','deliveries','branch')
+            $data = Sale::with('order','sale_man','products','collections','products.uom', 'warehouse','customer','products.selling_uoms','deliveries','branch')
                     ->where('sale_type', $request->sale_type)->where('is_opening',0);
 
             if($request->sale_man_id != "") {
