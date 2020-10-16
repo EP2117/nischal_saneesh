@@ -8,6 +8,7 @@ use App\Product;
 use App\ProductTransition;
 use App\PurchaseInvoice;
 use App\User;
+use App\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -94,7 +95,7 @@ class PurchaseInvoiceController extends Controller
         $p->created_by = Auth::user()->id;
         $p->updated_by = Auth::user()->id;
         $p->save();
-        $description="Inv ".$p->invoice_no.",Inv Date ".$p->invoice_date." to " .$p->supplier->name;
+        $description=$p->invoice_no.",Inv Date ".$p->invoice_date." to " .$p->supplier->name;
 
         if($p){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)){
@@ -210,7 +211,8 @@ class PurchaseInvoiceController extends Controller
         $p->updated_at = time();
         $p->updated_by = Auth::user()->id;
         $p->save();
-        $description="Inv ".$p->invoice_no.",Inv Date ".$p->invoice_date." to " .$p->supplier->name;
+        $sup_name=Supplier::find($request->supplier_id);
+        $description=$p->invoice_no.",Inv Date ".$p->invoice_date." to " .$sup_name->name;
         if($p){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
                     AccountTransition::where('purchase_id',$id)->update([
@@ -227,7 +229,6 @@ class PurchaseInvoiceController extends Controller
             }elseif($request->payment_type=='credit' && $request->pay_amount==0){
                 AccountTransition::where('purchase_id',$id)->delete();
             }
-
         }
         $ex_pivot_arr = $request->ex_product_pivot;
         //remove id in pivot that are removed in sale Form

@@ -77,9 +77,10 @@
                             <th class="text-center">Credit</th>
                         </tr>
                         </tfoot>
-                        <template v-for="(at ,index) in cashbook">
                             <tbody id="c_body">
-                            <tr class="total_row"   v-if="at.opening_balance != 0 && !at.hide" >
+
+                        <template v-for="(at ,index) in cashbook">
+                            <tr class="total_row"   v-if="at.opening_balance != 0 && !at.hide && at.cashbook_list.lenght>0" >
                                 <td colspan="5" class="text-right mm-txt"><strong>Opening Balance</strong></td>
                                 <td class="text-center" colspan="1" v-if="at.opening_balance > 0 ">
                                     {{at.opening_balance}}
@@ -113,8 +114,7 @@
                                     <td >{{at.date}}</td>
                                 </tr>
                             </template>
-                             <template v-else-if="at.cashbook_list.length<=0">
-                        </template>
+                            
                             <tr class="total_row"    v-if="at.cashbook_list.length>0 && !at.hide">
                                 <td colspan="5" class="text-right mm-txt"><strong>DailyTotal</strong></td>
                                 <td class="text-center" colspan="1">
@@ -125,7 +125,6 @@
                                 </td>
 
                             </tr>
-                            <tr>
                             <tr class="total_row" v-if="!at.hide">
                                 <td colspan="5" class="text-right mm-text"><strong>Closing Balance</strong></td>
                                 <td class="text-center " colspan="1" v-if="at.closing_balance>0">
@@ -142,9 +141,9 @@
                                 <td class="text-center " colspan="1" v-else-if="at.closing_balance > 0">
                                 </td>
                             </tr>
-                            <br>
-                            </tbody>
                         </template>
+                            </tbody>
+
                     </table>
                 </div>
                 <div v-else>
@@ -307,10 +306,22 @@ export default {
             axios.get('/sub_account/get_all_sub_account').then(({data})=>(this.sub_account=data.sub_account));
         },
         getCashbook(page=1){
-            $("#loading").show();
-            // alert(page);
-
             let app = this;
+            if(this.search.from_date == "") {
+                swal("Warning!", "From Date must be added!", "warning")
+                return false;
+            }
+            // if(app.search.from_date == null && app.search.to_date ==null){
+            //     swal({
+            //     title: "Required to fill date ",
+            //     // text: "Once deleted, you will not be able to recover!",
+            //     icon: "warning",
+            //     buttons: true,
+            //     dangerMode: true
+            // });
+            // }
+            $("#loading").show();
+
             var search =
                 "&sub_account=" +
                 app.search.sub_account +
