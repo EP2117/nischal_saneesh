@@ -291,5 +291,19 @@ class PurchaseCollectionController extends Controller
         $html=$this->getPaymentReport($request);
         return response(compact('html'), 200);
     }
+    public function getPurchaseOutstanding(Request $request){
+        // dd($request->all());
+        $purchase_outstandings=$this->getPurchaseOutStandingReport($request);
+        $net_inv_amt=$net_paid_amt=$net_balance_amt=0;
+        foreach($purchase_outstandings as $po){
+            foreach($po->out_list as $i){
+                // dd($i);
+                $net_inv_amt+=$i->total_amount; 
+                $net_paid_amt+=$i->t_paid_amount;
+                $net_balance_amt+=$i->t_balance_amount;
+            }
+        }
+        return compact('purchase_outstandings','net_paid_amt','net_balance_amt','net_inv_amt');
+    }
 
 }

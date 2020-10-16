@@ -95,12 +95,14 @@ import ReceiptForm from "./views/Receipt/ReceiptForm";
 import Payment from "./views/Payment/Payment";
 import PaymentForm from "./views/Payment/PaymentForm";
 import Cashbook from "./views/Cashbook/Cashbook";
-import DailyPurchaseProductReport from "./views/PurchaseReport/DailyPurchaseProductReport";
-import CreditPaymentReport from "./views/PurchaseReport/CreditPaymentReport";
+import DailyPurchaseProductReport from "./views/Report/DailyPurchaseProductReport";
+import CreditPaymentReport from "./views/Report/CreditPaymentReport";
 import SupplierOpeningBalance from "./views/SupplierOpeningBalance/SupplierOpeningBalance";
 import SupplierOpeningBalanceForm from "./views/SupplierOpeningBalance/SupplierOpeningBalanceForm";
 import CustomerOpeningBalance from "./views/CustomerOpeningBalance/CustomerOpeningBalance";
 import CustomerOpeningBalanceForm from "./views/CustomerOpeningBalance/CustomerOpeningBalanceForm";
+import PurchaseOutstandingReport from "./views/Report/PurchaseOutstandingReport";
+import SaleOutstandingReport from "./views/Report/SaleOutstandingReport";
 
 const routes = [
     {
@@ -494,7 +496,15 @@ const routes = [
   {
       path:'/customer_ob/edit/:id',
       component: CustomerOpeningBalanceForm,
-  }
+  },
+  {
+    path:'/report/purchase_outstanding',
+    component: PurchaseOutstandingReport,
+},
+{
+  path:'/report/sale_outstanding',
+  component: SaleOutstandingReport,
+},
 
 ];
 

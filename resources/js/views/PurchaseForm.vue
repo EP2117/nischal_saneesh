@@ -258,7 +258,7 @@
 
                         </div>
 
-                        <div class="row">
+                        <div class="row" >
                             <div class="col-md-12" v-if="!isEdit">
                                 <input type="submit" class="btn btn-primary btn-sm" value="Save Entry"  :disabled = "isDisabled">
                             </div>
@@ -1277,6 +1277,7 @@ export default {
                         // console.log('b');
                         app.form.office_purchase_man = '';
                     }
+                    
                     // console.log(app);
 
                     if(app.form.payment_type == 'credit') {
@@ -1291,6 +1292,9 @@ export default {
                     app.form.pay_amount = response.data.purchase.pay_amount;
                     app.form.discount = response.data.purchase.discount;
                     app.form.balance_amount = response.data.purchase.balance_amount;
+                     if(app.form.collection_amount!=0  && app.form.payment_type=='credit'){
+                        app.isDisabled=true;
+                    }
                     $.each(app.ex_products, function( key, value ) {
                         app.form.ex_product_pivot.push(value.pivot.id);
                     });

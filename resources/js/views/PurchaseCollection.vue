@@ -324,7 +324,7 @@ export default {
             }).then(willDelete => {
                 if (willDelete) {
                     axios.delete("/purchase_collection/destroy/" + id).then(function() {
-                        swal("Success! Collection has been deleted!", {
+                        swal("Success! Credit Payment has been deleted!", {
                             icon: "success"
                         });
                         app.getCollections();

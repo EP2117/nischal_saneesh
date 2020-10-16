@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use DB;
+use PDF;
+use Session;
+use App\Sale;
+use App\User;
+use App\Order;
+use App\Product;
+use App\Customer;
+use Carbon\Carbon;
 use App\AccountTransition;
+use App\ProductTransition;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Auth;
-use App\Sale;
-use App\Order;
-use App\ProductTransition;
-use Carbon\Carbon;
-use App\Product;
-use App\User;
 use App\Exports\DailySaleExport;
-use App\Exports\DailySaleProductExport;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
-use PDF;
-use DB;
-use Session;
+use App\Exports\DailySaleProductExport;
+use Illuminate\Validation\ValidationException;
 
 class SaleController extends Controller
 {
@@ -326,7 +327,8 @@ class SaleController extends Controller
         $sale->created_by = Auth::user()->id;
         $sale->updated_by = Auth::user()->id;
         $sale->save();
-        $description="SI ".$sale->invoice_no.",Inv Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
+
+        $description=$sale->invoice_no.",Inv Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
         /* Cash Book  for sale*/
         if($sale) {
             if ($request->payment_type == 'cash' || ($request->payment_type == 'credit' && $request->pay_amount != 0)) {
@@ -492,7 +494,8 @@ class SaleController extends Controller
         $sale->updated_at = time();
         $sale->updated_by = Auth::user()->id;
         $sale->save();
-        $description="Inv ".$sale->invoice_no.",Inv Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
+        $cus=Customer::find($request->customer_id);
+        $description=$sale->invoice_no.",Inv Date ".$sale->invoice_date." by " .$cus->_cus_name;
         if($sale){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
                     AccountTransition::where('purchase_id',$id)->update([

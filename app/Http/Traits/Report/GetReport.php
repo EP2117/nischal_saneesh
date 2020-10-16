@@ -1,12 +1,15 @@
 <?php
 namespace App\Http\Traits\Report;
+use App\Sale;
+use Carbon\Carbon;
+use App\PurchaseInvoice;
 use App\AccountTransition;
 use App\CollectionPurchase;
 use App\PurchaseCollection;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 trait GetReport{
+    
     public function getPaymentReport($request){
 //        dd($request->all());
         $payments =DB::table('collection_purchase')
@@ -214,6 +217,134 @@ trait GetReport{
             }
         }
         return $cashbook;
+    }
+    public function getPurchaseOutStandingReport($request){
+        // dd($request->all());
+        $purchase_outstanding=PurchaseInvoice::where('payment_type','credit');
+        $sup=PurchaseInvoice::where('payment_type','credit');
+        if($request->supplier_id!=null){
+            $sup->where('supplier_id',$request->supplier_id);
+        }
+        if($request->invoice_no!=null){
+            $sup->where('invoice_no',$request->invoice_no);
+        }
+        if($request->branch_id!=null){
+            $sup->where('branch_id',$request->branch_id);
+        }
+        if($request->state_id){
+            $state=$request->state_id;
+            $sup->whereHas('supplier',function($q)use($state){
+                $q->where('state_id',$state);
+            });
+        }
+        if($request->township_id){
+            $town=$request->township_id;
+            $sup->whereHas('supplier',function($q)use($town){
+                $q->where('township_id',$town);
+            });
+        }
+        if($request->from_date != '' && $request->to_date != '')
+        {
+            $sup->whereBetween('invoice_date', array($request->from_date, $request->to_date));
+        } else if($request->from_date != '') {
+            $sup->whereDate('invoice_date', '>=', $request->from_date);
+
+        }else if($request->to_date != '') {
+            $sup->whereDate('invoice_date', '<=', $request->to_date);
+        } else {
+            // $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
+        }
+        $sup=$sup->groupBy('supplier_id')->get();
+        // $net_inv_amt=$net_paid_amt=$net_balance_amt=0;
+        foreach($sup as $key=>$s){
+            // dd($s);
+            $per_inv_amt=$per_paid_amt=$per_bal_amt=0;
+            $p_outstandings[$key]=new \stdClass();
+            $invoices=PurchaseInvoice::where('supplier_id',$s->supplier_id);
+            if($request->invoice_no!=null){
+                $invoices->where('invoice_no',$request->invoice_no);
+            }
+            $invoices=$invoices->get();
+            foreach($invoices as $k=>$i){
+                $i->t_paid_amount=$i->pay_amount+$i->collection_amount;
+                $i->t_balance_amount=$i->balance_amount-$i->collection_amount;
+                $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
+                // $net_inv_amt+=$i->total_amount; $net_paid_amt+=$i->paid_amount;$net_balance_amt+=$i->balance_amount;
+            }
+            // $invoices[$key]->per_inv_amt=$per_inv_amt;
+            // $invoices[$key]->per_paid_amt=$per_paid_amt;
+            // $invoices[$key]->per_bal_amt=$per_bal_amt;
+            $p_outstandings[$key]->out_list=$invoices;
+            $p_outstandings[$key]->total_inv_amt=$per_inv_amt;
+            $p_outstandings[$key]->total_paid_amt=$per_paid_amt;
+            $p_outstandings[$key]->total_bal_amt=$per_bal_amt;
+        }
+        // dd($p_outstandings);
+        return $p_outstandings;
+    }
+    public function getSaleOutstandingReport($request){
+        // dd($request->all());
+        $purchase_outstanding=Sale::where('payment_type','credit');
+        $cus=Sale::where('payment_type','credit');
+        if($request->customer_id!=null){
+            $cus->where('customer_id',$request->customer_id);
+        }
+        if($request->invoice_no!=null){
+            $cus->where('invoice_no',$request->invoice_no);
+        }
+        if($request->branch_id!=null){
+            $cus->where('branch_id',$request->branch_id);
+        }
+        if($request->state_id){
+            $state=$request->state_id;
+            $cus->whereHas('customer',function($q)use($state){
+                $q->where('state_id',$state);
+            });
+        }
+        if($request->township_id){
+            $town=$request->township_id;
+            $cus->whereHas('customer',function($q)use($town){
+                $q->where('township_id',$town);
+            });
+        }
+        if($request->from_date != '' && $request->to_date != '')
+        {
+            $cus->whereBetween('invoice_date', array($request->from_date, $request->to_date));
+        } else if($request->from_date != '') {
+            $cus->whereDate('invoice_date', '>=', $request->from_date);
+
+        }else if($request->to_date != '') {
+            $cus->whereDate('invoice_date', '<=', $request->to_date);
+        } else {
+            // $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
+        }
+        $cus=$cus->groupBy('customer_id')->get();
+        // $net_inv_amt=$net_paid_amt=$net_balance_amt=0;
+        foreach($cus as $key=>$s){
+            // dd($s);
+            $per_inv_amt=$per_paid_amt=$per_bal_amt=0;
+            $p_outstandings[$key]=new \stdClass();
+            $invoices=Sale::where('customer_id',$s->customer_id);
+            if($request->invoice_no!=null){
+                $invoices->where('invoice_no',$request->invoice_no);
+            }
+            $invoices=$invoices->get();
+            foreach($invoices as $k=>$i){
+                $i->t_paid_amount=$i->pay_amount+$i->collection_amount;
+                $i->t_balance_amount=$i->balance_amount-$i->collection_amount;
+                $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
+                // $net_inv_amt+=$i->total_amount; $net_paid_amt+=$i->paid_amount;$net_balance_amt+=$i->balance_amount;
+            }
+            // $invoices[$key]->per_inv_amt=$per_inv_amt;
+            // $invoices[$key]->per_paid_amt=$per_paid_amt;
+            // $invoices[$key]->per_bal_amt=$per_bal_amt;
+            $p_outstandings[$key]->out_list=$invoices;
+            $p_outstandings[$key]->total_inv_amt=$per_inv_amt;
+            $p_outstandings[$key]->total_paid_amt=$per_paid_amt;
+            $p_outstandings[$key]->total_bal_amt=$per_bal_amt;
+        }
+        // dd($p_outstandings);
+        return $p_outstandings;
     }
 
 }

@@ -140,6 +140,7 @@
                     <span>Customer Opening Balance</span>
                 </a>
             </router-link>
+            
 
         <!--<hr class="sidebar-divider">-->
 
@@ -517,6 +518,20 @@
                     <a class="nav-link" href="#">
                         <i class="fas fa-chart-bar"></i>
                         <span>Daily Purchase Product Wise Report</span>
+                    </a>
+                </router-link>
+                <hr class="sidebar-divider">
+                <router-link  tag="li" to="/report/purchase_outstanding" class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Purchase Outstanding Report</span>
+                    </a>
+                </router-link>
+                <hr class="sidebar-divider">
+                <router-link  tag="li" to="/report/sale_outstanding" class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Sale Outstanding Report</span>
                     </a>
                 </router-link>
 

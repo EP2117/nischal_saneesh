@@ -206,46 +206,7 @@
 <!--                                    </td>-->
 <!--                                </template>-->
 
-                                <td class="text-center" v-if="p.collection_amount==0">
-                                    <!-- before delivery -->
-                                    <!--<router-link tag="span" :to="'/sale/'+sale_type+'/edit/' + sale.id" >
-                                        <a href="#" title="Edit/View" class="">
-                                            <i class="fas fa-edit"></i>
-                                        </a>&nbsp;
-                                    </router-link>
-
-                                    <a title="Print" class="text-primary" @click="printSale(sale.id)" v-if="sale_type == 2 && user_role != 'Country Head' && user_role != 'Local Supervisor' && user_role != 'office_order_user'">
-                                        <i class="fas fa-print"></i>
-                                    </a>
-
-                                    <a title="Print" class="text-primary" @click="generatePDF(sale.id)" v-if="sale_type == 1 && user_role != 'Country Head' && user_role != 'Local Supervisor' && user_role != 'office_order_user'">
-                                        <i class="fas fa-print"></i>
-                                    </a>
-
-                                    <a title="Delete" class="text-danger" @click="removeSale(sale.id)" v-if="(user_role == 'system' || user_role == 'admin') && sale.collections.length == 0">
-                                        <i class="fas fa-trash"></i>
-                                    </a>&nbsp;-->
-
-                                    <!-- after delivery -->
-
-                                    <!--<router-link tag="span" :to="'/sale/'+sale_type+'/edit/' + sale.id" v-if="user_role != 'delivery'">
-                                        <a href="#" title="Edit/View" class="">
-                                            <i class="fas fa-edit"></i>
-                                        </a>&nbsp;
-                                    </router-link>
-
-                                    <a title="Print" class="text-primary" @click="printSale(sale.id)" v-if="sale_type == 2 && user_role != 'Country Head' && user_role != 'Local Supervisor' && user_role != 'office_order_user'">
-                                        <i class="fas fa-print"></i>
-                                    </a>
-
-                                    <a title="Print" class="text-primary" @click="generatePDF(sale.id)" v-if="sale_type == 1 && user_role != 'Country Head' && user_role != 'Local Supervisor' && user_role != 'office_order_user'">
-                                        <i class="fas fa-print"></i>
-                                    </a>
-
-                                    <a title="Delete" class="text-danger" @click="removeSale(sale.id)" v-if="(user_role == 'system' || user_role == 'admin') && sale.collections.length == 0 && sale.delivery_approve == 0 && sale.deliveries.length == 0">
-                                        <i class="fas fa-trash"></i>
-                                    </a>&nbsp;-->
-
+                                <td class="text-center" >
 <!--                                    temp command-->
                                     <div class="dropdown">
                                         <a class="btn btn-sm btn-icon-only text-danger " href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -260,19 +221,12 @@
                                                 </router-link>
                                             </a>
 
-                                            <a class="dropdown-item">
+                                            <a class="dropdown-item" >
                                                 <a title="Print" class="text-primary" @click="printSale(p.id)" v-if="user_role != 'Country Head' && user_role != 'Local Supervisor' && user_role != 'office_order_user'">
                                                     <i class="fas fa-print"></i>
                                                 </a>
                                             </a>
-
-<!--                                            <a class="dropdown-item">-->
-<!--                                                <a title="Print" class="text-primary" @click="generatePDF(p.id)" v-if="purchase_type == 1 && user_role != 'Country Head' && user_role != 'Local Supervisor' && user_role != 'office_order_user'">-->
-<!--                                                    <i class="fas fa-print"></i>-->
-<!--                                                </a>-->
-<!--                                            </a>-->
-
-                                            <a class="dropdown-item">
+                                            <a class="dropdown-item" v-if="p.collection_amount==0">
                                                 <a title="Delete" class="text-danger" @click="removePurchase(p.id)" v-if="(user_role == 'system' || user_role == 'office_user') ">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
@@ -284,138 +238,7 @@
                             </tr>
 
                             <!-- detail view for each invoice -->
-<!--                            <template v-if="purchase_type == 2">-->
-<!--                                <div :id="p.id" style="display:none;">-->
-<!--                                    <div style="text-aling:center;display:inline-block; margin:0 auto; width:100%;">-->
-<!--                                        <h4 class="text-center title">Like Link Co., Ltd.</h4>-->
-<!--                                        &lt;!&ndash;<div style="text-align:center">-->
-<!--                                            <img src="images/LikeLinklogo.png" width="100" />-->
-<!--                                        </div>&ndash;&gt;-->
-<!--                                        <table style="border:none;">-->
-<!--                                            <tr>-->
-<!--                                                <td class="mm-txt">၀ယ္သူ</td>-->
-<!--                                                <td class="mm-txt">{{p.supplier.name}}</td>-->
-<!--                                                <td class="mm-txt" style="text-align:right">ရက္စဲြ</td>-->
-<!--                                                <td style="text-align:right">{{p.invoice_date}}</td>-->
-<!--                                            </tr>-->
-<!--                                            <tr>-->
-<!--                                                <td class="mm-txt">လိပ္စာ</td>-->
-<!--                                                <td>{{p.supplier.sup_shipping_address}}</td>-->
-<!--                                                <td style="text-align:right">Invoice No.</td>-->
-<!--                                                <td style="text-align:right">{{p.invoice_no}}</td>-->
-<!--                                            </tr>-->
-<!--                                        </table>-->
 
-<!--                                        <table class="t-class" cellspacing="2" style="margin-top:20px;">-->
-<!--                                            <thead>-->
-<!--                                            <tr>-->
-<!--                                                <td class='mm-txt font-bold'>စဥ္</td>-->
-<!--                                                <td class='mm-txt font-bold'>အမ်ိဳးအမည္</td>-->
-<!--                                                <td class='mm-txt font-bold' style="min-width:50px;">အေရအတြက္</td>-->
-<!--                                                <td class='mm-txt font-bold' style="min-width:30px;">ေစ်းႏႈန္း</td>-->
-<!--                                                <td class='mm-txt font-bold'>သင့္ေငြ</td>-->
-<!--                                            </tr>-->
-<!--                                            </thead>-->
-<!--                                            <tbody>-->
-<!--                                            <tr v-for="(product,i) in p.products">-->
-<!--                                                <td>{{i+1}}</td>-->
-<!--                                                <td>{{product.product_name}}</td>-->
-
-<!--                                                <td>-->
-<!--                                                    {{product.pivot.product_quantity}} {{getUomName(product,product.pivot.uom_id)}}-->
-<!--                                                </td>-->
-<!--                                                <td v-if="product.pivot.is_foc == '0'">{{product.pivot.price}}</td>-->
-<!--                                                <td v-else>FOC</td>-->
-<!--                                                <td v-if="product.pivot.is_foc == '0'" class="text-right">{{product.pivot.total_amount}}</td>-->
-<!--                                                <td v-else></td>-->
-<!--                                            </tr>-->
-<!--                                            <tr>-->
-<!--                                                <td colspan="4" class="text-right mm-txt">စုစုေပါင္း</td>-->
-<!--                                                <td class="text-right">{{numberWithCommas(p.total_amount)}}</td>-->
-<!--                                            </tr>-->
-<!--                                            &lt;!&ndash;<tr>-->
-<!--                                                <td colspan="4" class="text-right mm-txt">လက္က်န္ေငြ</td>-->
-<!--                                                <td class="text-right">{{sale.balance_amount}}</td>-->
-<!--                                            </tr>&ndash;&gt;-->
-<!--                                            </tbody>-->
-<!--                                        </table>-->
-
-<!--                                        <h4 class="text-center">Thanks for your purchase!</h4>-->
-<!--                                    </div>-->
-
-<!--                                </div>-->
-<!--                            </template>-->
-
-<!--                            <template v-else>-->
-<!--                                <div :id="p.id" style="display:none;">-->
-<!--                                    <div style="text-aling:center;display:inline-block; margin-top:212px; width:100%;">-->
-<!--                                        &lt;!&ndash;<div style="text-align:center">-->
-<!--                                            <img src="images/LikeLinklogo.png" width="100" />-->
-<!--                                        </div>&ndash;&gt;-->
-<!--                                        <table style="border:none;">-->
-<!--                                            <tr>-->
-<!--                                                <td class="mm-txt">၀ယ္သူ</td>-->
-<!--                                                <td class="mm-txt">{{p.supplier.name}}</td>-->
-<!--                                                <td class="mm-txt" style="text-align:right">ရက္စဲြ</td>-->
-<!--                                                <td style="text-align:right">{{p.invoice_date}}</td>-->
-<!--                                            </tr>-->
-<!--                                            <tr>-->
-<!--                                                <td class="mm-txt">လိပ္စာ</td>-->
-<!--                                                <td>{{p.supplier.sup_shipping_address}}</td>-->
-<!--                                                <td style="text-align:right">Invoice No.</td>-->
-<!--                                                <td style="text-align:right">{{p.invoice_no}}</td>-->
-<!--                                            </tr>-->
-<!--                                        </table>-->
-
-<!--                                        <table class="t-office-class" cellspacing="0" style="margin-top:20px;">-->
-<!--                                            <thead>-->
-<!--                                            <tr>-->
-<!--                                                <td class='mm-txt font-bold' style="text-align:center;">စဥ္</td>-->
-<!--                                                <td class='mm-txt font-bold' style="text-align:center;">အမ်ိဳးအမည္</td>-->
-<!--                                                <td class='mm-txt font-bold' style="min-width:50px;text-align:center;">အေရအတြက္</td>-->
-<!--                                                <td class='mm-txt font-bold' style="min-width:30px;text-align:center;">ေစ်းႏႈန္း</td>-->
-<!--                                                <td class='mm-txt font-bold' style="text-align:center;">သင့္ေငြ</td>-->
-<!--                                            </tr>-->
-<!--                                            </thead>-->
-<!--                                            <tbody>-->
-<!--                                            <tr v-for="(product,i) in p.products">-->
-<!--                                                <td>{{i+1}}</td>-->
-<!--                                                <td>{{product.product_name}}</td>-->
-
-<!--                                                <td v-if="product.pivot.uom_id == product.uom_id">-->
-<!--                                                    {{product.pivot.product_quantity}} {{getUomName(product,product.pivot.uom_id)}}-->
-<!--                                                </td>-->
-
-<!--                                                <td v-else>-->
-<!--                                                    {{product.pivot.product_quantity}} {{getUomName(product,product.pivot.uom_id)}} x {{getUomRelation(product,product.pivot.uom_id)}} {{getUomName(product,product.uom_id)}}-->
-<!--                                                </td>-->
-
-<!--                                                <td v-if="product.pivot.is_foc == '0'">{{product.pivot.price}}</td>-->
-<!--                                                <td v-else>FOC</td>-->
-<!--                                                <td v-if="product.pivot.is_foc == '0'" class="text-right">{{product.pivot.total_amount}}</td>-->
-<!--                                                <td v-else></td>-->
-<!--                                            </tr>-->
-<!--                                            <tr>-->
-<!--                                                <td colspan="4" class="text-right mm-txt">စုစုေပါင္း</td>-->
-<!--                                                <td class="text-right">{{numberWithCommas(p.total_amount)}}</td>-->
-<!--                                            </tr>-->
-<!--                                            &lt;!&ndash;<tr>-->
-<!--                                                <td colspan="4" class="text-right mm-txt">လက္က်န္ေငြ</td>-->
-<!--                                                <td class="text-right">{{sale.balance_amount}}</td>-->
-<!--                                            </tr>&ndash;&gt;-->
-<!--                                            </tbody>-->
-<!--                                        </table>-->
-
-<!--                                        <table style="border:none;width:100%;margin-top:50px;">-->
-<!--                                            <tr>-->
-<!--                                                <td class="mm-txt">Check By</td>-->
-<!--                                                <td style="text-align:right">Receive By</td>-->
-<!--                                            </tr>-->
-<!--                                        </table>-->
-<!--                                    </div>-->
-
-<!--                                </div>-->
-<!--                            </template>-->
                             <!-- END detail view for each invoice -->
                         </template>
                         </tbody>
