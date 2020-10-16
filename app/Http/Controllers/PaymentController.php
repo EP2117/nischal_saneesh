@@ -157,7 +157,9 @@ class PaymentController extends Controller
     }
     public function destroy($id){
         Payment::whereId($id)->delete();
-        AccountTransition::where('payment_id',$id)->delete();
+        AccountTransition::where('payment_id',$id)
+        ->where('is_cashbook',1)
+        ->delete();
 
     }
 }

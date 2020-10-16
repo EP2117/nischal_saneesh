@@ -39,7 +39,7 @@ class ReceiptController extends Controller
         }else{
             $no=$latest->id;
         }
-        $invoice_no = "CR".str_pad((int)$no + 1,8,"0",STR_PAD_LEFT);
+        $invoice_no = "CR".str_pad((int)$no + 1,5,"0",STR_PAD_LEFT);
         $cash_receipt_no = str_pad($invoice_no,5,"0",STR_PAD_LEFT);
         $receipt=Recepit::create([
             'cash_receipt_no'=>$cash_receipt_no,
@@ -157,7 +157,9 @@ class ReceiptController extends Controller
     }
     public function destroy($id){
         Recepit::whereId($id)->delete();
-        AccountTransition::where('receipt_id',$id)->delete();
+        AccountTransition::where('receipt_id',$id)
+        ->where('is_cashbook',1)
+        ->delete();
 
     }
 }

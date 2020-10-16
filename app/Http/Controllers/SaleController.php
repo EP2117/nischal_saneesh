@@ -301,7 +301,7 @@ class SaleController extends Controller
             $max_id = 1;
         }
 
-        $invoice_no = str_pad($max_id,5,"0",STR_PAD_LEFT);
+        $invoice_no = "SI".str_pad($max_id,5,"0",STR_PAD_LEFT);
 
         $sale->invoice_no = $invoice_no;
         $sale->branch_id = Auth::user()->branch_id;

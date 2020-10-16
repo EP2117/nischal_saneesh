@@ -16,40 +16,6 @@ class AccountTransitionController extends Controller
     use GetReport;
     public function getAllCashbook(Request $request){
         $date_arr=$this->getDateArr($request);
-//        foreach($date_arr as $key=>$d){
-//            $cashbook[$key]=new \stdClass();
-//
-//            $account_transition=AccountTransition::whereDate('transition_date',$d)->where('is_cashbook',1)->get();
-////            if($account_transition->isEmpty()){
-////                dd('bbb');
-////            }
-//            if($account_transition->isNotEmpty()){
-//
-//
-//                $opening_balance = $this->getOpening($request,$d);
-//                $total_credit = 0;
-//                $total_debit = 0;
-//                foreach($account_transition as $k=>$at){
-//                    $total_debit += $at->debit;
-//                    $total_credit += $at->credit;
-//
-//                }
-//                $cashbook[$key]->total_credit=$total_credit;
-//                $cashbook[$key]->total_debit=$total_debit;
-//                $cashbook[$key]->date=$d;
-//                $cashbook[$key]->opening_balance =$opening_balance;
-//                $cashbook[$key]->closing_balance = $this->getClosing($request,$d, $opening_balance);
-//                $cashbook[$key]->cashbook_list= $account_transition;
-//            }
-//            else{
-//                $cashbook[$key]->date=$d;
-//                $cashbook[$key]->opening_balance =$cashbook[$key-1]->closing_balance;
-//                $cashbook[$key]->closing_balance = $cashbook[$key-1]->closing_balance;
-//                $cashbook[$key]->cashbook_list= [];
-//            }
-//
-//        }
-
         $cashbook=$this->getCashBookList($request);
         return response(compact('cashbook'));
     }

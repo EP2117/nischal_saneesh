@@ -38,17 +38,15 @@
                         <input type="text" class="form-control" autocomplete="off" id="sub_account" name="sub_account" v-model="search.cash_payment_no">
                     </div>
                     <div class="form-group col-md-4 col-lg-3">
-                        <label >Debit</label>
+                        <label >Credit</label>
                         <select id="debit_id" class="form-control"
                                 v-model="search.debit" style="width:100%">
                             <option value="">Select One</option>
                             <option v-for="d in debit" :value="d.id"  >{{d.sub_account_name}}</option>
                         </select>
                     </div>
-
-
                     <div class="form-group col-md-4 col-lg-3">
-                        <label>Credit</label>
+                        <label>Debit</label>
                         <select id="credit_id" class="form-control"
                                 v-model="search.credit" style="width:100%">
                             <option value="">Select One</option>
@@ -332,9 +330,9 @@ export default {
                 "&cash_payment_no=" +
                 app.search.cash_payment_no +
                 "&debit=" +
-                app.search.debit +
+                app.search.credit +
                 "&credit=" +
-                app.search.credit;
+                app.search.debit;
             axios.get('/payment/get_all?page='+ page+search ).then(function (response){
                 $("#loading").hide();
                 // console.log(response);

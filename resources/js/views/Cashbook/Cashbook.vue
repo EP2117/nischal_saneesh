@@ -79,7 +79,7 @@
                         </tfoot>
                         <template v-for="(at ,index) in cashbook">
                             <tbody id="c_body">
-                            <tr class="total_row"   v-if="at.opening_balance != 0 " >
+                            <tr class="total_row"   v-if="at.opening_balance != 0 && !at.hide" >
                                 <td colspan="5" class="text-right mm-txt"><strong>Opening Balance</strong></td>
                                 <td class="text-center" colspan="1" v-if="at.opening_balance > 0 ">
                                     {{at.opening_balance}}
@@ -113,7 +113,9 @@
                                     <td >{{at.date}}</td>
                                 </tr>
                             </template>
-                            <tr class="total_row"    v-if="at.cashbook_list.lenght>0">
+                             <template v-else-if="at.cashbook_list.length<=0">
+                        </template>
+                            <tr class="total_row"    v-if="at.cashbook_list.length>0 && !at.hide">
                                 <td colspan="5" class="text-right mm-txt"><strong>DailyTotal</strong></td>
                                 <td class="text-center" colspan="1">
                                     {{at.total_debit}}
