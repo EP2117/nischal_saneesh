@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use DB;
+use Session;
+use App\Sale;
+use Carbon\Carbon;
+use App\Collection;
 use App\AccountTransition;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
-use App\Sale;
-use App\Collection;
-use Carbon\Carbon;
-use DB;
-use Session;
+use App\Http\Traits\Report\GetReport;
+use Illuminate\Validation\ValidationException;
 
 class CollectionController extends Controller
 {
-
+    use GetReport;
 	public function index(Request $request)
     {
         $login_year = Session::get('loginYear');

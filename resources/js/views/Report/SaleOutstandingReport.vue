@@ -22,7 +22,10 @@
             </div>
             <div class="card-body">
                 <div class="row">
-
+                     <div class="form-group col-md-4 col-lg-3">
+                        <label for="invoice_no">Invoice No.</label>
+                        <input type="text" class="form-control" id="invoice_no" name="invoice_no" v-model="search.invoice_no">
+                    </div>
                     <div class="form-group col-md-4 col-lg-3">
                         <label for="from_date">From Date</label>
                         <input type="text" class="form-control datetimepicker" id="from_date" name="from_date"
@@ -35,10 +38,7 @@
                                v-model="search.to_date">
                     </div>
 
-                    <div class="form-group col-md-4 col-lg-3">
-                        <label for="invoice_no">Invoice No.</label>
-                        <input type="text" class="form-control" id="invoice_no" name="invoice_no" v-model="search.invoice_no">
-                    </div>
+                   
 
                     <div class="form-group col-md-4 col-lg-3 mm-txt">
                         <label for="branch_id">Branch</label>
@@ -165,8 +165,8 @@
                                 <td class="text-center">{{c.invoice_no}}</td>
                                 <td class="text-center">{{c.invoice_date}}</td>
                                 <!--                            <td class="text-center">{{c.vochur_no}}</td>-->
-                                <td class="text-center">{{c.customer.name}}</td>
-                                <td class="text-center" style="right: 4px ">{{c.customer.customer_code}}</td>
+                                <td class="text-center">{{c.customer.cus_name}}</td>
+                                <td class="text-center" style="right: 4px ">{{c.customer.cus_code}}</td>
                                 <td class="text-center">{{c.total_amount}} </td>
                                 <td class="text-center">{{c.t_paid_amount}} </td>
                                 <td class="text-center">{{c.t_balance_amount}} </td>
