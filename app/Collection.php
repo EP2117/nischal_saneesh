@@ -14,7 +14,7 @@ class Collection extends Model
     public function customer(){
         return $this->belongsTo('App\Customer','customer_id','id')->withTrashed();
     }
-
+ 
     public function branch()
     {
         return $this->belongsTo('App\Branch','branch_id','id')->select('id', 'branch_name');

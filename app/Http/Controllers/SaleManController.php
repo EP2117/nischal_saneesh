@@ -95,4 +95,8 @@ class SaleManController extends Controller
         $data->save();
         return response(compact('data'), 200);
     }
+    public function getSaleMan(){
+        $sale_man=SaleMan::orderBy('name','asc')->get();
+        return compact('sale_man');
+    }
 }

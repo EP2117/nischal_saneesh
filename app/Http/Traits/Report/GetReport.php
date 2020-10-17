@@ -72,21 +72,7 @@ trait GetReport{
             $html .= '<td class="mm-txt">'.$payment->supplier_name.'</td>';
             $html .= '<td class="text-center">'.$payment->paid_amount.'</td>';
             $html .= '<td class="mm-txt">'.$payment->discount.'</td>';
-//            if($purchase->is_foc == 0) {
-//                $html .= '<td class="text-right">'.$payment->price.'</td>';
-//            }
-//            else {
-//                $html .= '<td>FOC</td>';
-//            }
-
             $html .= '</tr>';
-
-//            if($purchase->is_foc == 0){
-//                $total = $total + $purchase->total_amount;
-//            }
-
-//            $i++;
-
         }
 
 
@@ -346,5 +332,84 @@ trait GetReport{
         // dd($p_outstandings);
         return $p_outstandings;
     }
+    public function getCreditCollection($request){
+                $collections =DB::table('collection_sale')
+                    ->select(DB::raw("collection_sale.*, collections.collection_no,collections.collection_date,sales.invoice_date,collections.collect_type, sales.invoice_no,collections.customer_id, sales.branch_id,customers.state_id,customers.township_id,customers.cus_name as customer_name,branches.branch_name,sale_men.sale_man"))
+                    ->leftjoin('sales', 'sales.id', '=', 'collection_sale.sale_id')
+        //            ->leftjoin('products', 'products.id', '=', 'product_purchase.product_id')
+                    ->leftjoin('collections', 'collections.id', '=', 'collection_sale.collection_id')
+        //            ->leftjoin('brands', 'brands.id', '=', 'products.brand_id')
+                    ->leftjoin('customers', 'customers.id', '=', 'collections.customer_id')
+                    ->leftjoin('sale_men', 'sale_men.id', '=', 'sales.office_sale_man_id')
+                    ->leftjoin('states', 'states.id', '=', 'customers.state_id')
+                    ->leftjoin('townships', 'townships.id', '=', 'customers.township_id')
+        //            ->leftjoin('uoms', 'uoms.id', '=', 'product_purchase.uom_id')
+                    ->leftjoin('branches', 'branches.id', '=', 'collections.branch_id')->orderBy('collections.collection_date','asc');
+        //        $payment=CollectionPurchase::orderBy('id','asc')->get();
+            //    dd($collections->get());
+                if($request->collection_no!=null){
+                    $collections->where('collections.collection_no',$request->collection_no);
+                }
+                if($request->from_date != '' && $request->to_date != '')
+                {
+                    $collections->whereBetween('collections.collection_date', array($request->from_date, $request->to_date));
+                } else if($request->from_date != '') {
+                    $collection->whereDate('collections.collection_date', '>=', $request->from_date);
+                }else if($request->to_date != '') {
+                    $collections->whereDate('collections.collection_date', '<=', $request->to_date);
+                }
+                if($request->sale_man_id!=null){
+                    $collections->where('sales.office_sale_man_id',$request->sale_man_id);
+                }
+                if($request->collect_type!=null){
+                    $collections->where('collections.collect_type',$request->collect_type);
+                }
+                if($request->branch_id!=null){
+                    $collections->where('collections.branch_id',$request->branch_id);
+                }
+                if($request->supplier_id!=null){
+                    $collections->where('collections.supplier_id',$request->supplier_id);
+                }
+                if($request->state_id!=null){
+                    $collections->where('customers.state_id',$request->state_id);
+                }
+                if($request->township_id!=null){
+                    $collections->where('customers.township_id',$request->township_id);
+                }
+                $collections=$collections->get();
+                // dd($collections);
+        //        if($request->supplier_id!=null){
+        //            $payments->where('collection_no',$request->payment_no);
+        //        }
+        //        if($request->invoice_no!=null){
+        //            $payments->where('collection_no',$request->payment_no);
+        //        }
+                $total_paid=0;
+                $total_discount=0;
+                $html="";
+                foreach($collections as $c) {
+                    if($c->discount==null){
+                        $c->discount=0;
+                    }
+                    if($c->paid_amount==null){
+                        $c->padi_amount=0;
+                    }
+                    $total_discount+=$c->discount;
+                    $total_paid+=$c->paid_amount;
+                    $html .= '<tr><td class="text-center"></td><td class="text-center">'.$c->collection_date.'</td><td class="text-center">'.$c->collection_no.'</td>';
+                    $html .= '<td class="text-center">'.$c->invoice_date.'</td><td>'.$c->invoice_no.'</td>';
+                    $html .= '<td class="mm-txt">'.$c->customer_name.'</td>';
+                    $html .= '<td class="mm-txt">'.$c->sale_man.'</td>';
+                    $html .= '<td class="text-center">'.$c->paid_amount.'</td>';
+                    $html .= '<td class=" text-center mm-txt">'.$c->discount.'</td>';
+                    $html .= '<td class=" text-center mm-txt">'.$c->collect_type.'</td>';
+                    $html .= '</tr>';
+                }
+        
+        
+                $html .= '<tr><td colspan ="7" style="text-align: right;"><strong>Total</strong></td><td class="text-center">'.number_format($total_paid).'</td><td class="text-center">'.number_format($total_discount).'</td></tr>';
+                return $html;
+        //
+            }
 
 }

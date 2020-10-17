@@ -28,6 +28,12 @@
                                 <label for="transfer_no">Collection No.</label>
                                 <input type="text" class="form-control" id="collection_no" name="collection_no" v-model="form.collection_no" readonly>
                             </div>
+                            <div class="form-group col-md-4">
+                                <label for="collection_date">Date</label>
+                                <input type="text" class="form-control datetimepicker" id="collection_date" name="collection_date"
+                                v-model="form.collection_date" required>
+                            </div>
+                            
                         </div>
                         <div class="row">
                             <!--<div class="form-group col-md-4">
@@ -44,14 +50,7 @@
                                     <option v-for="branch in branches" :value="branch.id"  >{{branch.branch_name}}</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-4">
-                                <label for="collection_date">Date</label>
-                                <input type="text" class="form-control datetimepicker" id="collection_date" name="collection_date"
-                                v-model="form.collection_date" required>
-                            </div>
-                        </div>
 
-                        <div class="row mt-3">
                             <div class="form-group col-md-4">
                                 <label for="customer_id">Customer</label>
                                 <select id="customer_id" class="form-control"
@@ -61,13 +60,32 @@
                                     <option v-for="cus in customers" :value="cus.id"  >{{cus.cus_name}}</option>
                                 </select>
                             </div>
+                            <!-- <div class="form-group col-md-4">
+                                <label for="collection_date">Date</label>
+                                <input type="text" class="form-control datetimepicker" id="collection_date" name="collection_date"
+                                v-model="form.collection_date" required>
+                            </div> -->
+                        </div>
 
+                        <div class="row mt-3">
+                            
                             <div class="form-group col-md-4">
                                 <label for="invoices">Invoice</label>
                                 <select multiple class="form-control invoices"
                                     name="invoices[]" v-model="form.invoices" :required="isRequired" style="width:100%"
                                 >
                                     <option v-for="sale in sale_invoices" :value="sale.id">{{sale.invoice_no}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="branch_id">Collect Type</label>
+                                <select id="collect_type_id" class="form-control mm-txt"
+                                    name="collect_type" v-model="form.collect_type" style="width:100%" :disabled="cusReadonly" required
+                                >
+                                    <option value="">Select One</option>
+                                    <option value="cash">Cash</option>
+                                    <option value="bank">Bank</option>
+                                    <!-- <option v-for="branch in branches" :value="branch.id"  >{{branch.branch_name}}</option> -->
                                 </select>
                             </div>
                         </div>
@@ -99,6 +117,7 @@
                                             <th scope="col" >No.</th>
                                             <th scope="col" >Invoice Date</th>
                                             <th scope="col" >Invoice No.</th>
+                                            <th scope="col" >Sale Man</th>
                                             <th scope="col" >Invoice Amount</th>
                                             <th scope="col" >Previous Paid Amount</th>
                                             <th scope="col" >Pay Amount</th>
@@ -113,12 +132,16 @@
                                             <td class="text-right"></td>
                                             <td>{{sale.invoice_date}}</td>
                                             <td>{{sale.invoice_no}}</td>
+                                             <td>
+                                                <input type="text" :id="'sale_man'+sale.id" class="form-control num_txt sale_man" :value="sale.sale_man.sale_man" :readonly="isReadonly" />
+                                            </td>
                                             <td>
                                                 <input type="text" :id="'inv_amt'+sale.id" class="form-control num_txt inv_amt" readonly :value="sale.total_amount" />
                                             </td>
                                             <td>
                                                 <input type="text" :id="'prev_amt'+sale.id" class="form-control num_txt prev_amt" readonly :value="parseInt(sale.pay_amount) + parseInt(sale.collection_amount)" />
                                             </td>
+                                            
                                             <td>
                                                 <input type="text" :id="'pay_amt'+sale.id" class="form-control num_txt pay_amt" :readonly="isReadonly" @blur="calcPay(sale.id)"/>
                                             </td>
@@ -210,6 +233,7 @@
                 payments: [],
                 discounts: [], 
                 pay_amount: '', 
+                collect_type:'',
                 total_pay: '', 
                 remove_pivot_id: [],  
                 branch_id: '',           
@@ -311,7 +335,6 @@
                 
                 $("#"+data.id).show();
                 //console.log($('.invoices').val());
-
                 if(app.form.is_auto) {
                     $('.pay_amt').attr('required',false);
                 } else {
@@ -630,8 +653,8 @@
                     } else {
                         app.form.branch_id = '';
                     }
-
-                    $('#branch_id').val(app.form.branch_id).trigger('change');
+                        app.form.collect_type = response.data.collection.collect_type;
+                    $('#collect_type_id').val(app.form.collect_type).trigger('change');
                     
                     app.total_pay = response.data.collection.total_paid_amount;
                     if(response.data.collection.auto_payment == 1) {
@@ -661,9 +684,10 @@
                         } else {
                           html += '<tr id="'+value.id+'" style="display:none;" data-pivotid="0">';
                         }
-
                         //invoice lists
                         html += '<td class="text-right"></td><td>'+value.invoice_date+'</td><td>'+value.invoice_no+'</td>';
+                        // html += '<td class="text-right"></td><td>'+value.sale_man.sale_man+'</td><td>'+value.invoice_no+'</td>';
+                        html += '<td><input type="text" id="sale_man'+value.id+'" class="form-control num_txt sale_man" readonly value="'+value.sale_man.sale_man+'" /></td>';
 
                         html += '<td><input type="text" id="inv_amt'+value.id+'" class="form-control num_txt inv_amt" readonly value="'+value.total_amount+'" /></td>';
 
