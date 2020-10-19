@@ -328,7 +328,7 @@ class SaleController extends Controller
         $sale->updated_by = Auth::user()->id;
         $sale->save();
 
-        $description=$sale->invoice_no.",Inv Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
+        $description=$sale->invoice_no.", Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
         /* Cash Book  for sale*/
         if($sale) {
             if ($request->payment_type == 'cash' || ($request->payment_type == 'credit' && $request->pay_amount != 0)) {
@@ -495,7 +495,7 @@ class SaleController extends Controller
         $sale->updated_by = Auth::user()->id;
         $sale->save();
         $cus=Customer::find($request->customer_id);
-        $description=$sale->invoice_no.",Inv Date ".$sale->invoice_date." by " .$cus->_cus_name;
+        $description=$sale->invoice_no.", Date ".$sale->invoice_date." by " .$cus->cus_name;
         if($sale){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
                     AccountTransition::where('purchase_id',$id)->update([

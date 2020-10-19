@@ -103,6 +103,7 @@ import CustomerOpeningBalance from "./views/CustomerOpeningBalance/CustomerOpeni
 import CustomerOpeningBalanceForm from "./views/CustomerOpeningBalance/CustomerOpeningBalanceForm";
 import PurchaseOutstandingReport from "./views/Report/PurchaseOutstandingReport";
 import SaleOutstandingReport from "./views/Report/SaleOutstandingReport";
+import CreditCollectionReport from "./views/Report/CreditCollectionReport";
 
 const routes = [
     {
@@ -504,6 +505,10 @@ const routes = [
 {
   path:'/report/sale_outstanding',
   component: SaleOutstandingReport,
+},
+{
+  path:'/report/credit_collection',
+  component: CreditCollectionReport,
 },
 
 ];

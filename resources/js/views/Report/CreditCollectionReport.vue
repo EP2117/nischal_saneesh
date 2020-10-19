@@ -5,12 +5,12 @@
                 <li class="breadcrumb-item"><a href="#!"><i class="feather icon-home"></i></a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/'">Home</a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/report'">Report</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Sale Outstanding Report</li>
+                <li class="breadcrumb-item active" aria-current="page">Credit Collection Report</li>
             </ol>
         </nav>
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h4 class="mb-0 text-gray-800">Sale Outstanding Report</h4>
+            <h4 class="mb-0 text-gray-800">Credit Collection Report</h4>
             <!-- <router-link to="/inventory/transfer/new" class="d-sm-inline-block btn btn-primary shadow-sm inventory">
                  <i class="fas fa-plus"></i> Add New Transfer
              </router-link>-->
@@ -23,8 +23,8 @@
             <div class="card-body">
                 <div class="row">
                      <div class="form-group col-md-4 col-lg-3">
-                        <label for="invoice_no">Invoice No.</label>
-                        <input type="text" class="form-control" id="invoice_no" name="invoice_no" v-model="search.invoice_no">
+                        <label for="invoice_no">Collection No.</label>
+                        <input type="text" class="form-control" id="collection_no_id" name="collection_no" v-model="search.collection_no">
                     </div>
                     <div class="form-group col-md-4 col-lg-3">
                         <label for="from_date">From Date</label>
@@ -63,12 +63,20 @@
                     <div class="form-group col-md-4 col-lg-3 mm-txt">
                         <label >Customer</label>
                         <select id="customer_id" class="form-control mm-txt"
-                                name="customer_Id" v-model="search.customer_id" style="width:100%" required
-                        >
+                                name="customer_Id" v-model="search.customer_id" style="width:100%" required>
                             <option value="">Select One</option>
                             <option v-for="c in customers" :value="c.id"  >{{c.cus_name}}</option>
                         </select>
                     </div>
+                    <div class="form-group col-md-4 col-lg-3 mm-txt" >
+                        <label for="sale_man_id">Sale Man</label>
+                        <select id="sale_man_id" class="form-control mm-txt"
+                            name="sale_man_id" v-model="search.sale_man_id" style="width:100%" required >
+                            <option value="">Select One</option>
+                            <option v-for="sale_man in sale_mans" :value="sale_man.id"  >{{sale_man.sale_man}}</option>
+                        </select>
+                    </div>
+
                     <div class="form-group col-md-4 col-lg-3 mm-txt">
                         <label >State</label>
                         <select id="state_id" class="form-control mm-txt"
@@ -86,6 +94,17 @@
                             <option v-for="t in townships" :value="t.id"  >{{t.township_name}}</option>
                         </select>
                     </div>
+                     <div class="form-group col-md-4 col-lg-3 mm-txt"   >
+                                <label for="branch_id">Collect Type</label>
+                                <select id="collect_type_id" class="form-control mm-txt"
+                                    name="collect_type" v-model="search.collect_type" style="width:100%"  required
+                                >
+                                    <option value="">Select One</option>
+                                    <option value="cash">Cash</option>
+                                    <option value="bank">Bank</option>
+                                    <!-- <option v-for="branch in branches" :value="branch.id"  >{{branch.branch_name}}</option> -->
+                                </select>
+                            </div>
 
 
 <!--                    <div class="form-group col-md-4 col-lg-3 mm-txt">-->
@@ -110,7 +129,7 @@
         <!-- table start -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Sale Outstanding Report List</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Credit Collection Report List</h6>
             </div>
             <div class="card-body">
                 <!-- sort by -->
@@ -143,56 +162,30 @@
                 <!--<div class="text-right mb-2" v-if="sales.length > 0">
                     <button class="btn btn-primary btn-icon btn-sm" @click="exportExcel()"><i class="fas fa-file-excel"></i> &nbsp;Export to Excel</button>
                 </div>-->
-                <div class="table-responsive" v-if="out_count>0">
+                <div class="table-responsive">
                     <table class="table table-bordered table-striped table_no" id="dataTable" width="100%" cellspacing="0">  <!--kamlesh-->
                         <thead>
                         <tr>
                             <th class="text-center">No.</th>
+                            <th class="text-center">Collection Date</th>
+                            <th class="text-center">Collection No</th>
+                            <th class="text-center">Invoice Date</th>
                             <th class="text-center">Invoice No</th>
-                            <th class="text-center">Date</th>
                             <th class="text-center">Customer Name</th>
-                            <th class="text-center">customer Code</th>
-                            <th class="text-center">Invoice Amount</th>
-                            <th class="text-center">Paid Amount</th>
-                            <th class="text-center">Balance Amount</th>
+                            <th class="text-center">Sale Man Name</th>
+                            <!-- <th class="text-center">customer Code</th> -->
+                            <th class="text-center">Collect Amount</th>
+                            <th class="text-center">Discount</th>
+                            <th class="text-center">Collect Type</th>
                             <!-- <th class="text-center"> Discount</th> -->
                         </tr>
                         </thead>
                         <tbody id="result" >
-                            <template v-for="(po,k) in sale_outstandings">
-                                <tr v-for="(c,key) in po.out_list">
-                                <td class="text-center"></td>
-                                <td class="text-center">{{c.invoice_no}}</td>
-                                <td class="text-center">{{c.invoice_date}}</td>
-                                <!--                            <td class="text-center">{{c.vochur_no}}</td>-->
-                                <td class="text-center">{{c.customer.cus_name}}</td>
-                                <td class="text-center" style="right: 4px ">{{c.customer.cus_code}}</td>
-                                <td class="text-center">{{c.total_amount}} </td>
-                                <td class="text-center">{{c.t_paid_amount}} </td>
-                                <td class="text-center">{{c.t_balance_amount}} </td>
-                                </tr>
-                                <tr class="">
-                                    <td colspan="5" class="text-right mm-txt"><b>Total</b></td>
-                                    <td class="text-center">{{po.total_inv_amt}}</td>
-                                    <td class="text-center">{{po.total_paid_amt}}</td>
-                                    <td class="text-center">{{po.total_bal_amt}}</td>
-                                </tr>
-                            </template>
-                            <tr>
-                                <td></td>
-                            </tr>
-                             <tr class="">
-                                    <td colspan="5" class="text-right mm-txt"><strong>Total Net</strong></td>
-                                    <td class="text-center">{{net_inv_amt}}</td>
-                                    <td class="text-center">{{net_paid_amt}}</td>
-                                    <td class="text-center">{{net_bal_amt}}</td>
-                                </tr>
+                          
                         </tbody>
                     </table>
                 </div>
-                 <div v-else>
-                    <h5 class="text-center m-5">No Sale Outstanding found!</h5>
-                </div>
+                
             </div>
         </div>
         <!-- table end -->
@@ -209,18 +202,21 @@ export default {
             search: {
                 from_date: "",
                 to_date: "",
-                invoice_no: "",
+                collection_no: "",
                 customer_id: "",
                 sort_by: '',
                 branch_id: '',
+                sale_man_id:'',
+                collect_type:'',
                 state_id:'',
                 township_id:'',
             },
-            sale_outstandings: [],
+            collections: [],
             customers:[],
             brands: [],
             out_count:0,
             warehouses:[],
+            sale_mans:[],
             states:[],
             townships:[],
             user_year: '',
@@ -249,6 +245,11 @@ export default {
         app.initBranches();
         app.initBrands();
         // app.initWarehouses();
+          $("#sale_man_id").on("select2:select", function(e) {
+
+                var data = e.params.data;
+                app.search.sale_man_id = data.id;
+            });
         $("#from_date")
             .datetimepicker({
                 icons: {
@@ -346,6 +347,7 @@ export default {
             app.search.township_id = data.id;
 
         });
+        app.initSaleMan();
         app.initBrands();
         app.initStates();
         app.initTownships();
@@ -356,8 +358,10 @@ export default {
               axios.get("/customers").then(({ data }) => (this.customers = data.data));
               $("#customer_id").select2();
             },
-
-
+         initSaleMan() {
+              axios.get("/sale_men").then(({ data }) => (this.sale_mans = data.data));
+              $("#sale_man_id").select2();
+            },
         initBranches() {
             axios.get("/branches_byuser").then(({ data }) => (this.branches = data.data));
             $("#branch_id").select2();
@@ -396,10 +400,14 @@ export default {
                 app.search.from_date +
                 "&to_date=" +
                 app.search.to_date +
-                "&invoice_no=" +
-                app.search.invoice_no +
+                "&collection_no=" +
+                app.search.collection_no +
                 "&branch_id=" +
                 app.search.branch_id +
+                "&sale_man_id=" +
+                app.search.sale_man_id +
+                 "&collect_type=" +
+                app.search.collect_type +
                 "&customer_id=" +
                 app.search.customer_id +
                 "&brand_id=" +
@@ -413,14 +421,26 @@ export default {
                     console.log(app.sales);
                     $("#loading").hide();
                 });***/
-            axios.get("/report/get_sale_outstanding?" + search)
+            axios.get("/report/get_credit_collection?" + search)
                 .then(function(response) {
-                    console.log(response);
-                    app.sale_outstandings=response.data.sale_outstandings;
-                    app.out_count=response.data.sale_outstandings.length;
-                    app.net_bal_amt=response.data.net_balance_amt;
-                    app.net_inv_amt=response.data.net_inv_amt;
-                    app.net_paid_amt=response.data.net_paid_amt;
+                    // console.log(response);
+                     $("#result").html(response.data.html);
+                    if(response.data.html != "") {
+                        app.collections.push('1');
+                    } else {
+                        console.log('b');
+                         app.collections = []; }
+                    $('#loading').hide();
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+                    // console.log(response);
+                    // app.sale_outstandings=response.data.sale_outstandings;
+                    // app.out_count=response.data.sale_outstandings.length;
+                    // app.net_bal_amt=response.data.net_balance_amt;
+                    // app.net_inv_amt=response.data.net_inv_amt;
+                    // app.net_paid_amt=response.data.net_paid_amt;
                     // app.net_bal_amt=response.data.sale_outstandings;
                     // console.log(response.data.html);
                     // $("#result").html(response.data.html);
@@ -428,10 +448,7 @@ export default {
                     //     app.payments.push('1');
                     // } else { app.payments = []; }
                     // $('#loading').hide();
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+              
         },
 
         exportExcel() {

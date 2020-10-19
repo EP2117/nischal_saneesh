@@ -101,6 +101,7 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
     Route::get('/branches_byuser', 'BranchController@getBranchByUser');
     Route::get('/warehouses_bybranch/{id}', 'WarehouseController@warehouseByBranch');
     Route::resource('sale_man', 'SaleManController');
+    // Route::get('get_sale_man',['SaleManController','getSaleMan']);
     Route::get('/saleman_status/{id}/{status}', 'SaleManController@updateStatus');
     Route::get('/sale_men', 'SaleManController@allSaleMen');
     //Route for report and excel export
@@ -204,6 +205,7 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
         Route::get('get_credit_payment_report',['App\Http\Controllers\PurchaseCollectionController','getCreditPaymentReport']);
         Route::get('get_purchase_outstanding',['App\Http\Controllers\PurchaseCollectionController','getPurchaseOutStanding']);
         Route::get('get_sale_outstanding',['App\Http\Controllers\CollectionController','getSaleOutstanding']);
+        Route::get('get_credit_collection',['App\Http\Controllers\CollectionController','getCreditCollectionReport']);
 
     });
     Route::group(['prefix' => 'supplier_ob'], function () {

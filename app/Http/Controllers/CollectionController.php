@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use DB;
+use Session;
+use App\Sale;
+use Carbon\Carbon;
+use App\Collection;
 use App\AccountTransition;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
-use App\Sale;
-use App\Collection;
-use Carbon\Carbon;
-use DB;
-use Session;
+use App\Http\Traits\Report\GetReport;
+use Illuminate\Validation\ValidationException;
 
 class CollectionController extends Controller
 {
-
+    use GetReport;
 	public function index(Request $request)
     {
         $login_year = Session::get('loginYear');
@@ -89,6 +90,7 @@ class CollectionController extends Controller
         $collection->collection_no 		= $collection_no;
         $collection->collection_date 	= $request->collection_date;
         $collection->customer_id		= $request->customer_id;
+        $collection->collect_type       = $request->collect_type;
         $collection->branch_id = $request->branch_id;
         if($request->is_auto == true) {
         	$collection->auto_payment	= 1;
@@ -155,6 +157,7 @@ class CollectionController extends Controller
 
         $collection = Collection::find($id);
         $collection->collection_date 	= $request->collection_date;
+        $collection->collect_type       = $request->collect_type;
         if($request->is_auto == true) {
         	$collection->auto_payment	= 1;
         	$collection->total_paid_amount	= $request->pay_amount;
@@ -169,7 +172,7 @@ class CollectionController extends Controller
         $collection->updated_by = Auth::user()->id;
         $collection->save();
         $sub_account_id=10;    /*sub account id for credit payment */
-        $description="Inv ".$collection->collection_no.",Inv Date ".$collection->collection_date." to " .$collection->customer->cus_name;
+        $description=$collection->collection_no.",Date ".$collection->collection_date." to " .$collection->customer->cus_name;
         if($collection){
             if($collection->total_paid_amount!=0){
                 AccountTransition::where('sale_id',$id)->update([
@@ -317,5 +320,10 @@ class CollectionController extends Controller
             }
         }
         return compact('sale_outstandings','net_paid_amt','net_balance_amt','net_inv_amt');
+    }
+    public function getCreditCollectionReport(Request $request){
+        $html=$this->getCreditCollection($request);
+        return response(compact('html'), 200);
+        // return $credit_collection;
     }
 }
