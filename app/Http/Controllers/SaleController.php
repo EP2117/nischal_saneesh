@@ -1373,7 +1373,7 @@ class SaleController extends Controller
        // $data = ['title' => ''];
        //$pdf = PDF::loadView('invoice_print', $data);
 
-        $sale = Sale::with('products','warehouse','customer','products.uom','products.selling_uoms')->find($sale_id);
+        $sale = Sale::with('products','sale_man','warehouse','customer','products.uom','products.selling_uoms')->find($sale_id);
 
         //get customer previous balance
         $previous_balance = 0;

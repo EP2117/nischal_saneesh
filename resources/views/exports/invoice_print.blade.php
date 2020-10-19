@@ -20,7 +20,7 @@
   }
   .mm-txt{
     font-family: 'ZawgyiOne2008' !important;  
-    font-size:21px;
+    font-size:16px;
   }
   .box {
     float:left;
@@ -31,11 +31,11 @@
 
   table#t01 {
     width:100%;
-   font-size:21px;
+   font-size:16px;
    /* margin-top:20px; */
   } 
   table#t01 tr.tr_heigh td{
-    height: 50px;
+    height: 30px;
   }
   td {
     border: 1px solid black;
@@ -63,7 +63,7 @@
 
   table#t02 {
     width:100%;
-    font-size:21px;
+    font-size:16px;
   }
 
   table#t02 td{
@@ -120,37 +120,38 @@
     </div>
   </div>-->
   <!--<div>-->
-    <table id="t01" cellpadding="0" cellspacing="0" style="width:100%">
+    <table id="t01" cellpadding="0" cellspacing="0" style="border:none;width:100%">
       <thead>
         <tr style="border:none;">
-          <td colspan="6" style="border:none;">
-              <div style="text-align: center; margin-top:0; padding-top: 0"><img src="<?php echo  public_path();?>/storage/image/logokn.jpg" style="margin-top:20px;"/></div>
-              <div style="text-align: center;font-size:50px;margin-bottom: 15px;" class="mm-txt"><img src="<?php echo  public_path();?>/storage/image/kn.jpg" style="margin-top:20px;"/> ေက်ာ္ညႊန္႔</div>
-              <div style="text-align: center;margin-bottom: 15px;" class="mm-txt">ကုန္မာပစၥည္း၊ ပိုက္၊ ေရေမာ္တာ၊ လက္သမားသံုးစက္ႏွင့္ စက္ပစၥည္းအမ်ိဳးမ်ိဳး </div>
-              <div style="text-align: center; margin-bottom: 15px;" class="mm-txt">အိမ္သုတ္ေဆးအမ်ိဳးမ်ိဴးေရာင္း၀ယ္ေရး</div>
-              <div style="text-align: center; margin-bottom: 15px;" class="mm-txt">လိပ္စာ-No.47၊ ဘူတာတိုက္တန္း၊ ရထားသံလမ္းကူးအနီး၊ ျမစ္ႀကီးနား။</div>
-              <div style="text-align: center; margin-bottom: 15px;" class="mm-txt"><img src="<?php echo  public_path();?>/storage/image/phone.png" /> 074-2521430, 09-400012347, 09-427000242, 09-784012347</div>
+          <td colspan="9" style="border:none;height:20px;">
+              &nbsp;
+          </td>
+        </tr>
+        <tr style="border:none;">
+          <td colspan="9" style="border:none;height:30px; background-color: #4472c4;color:#fffff; text-align: center;font-weight: bold">
+              SALES INVOICE
           </td>
         </tr>
         <tr>
-          <td colspan="6">
+          <td colspan="9" style="border:none;padding-top:30px;">
             <table cellpadding="0" cellspacing="0" style="border:none; width:100%;">
                 <tr>
-                    <td class="mm-txt" style="border:none;">၀ယ္သူ</td>
+                    <td class="mm-txt" style="border:none;">Customer:</td>
                     <td class="mm-txt" style="border:none;">{{$sale->customer->cus_name}}</td>
-                    <td class="mm-txt" style="text-align:right;border:none;">ရက္စဲြ</td>
+                    <td style="text-align:right;border:none;" class="mm-txt">Invoice No.:</td>
+                    <td style="text-align:right; border:none;" class="mm-txt">{{$sale->invoice_no}}</td>
+                    
+                </tr>
+                <tr>
+                    <td class="mm-txt" style="border:none;">Address:</td>
+                    <td class="mm-txt" style="border:none;">{{$sale->customer->cus_shipping_address}}</td>
+                    <td class="mm-txt" style="text-align:right;border:none;">Invoice Date:</td>
                     <td class="mm-txt" style="text-align:right;border:none;">
                       <?php
                         $date_arr = explode('-',$sale->invoice_date);
                       ?>
                       {{$date_arr[2].'-'.$date_arr[1].'-'.$date_arr[0]}}
                     </td>
-                </tr>
-                <tr>
-                    <td class="mm-txt" style="border:none;">လိပ္စာ</td>
-                    <td class="mm-txt" style="border:none;">{{$sale->customer->cus_shipping_address}}</td>
-                    <td style="text-align:right;border:none;" class="mm-txt">Invoice No.</td>
-                    <td style="text-align:right; border:none;" class="mm-txt">{{$sale->invoice_no}}</td>
                 </tr>
             </table>
             <!--<div style="float:left;">
@@ -172,12 +173,15 @@
           </td>
         </tr>
         <tr class="tr_heigh">
-          <td class='mm-txt serial_no' style="text-align: center;">စဥ္</td>
-          <td class='mm-txt' style="text-align: center;width:320px;">အမ်ိဳးအမည္</td>
-          <td class='mm-txt' colspan="2" ="text-align: center;">အေရအတြက္</td>
-          <td class='mm-txt' style="text-align: center;">ေစ်းႏႈန္း</td>
-          <td class='mm-txt' style="text-align: center;width:160px;">သင့္ေငြ</td>
-          <!--<td class='mm-txt' style="text-align: center;">ပါ၀င္မႈ</td>-->
+          <td class='mm-txt' style="text-align: center;width:10px">No.</td>
+          <td class='mm-txt' style="text-align: center;width:200px;">Product Name</td>
+          <td class='mm-txt' style="text-align: center;width:70px;">QTY</td>
+          <td class='mm-txt' style="text-align: center;">UOM</td>
+          <td class='mm-txt' style="text-align: center;">Rate</td>
+          <td class='mm-txt' style="text-align: center;width:50px">Discount</td>
+          <td class='mm-txt' style="text-align: center;">Actual <br />Rate</td>
+          <td class='mm-txt' style="text-align: center;width:50px;">Other <br />Discount</td>
+          <td class='mm-txt' style="text-align: center;">Amount</td>
         </tr>
       </thead>
       <?php
@@ -191,70 +195,90 @@
           <td style="text-align: center;">{{$k}}</td>
           <td class="mm-txt">{{$product->product_name}}</td>
 
+          @if($product->pivot->uom_id == $product->uom_id)
           <td style="text-align: right;">
-              {{$product->pivot->product_quantity}} 
+              {{$product->pivot->product_quantity}}
+          </td>          
+          @else
+          <td style="text-align: right;">
+              {{$product->pivot->product_quantity}} {{getUomName($product,$product->pivot->uom_id)}} x {{getUomRelation($product,$product->pivot->uom_id)}} {{getUomName($product,$product->uom_id)}}
           </td>
+          @endif
           <td class="mm-txt">
-              {{getUomName($product,$product->pivot->uom_id)}}
+            {{getUomName($product,$product->pivot->uom_id)}}
           </td>
-
           @if($product->pivot->is_foc == 0)
-            <td style="text-align: right;">{{$product->pivot->price}}</td>
+            <td style="text-align: right;">{{number_format($product->pivot->rate)}}</td>
+            <td style="text-align: right;">{{!empty($product->pivot->discount) ? number_format($product->pivot->discount).'%' : '0'}}</td>
+            <td style="text-align: right;">{{number_format($product->pivot->actual_rate)}}</td>
+            <td style="text-align: right;">{{!empty($product->pivot->other_discount) ? number_format($product->pivot->other_discount).'%' : '0'}}</td>
             <td style="text-align: right;">{{number_format($product->pivot->total_amount)}}</td>
           @else
-            <td style="text-align: right">FOC</td>
-            <td></td>
+            <td style="text-align: right;">FOC</td>
+            <td style="text-align: right;">0</td>
+            <td style="text-align: right;">0</td>
+            <td style="text-align: right;">0</td>
+            <td style="text-align: right;">0</td>
           @endif
 
-          <!--@if($product->pivot->uom_id == $product->uom_id)
-            <td></td>
-          @else
-            <td>1 x {{getUomRelation($product,$product->pivot->uom_id)}}</td>
-          @endif-->
-
         </tr>
-       
+      <?php
+        }
+        for($i=0; $i<$extra_count; $i++) {
+          $k++;
+      ?>
+
+      <tr class="tr_heigh">
+        <td style="text-align: right;"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>      
       <?php
         }
       ?>
-        <tr>
-          <td style="text-align: right;" colspan="5" class="mm-txt">စုစုေပါင္း</td>
-          <td style="text-align: right;">{{number_format($sale->total_amount)}}</td>
-          <!--<td style="text-align: right; border-right: none">{{number_format($sale->total_amount)}}</td>
-          <td style="border-left: none"></td>-->
-        </tr>
-        @if(!empty($sale->discount))
-          <tr>
-            <td style="text-align: right;" colspan="5" class="mm-txt">ေလ်ာ့ေငြ</td>
-            <td style="text-align: right;">{{number_format($sale->discount)}}</td>
-            <!--<td style="border-left: none"></td>-->
-          </tr>
-        @endif
-        <tr>
-          <td style="text-align: right;" colspan="5" class="mm-txt">လက္ခံရရိွေငြ</td>
-          <td style="text-align: right;">{{number_format($sale->pay_amount)}}</td>
-          <!--<td style="border-left: none"></td>-->
-        </tr>
-        <tr>
-          <td style="text-align: right;" colspan="5" class="mm-txt">ယခင္လက္က်န္ေငြ</td>
-          <td style="text-align: right;">{{number_format($previous_balance)}}</td>
-          <!--<td style="border-left: none"></td>-->
-        </tr>
-        <tr>
-          <td style="text-align: right;" colspan="5" class="mm-txt">လက္က်န္ေငြစုစုေပါင္း</td>
-          <td style="text-align: right;">{{number_format(($sale->total_amount-($sale->discount + $sale->pay_amount)) + $previous_balance)}}</td>
-          <!--<td style="border-left: none"></td>-->
-        </tr>
 
-     <!-- <tr class="tr_heigh">
-        <td colspan="4" class="mm-txt" style="text-align: right;">စုစုေပါင္း</td>
+      <tr class="tr_heigh">
+        <td colspan="6" rowspan="6" style="vertical-align: top;" class="mm-txt">
+          Sales Man: {{$sale->sale_man->sale_man}} <br />
+          @if($sale->payment_type == 'credit')
+          Due Date: {{$sale->due_date}} <br />
+          @endif
+          Previous Balance: {{number_format($previous_balance)}}<br /><br />
+          Notes:
+        </td>
+        <td colspan="2" class="mm-txt">Total Amount</td>
         <td style="text-align: right;">{{number_format($sale->total_amount)}}</td>
       </tr>
       <tr>
-        <td colspan="2"><br /><br />Check By</td>
-        <td></td>
-        <td colspan="2" style="text-align: right;"><br /><br />Receive By</td>
-      </tr>-->
+        <td colspan="2" class="mm-txt">Cash Discount</td>
+        <td style="text-align: right;">{{number_format($sale->cash_discount)}}</td>
+      </tr>
+      <tr>
+        <td colspan="2" class="mm-txt">Net Total</td>
+        <td style="text-align: right;">{{number_format($sale->net_total)}}</td>
+      </tr>
+      <tr>
+        <td class="mm-txt">Tax</td>
+        <td>{{!empty($sale->tax) ? number_format($sale->tax).'%':''}}</td>
+        <td style="text-align: right;">{{number_format($sale->tax_amount)}}</td>
+      </tr>
+      <tr>
+        <td colspan="2" class="mm-txt">Paid Amount</td>
+        <td style="text-align: right;">{{!empty($sale->paid_amount) ? number_format($sale->paid_amount) : '0'}}</td>
+      </tr>
+      <tr>
+        <td colspan="2" class="mm-txt">Balance Amount</td>
+        <td style="text-align: right;">{{number_format($sale->balance_amount)}}</td>
+      </tr>
+      <tr>
+        <td colspan="9" style="height:100px;vertical-align: top" class="mm-txt">Bank Details:</td>
+      </tr>
       <!--<tfoot>
         <tr style="border:none;">
           <td colspan="5" style="border:none;">
@@ -263,6 +287,5 @@
         </tr>
       </tfoot>-->
     </table>
-    <div class="text-center mm-txt" style="text-align:center;margin-top:30px;">၀ယ္ယူမႈအတြက္ ေက်းဇူးတင္ပါသည္။</div>
 </body>
 </html>
