@@ -22,7 +22,7 @@ class DailySaleExport implements FromView, WithTitle
     public function view(): View
     {
         $request = $this->request;
-        $sales =    Sale::with('customer','order','order.sale_man','customer.township','customer.customer_type','warehouse','office_sale_man','branch');
+        $sales =    Sale::with('customer','order','sale_man','customer.township','customer.customer_type','warehouse','branch');
 
 
         if($request->invoice_no != "") {
@@ -84,14 +84,12 @@ class DailySaleExport implements FromView, WithTitle
         }
 
         if($request->sale_man_id != "") {
-            $sales->whereHas('order', function ($query) use ($request) {
-                $query->where('sale_man_id', $request->sale_man_id);                         
-            });   
+            $sales->where('office_sale_man_id', $request->sale_man_id);
         }
 
-        if($request->office_sale_man_id != "") {
+        /**if($request->office_sale_man_id != "") {
             $sales->where('office_sale_man_id', $request->office_sale_man_id);
-        }
+        }**/
 
         if(Auth::user()->role->id == 6) {
             //for Country Head User

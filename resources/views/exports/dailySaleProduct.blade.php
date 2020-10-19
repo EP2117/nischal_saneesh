@@ -55,7 +55,7 @@
             <th class="text-center">Branch</th>
             <th class="text-center">Customer</th>
             <th class="text-center">Sale Man</th>
-            <th class="text-center">Office Sale Man</th>
+            <!--<th class="text-center">Office Sale Man</th>-->
             <th class="text-center">Product Code</th>
             <th class="text-center">Product Name</th>
             <th class="text-center">QTY</th>
@@ -74,13 +74,19 @@
                         $html .= '<td class="mm-txt">'.$sale->branch_name.'</td>';
                         $html .= '<td class="mm-txt">'.$sale->cus_name.'</td>';
                         $html .= '<td class="mm-txt">'.$sale->sale_man.'</td>';
-                        $html .= '<td class="mm-txt">'.$sale->office_sale_man.'</td>';              
+                        //$html .= '<td class="mm-txt">'.$sale->office_sale_man.'</td>';              
                         $html .= '<td>'.$sale->product_code.'</td>';
                         $html .= '<td>'.$sale->product_name.'</td>';
                         $html .= '<td>'.$sale->product_quantity.'</td>';
                         $html .= '<td>'.$sale->uom_name.'</td>';
                         if($sale->is_foc == 0) {
-                            $html .= '<td class="text-right">'.$sale->price.'</td>';
+                            if(!empty($sale->other_discount)) {
+                                $other_discount = ($sale->other_discount/100) * $sale->actual_rate;
+                            } else {
+                                $other_discount = 0;
+                            }
+                            $price = $sale->actual_rate - $other_discount;
+                            $html .= '<td class="text-right">'.$price.'</td>';
                         }
                         else {
                             $html .= '<td>FOC</td>';
@@ -97,7 +103,7 @@
                     
                 }
                 
-                $html .= '<tr><td colspan ="12" style="text-align: right;">Total</td><td class="text-right">'.number_format($total).'</td></tr>';
+                $html .= '<tr><td colspan ="11" style="text-align: right;">Total</td><td class="text-right">'.number_format($total).'</td></tr>';
                 
                 echo $html;
             ?>

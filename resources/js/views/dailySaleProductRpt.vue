@@ -51,7 +51,7 @@
                         </select>
                     </div>
 
-                    <div class="form-group col-md-4 col-lg-3">
+                    <!--<div class="form-group col-md-4 col-lg-3">
                         <label for="warehouse_id">Warehouse</label>
                         <select id="warehouse_id" class="form-control"
                             name="warehouse_id" v-model="search.warehouse_id" style="width:100%" required
@@ -59,7 +59,7 @@
                             <option value="">Select One</option>
                             <option v-for="warehouse in warehouses" :value="warehouse.id"  >{{warehouse.warehouse_name}}</option>
                         </select>
-                    </div>
+                    </div>-->
 
                     <div class="form-group col-md-4 col-lg-3 mm-txt">
                         <label for="entry_date">Customer</label>
@@ -88,16 +88,26 @@
                     </div>
 
                     <div class="form-group col-md-4 col-lg-3 mm-txt">
+                        <label for="category_id">Category</label>
+                        <select id="category_id" class="form-control"
+                            name="category_id" v-model="search.category_id" style="width:100%"
+                        >
+                            <option value="">Select One</option>
+                            <option v-for="cat in categories" :value="cat.id">{{cat.category_name}}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-4 col-lg-3 mm-txt">
                         <label for="sale_man_id">Sale Man</label>
                         <select id="sale_man_id" class="form-control mm-txt"
                             name="sale_man_id" v-model="search.sale_man_id" style="width:100%" required
                         >
                             <option value="">Select One</option>
-                            <option v-for="sale_man in sale_mans" :value="sale_man.id"  >{{sale_man.name}}</option>
+                            <option v-for="sale_man in sale_mans" :value="sale_man.id"  >{{sale_man.sale_man}}</option>
                         </select>
                     </div>
 
-                    <div class="form-group col-md-4 col-lg-3 mm-txt">
+                   <!-- <div class="form-group col-md-4 col-lg-3 mm-txt">
                         <label for="office_sale_man_id">Office Sale Man</label>
                         <select id="office_sale_man_id" class="form-control mm-txt"
                             name="office_sale_man_id" v-model="search.office_sale_man_id" style="width:100%" required
@@ -105,7 +115,7 @@
                             <option value="">Select One</option>
                             <option v-for="office_sale_man in office_sale_mans" :value="office_sale_man.id"  >{{office_sale_man.name}}</option>
                         </select>
-                    </div>
+                    </div> -->
 
                     <div class="form-group col-md-3 col-lg-2">
                         <label class="small" for="search">&nbsp;</label>
@@ -165,7 +175,7 @@
                                 <th class="text-center">Branch</th>
                                 <th class="text-center">Customer</th>
                                 <th class="text-center">Sale Man</th>
-                                <th class="text-center">Office Sale Man</th>
+                                <!--<th class="text-center">Office Sale Man</th>-->
                                 <th class="text-center">Product Code</th>
                                 <th class="text-center">Product Name</th>
                                 <th class="text-center">QTY</th>
@@ -197,6 +207,7 @@
                     to_date: "",
                     invoice_no: "",
                     customer_id: "",
+                    category_id: "",
                     warehouse_id: "",
                     product_name: "",
                     brand_id: "",
@@ -215,6 +226,7 @@
                 sale_mans: [],
                 office_sale_mans: [],
                 branches: [],
+                categories: [],
                 site_path: '',
                 storage_path: '',
             };
@@ -236,6 +248,7 @@
 
             app.initCustomers();
             app.initBrands();
+            app.initCategories();
            // app.initWarehouses();
             app.initBranches();
 
@@ -252,6 +265,11 @@
 
                 var data = e.params.data;
                 app.search.sale_man_id = data.id;
+            });
+
+            $("#category_id").on("select2:select", function(e) {
+                var data = e.params.data;
+                app.search.category_id = data.id;
             });
 
             $("#branch_id").on("select2:select", function(e) {
@@ -349,8 +367,13 @@
 
         methods: {
 
+            initCategories() {
+              axios.get("/categories").then(({ data }) => (this.categories = data.data));
+              $("#category_id").select2();
+            },
+
             initSaleMan() {
-              axios.get("/sale_man").then(({ data }) => (this.sale_mans = data.data));
+              axios.get("/sale_men").then(({ data }) => (this.sale_mans = data.data));
               $("#sale_man_id").select2();
             },
 
@@ -414,6 +437,8 @@
                     app.search.order +
                     "&branch_id=" +
                     app.search.branch_id +
+                    "&category_id=" +
+                    app.search.category_id +
                     "&sort_by=" +
                     app.search.sort_by;
 
@@ -468,6 +493,8 @@
                 app.search.order +
                 "&branch_id=" +
                 app.search.branch_id +
+                "&category_id=" +
+                app.search.category_id +
                 "&sort_by=" +
                 app.search.sort_by;
 

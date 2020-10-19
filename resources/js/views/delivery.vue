@@ -60,10 +60,10 @@
                         </select>
                     </div>
 
-                    <div class="form-group col-md-4 col-lg-3">
+                    <!--<div class="form-group col-md-4 col-lg-3">
                         <label for="ref_no">Reference No.</label>
                         <input type="text" class="form-control" id="ref_no" name="ref_no" v-model="search.ref_no">
-                    </div>
+                    </div>-->
 
                     <div class="form-group col-md-4 col-lg-3">
                         <label for="delivery_approve">Delivery Approve</label>

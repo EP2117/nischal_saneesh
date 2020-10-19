@@ -25,23 +25,27 @@ class DailySaleProductExport implements FromView, WithTitle
         $request = $this->request;
         $sales = DB::table("product_sale")
 
-                    ->select(DB::raw("product_sale.*, sales.invoice_date, sales.invoice_no, sales.order_id, sales.branch_id, sales.warehouse_id, sales.customer_id, sales.office_sale_man_id, products.product_code, products.product_name, products.brand_id, brands.brand_name, u1.name as office_sale_man, customers.cus_name, uoms.uom_name, u2.name as sale_man,orders.sale_man_id,branches.branch_name"))
+                    ->select(DB::raw("product_sale.*, sales.invoice_date, sales.invoice_no, sales.order_id, sales.branch_id, sales.warehouse_id, sales.customer_id, sales.office_sale_man_id, products.product_code, products.product_name, products.brand_id, brands.brand_name, customers.cus_name, uoms.uom_name, sale_men.sale_man,orders.sale_man_id,branches.branch_name"))
 
                     ->leftjoin('sales', 'sales.id', '=', 'product_sale.sale_id')
-                    
+
                     ->leftjoin('orders', 'orders.id', '=', 'sales.order_id')
 
                     ->leftjoin('products', 'products.id', '=', 'product_sale.product_id')
 
                     ->leftjoin('brands', 'brands.id', '=', 'products.brand_id')
 
+                    ->leftjoin('categories', 'categories.id', '=', 'products.category_id')
+
                     ->leftjoin('customers', 'customers.id', '=', 'sales.customer_id')
 
                     ->leftjoin('uoms', 'uoms.id', '=', 'product_sale.uom_id')
 
-                    ->leftjoin('users as u1', 'u1.id', '=', 'sales.office_sale_man_id')
-                    
-                    ->leftjoin('users as u2', 'u2.id', '=', 'orders.sale_man_id')
+                    ->leftjoin('sale_men', 'sale_men.id', '=', 'sales.office_sale_man_id')
+
+                    //->leftjoin('users as u1', 'u1.id', '=', 'sales.office_sale_man_id')
+
+                    //->leftjoin('users as u2', 'u2.id', '=', 'orders.sale_man_id')
 
                     ->leftjoin('branches', 'branches.id', '=', 'sales.branch_id');
 
@@ -117,11 +121,11 @@ class DailySaleProductExport implements FromView, WithTitle
             });   
         }*/
         if($request->sale_man_id != "") {
-            $sales->where('orders.sale_man_id', $request->sale_man_id);   
-        } 
+            $sales->where('sales.office_sale_man_id', $request->sale_man_id);
+        }
 
-        if($request->office_sale_man_id != "") {
-            $sales->where('sales.office_sale_man_id', $request->office_sale_man_id);
+        if($request->category_id != "") {
+            $sales->where('products.category_id', $request->category_id);
         }
 
         if(Auth::user()->role->id == 6) {

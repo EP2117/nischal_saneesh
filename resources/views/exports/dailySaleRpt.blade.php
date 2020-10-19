@@ -33,12 +33,12 @@
         <tr>
             <th class="text-center">No.</th>
             <th class="text-center">Invoice No.</th>
-            <th class="text-center">Reference No.</th>
+           <!-- <th class="text-center">Reference No.</th>-->
             <th class="text-center">Date</th>
             <th class="text-center">Branch</th>
             <th class="text-center">Customer</th>
             <th class="text-center">Sale Man</th>
-            <th class="text-center">Office Sale Man</th>
+            <!--<th class="text-center">Office Sale Man</th>-->
             <th class="text-center">Total</th>
         </tr>
         </thead>
@@ -51,7 +51,7 @@
                 <tr>
                     <td class="text-right">{{$i}}</td>
                     <td>{{$sale->invoice_no}}</td>
-                    <td>{{$sale->reference_no}}</td>
+                    <!--<td>{{$sale->reference_no}}</td>-->
                     <td>{{$sale->invoice_date}}</td>
                     @if($sale->branch != NULL)
                     <td>{{$sale->branch->branch_name}}</td>
@@ -59,29 +59,25 @@
                     <td></td>
                     @endif
                     <td class="mm-txt">{{$sale->customer->cus_name}}</td>
-                    @if(!empty($sale->order) && !empty($sale->order->sale_man))
-                    <td class="mm-txt">{{$sale->order->sale_man->name}}</td>
-                    @else
-                    <td></td>
-                    @endif
+                    
                     @if(!empty($sale->office_sale_man_id))
-                    <td class="mm-txt">{{$sale->office_sale_man->name}}</td>
+                    <td class="mm-txt">{{$sale->sale_man->sale_man}}</td>
                     @else
                     <td></td>
                     @endif
-                    <td class="text-right">{{$sale->total_amount}}</td>
+                    <td class="text-right">{{$sale->net_total}}</td>
                 </tr>
 
                 <?php
-                    if($sale->total_amount != NULL && $sale->total_amount != ''){
-                        $total = $total + $sale->total_amount;
+                    if($sale->net_total != NULL && $sale->net_total != ''){
+                        $total = $total + $sale->net_total;
                     }
                     $i = $i+1;
                 ?>
 
             @endforeach
             <tr>
-                <td colspan ="8" style="text-align: right;">Total</td>
+                <td colspan ="6" style="text-align: right;">Total</td>
                 <td  style="text-align: right;">{{ number_format($total) }}</td>
             </tr>
         </tbody>

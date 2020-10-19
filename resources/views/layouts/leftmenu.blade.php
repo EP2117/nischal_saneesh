@@ -302,9 +302,10 @@
             @else
             @endif
 
-        <hr class="sidebar-divider">
+       
 
         @if(Auth::user()->role->role_name != 'office_order_user' && Auth::user()->role->role_name != 'delivery' && Auth::user()->role->id != 6 && Auth::user()->role->id != 7)
+         <hr class="sidebar-divider">
 
         <router-link  tag="li" to="/order" class="nav-item">
             <a class="nav-link" href="#">
@@ -322,6 +323,7 @@
                 <span>Sale Invoice</span>
             </a>
         </router-link>
+
         <!--if(Request::path() != 'van' && Auth::user()->role->id != 6 && Auth::user()->role->id != 7) -->
         <!--for only system and admin role -->
         @if(Request::path() != 'van' && (Auth::user()->role->id == 1 || Auth::user()->role->id == 2))
@@ -343,6 +345,17 @@
                 <span>Collection</span>
             </a>
         </router-link>-->
+
+        @if(Request::path() != 'van' && (Auth::user()->role->id == 1 || Auth::user()->role->id == 2 || Auth::user()->role->id == 3 || Auth::user()->role->id == 8))
+        <!-- only admin, system, office user and delivery roles -->
+        <hr class="sidebar-divider">
+        <router-link  tag="li" to="/delivery" class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-shipping-fast"></i>
+                <span>Delivery</span>
+            </a>
+        </router-link>
+        @endif
 
         @endif
             @if(Request::path() == 'van' || Request::path() == 'purchase_office')

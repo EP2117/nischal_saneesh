@@ -670,7 +670,7 @@ class SaleController extends Controller
     public function getDailySaleReport(Request $request)
     {
 
-        $sales =    Sale::with('customer','order','order.sale_man','customer.township','customer.customer_type','warehouse','office_sale_man','branch');
+        $sales =    Sale::with('customer','order','sale_man','customer.township','customer.customer_type','warehouse','branch');
 
 
         if($request->invoice_no != "") {
@@ -732,14 +732,12 @@ class SaleController extends Controller
         }
 
         if($request->sale_man_id != "") {
-            $sales->whereHas('order', function ($query) use ($request) {
-                $query->where('sale_man_id', $request->sale_man_id);
-            });
+            $sales->where('office_sale_man_id', $request->sale_man_id);
         }
 
-        if($request->office_sale_man_id != "") {
+        /**if($request->office_sale_man_id != "") {
             $sales->where('office_sale_man_id', $request->office_sale_man_id);
-        }
+        }**/
 
         if(Auth::user()->role->id == 6) {
             //for Country Head User
@@ -830,7 +828,7 @@ class SaleController extends Controller
        // $data = ['title' => ''];
        // $pdf = PDF::loadView('invoice_print', $data);
 
-         $sales =    Sale::with('customer','order','order.sale_man','customer.township','customer.customer_type','warehouse','office_sale_man','branch');
+         $sales =    Sale::with('customer','order','sale_man','customer.township','customer.customer_type','warehouse','office_sale_man','branch');
 
 
         if($request->invoice_no != "") {
@@ -891,14 +889,14 @@ class SaleController extends Controller
             });
         }
 
-        if($request->sale_man_id != "") {
+        /***if($request->sale_man_id != "") {
             $sales->whereHas('order', function ($query) use ($request) {
                 $query->where('sale_man_id', $request->sale_man_id);
             });
-        }
+        }****/
 
-        if($request->office_sale_man_id != "") {
-            $sales->where('office_sale_man_id', $request->office_sale_man_id);
+        if($request->sale_man_id != "") {
+            $sales->where('office_sale_man_id', $request->sale_man_id);
         }
 
         if(Auth::user()->role->id == 6) {
@@ -1128,7 +1126,7 @@ class SaleController extends Controller
         //$sales =    Sale::with('products','order','order.sale_man','customer','warehouse','products.selling_uoms','products.uom','office_sale_man');
          $sales = DB::table("product_sale")
 
-                    ->select(DB::raw("product_sale.*, sales.invoice_date, sales.invoice_no, sales.order_id, sales.branch_id, sales.warehouse_id, sales.customer_id, sales.office_sale_man_id, products.product_code, products.product_name, products.brand_id, brands.brand_name, u1.name as office_sale_man, customers.cus_name, uoms.uom_name, u2.name as sale_man,orders.sale_man_id,branches.branch_name"))
+                    ->select(DB::raw("product_sale.*, sales.invoice_date, sales.invoice_no, sales.order_id, sales.branch_id, sales.warehouse_id, sales.customer_id, sales.office_sale_man_id, products.product_code, products.product_name, products.brand_id, brands.brand_name, customers.cus_name, uoms.uom_name, sale_men.sale_man,orders.sale_man_id,branches.branch_name"))
 
                     ->leftjoin('sales', 'sales.id', '=', 'product_sale.sale_id')
 
@@ -1138,13 +1136,17 @@ class SaleController extends Controller
 
                     ->leftjoin('brands', 'brands.id', '=', 'products.brand_id')
 
+                    ->leftjoin('categories', 'categories.id', '=', 'products.category_id')
+
                     ->leftjoin('customers', 'customers.id', '=', 'sales.customer_id')
 
                     ->leftjoin('uoms', 'uoms.id', '=', 'product_sale.uom_id')
 
-                    ->leftjoin('users as u1', 'u1.id', '=', 'sales.office_sale_man_id')
+                    ->leftjoin('sale_men', 'sale_men.id', '=', 'sales.office_sale_man_id')
 
-                    ->leftjoin('users as u2', 'u2.id', '=', 'orders.sale_man_id')
+                    //->leftjoin('users as u1', 'u1.id', '=', 'sales.office_sale_man_id')
+
+                    //->leftjoin('users as u2', 'u2.id', '=', 'orders.sale_man_id')
 
                     ->leftjoin('branches', 'branches.id', '=', 'sales.branch_id');
 
@@ -1219,12 +1221,16 @@ class SaleController extends Controller
                 $query->where('sale_man_id', $request->sale_man_id);
             });
         }*/
-        if($request->sale_man_id != "") {
+        /**if($request->sale_man_id != "") {
             $sales->where('orders.sale_man_id', $request->sale_man_id);
+        }**/
+
+        if($request->sale_man_id != "") {
+            $sales->where('sales.office_sale_man_id', $request->sale_man_id);
         }
 
-        if($request->office_sale_man_id != "") {
-            $sales->where('sales.office_sale_man_id', $request->office_sale_man_id);
+        if($request->category_id != "") {
+            $sales->where('products.category_id', $request->category_id);
         }
 
         if(Auth::user()->role->id == 6) {
@@ -1319,13 +1325,19 @@ class SaleController extends Controller
                 $html .= '<td class="mm-txt">'.$sale->branch_name.'</td>';
                 $html .= '<td class="mm-txt">'.$sale->cus_name.'</td>';
                 $html .= '<td class="mm-txt">'.$sale->sale_man.'</td>';
-                $html .= '<td class="mm-txt">'.$sale->office_sale_man.'</td>';
+                //$html .= '<td class="mm-txt">'.$sale->office_sale_man.'</td>';
                 $html .= '<td>'.$sale->product_code.'</td>';
                 $html .= '<td>'.$sale->product_name.'</td>';
                 $html .= '<td>'.$sale->product_quantity.'</td>';
                 $html .= '<td>'.$sale->uom_name.'</td>';
                 if($sale->is_foc == 0) {
-                    $html .= '<td class="text-right">'.$sale->price.'</td>';
+                    if(!empty($sale->other_discount)) {
+                        $other_discount = ($sale->other_discount/100) * $sale->actual_rate;
+                    } else {
+                        $other_discount = 0;
+                    }
+                    $price = $sale->actual_rate - $other_discount;
+                    $html .= '<td class="text-right">'.$price.'</td>';
                 }
                 else {
                     $html .= '<td>FOC</td>';
@@ -1342,7 +1354,7 @@ class SaleController extends Controller
 
         }
 
-        $html .= '<tr><td colspan ="12" style="text-align: right;">Total</td><td class="text-right">'.number_format($total).'</td></tr>';
+        $html .= '<tr><td colspan ="11" style="text-align: right;">Total</td><td class="text-right">'.number_format($total).'</td></tr>';
 
         return response(compact('html'), 200);
     }

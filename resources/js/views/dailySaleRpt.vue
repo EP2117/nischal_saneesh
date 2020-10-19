@@ -51,7 +51,7 @@
                         </select>
                     </div>
 
-                    <div class="form-group col-md-4 col-lg-3">
+                    <!--<div class="form-group col-md-4 col-lg-3">
                         <label for="warehouse_id">Warehouse</label>
                         <select id="warehouse_id" class="form-control"
                             name="warehouse_id" v-model="search.warehouse_id" style="width:100%" required
@@ -59,7 +59,7 @@
                             <option value="">Select One</option>
                             <option v-for="warehouse in warehouses" :value="warehouse.id"  >{{warehouse.warehouse_name}}</option>
                         </select>
-                    </div>
+                    </div>-->
 
                     <div class="form-group col-md-4 col-lg-3">
                         <label for="township_id">Township</label>
@@ -97,11 +97,11 @@
                             name="sale_man_id" v-model="search.sale_man_id" style="width:100%" required
                         >
                             <option value="">Select One</option>
-                            <option v-for="sale_man in sale_mans" :value="sale_man.id"  >{{sale_man.name}}</option>
+                            <option v-for="sale_man in sale_mans" :value="sale_man.id"  >{{sale_man.sale_man}}</option>
                         </select>
                     </div>
 
-                    <div class="form-group col-md-4 col-lg-3 mm-txt">
+                    <!--<div class="form-group col-md-4 col-lg-3 mm-txt">
                         <label for="office_sale_man_id">Office Sale Man</label>
                         <select id="office_sale_man_id" class="form-control mm-txt"
                             name="office_sale_man_id" v-model="search.office_sale_man_id" style="width:100%" required
@@ -109,12 +109,12 @@
                             <option value="">Select One</option>
                             <option v-for="office_sale_man in office_sale_mans" :value="office_sale_man.id"  >{{office_sale_man.name}}</option>
                         </select>
-                    </div>
+                    </div>-->
 
-                    <div class="form-group col-md-4 col-lg-3">
+                    <!--<div class="form-group col-md-4 col-lg-3">
                         <label for="ref_no">Reference No.</label>
                         <input type="text" class="form-control" id="ref_no" name="ref_no" v-model="search.ref_no">
-                    </div>
+                    </div>-->
 
                     <div class="form-group col-md-3 col-lg-2">
                         <label class="small" for="search">&nbsp;</label>
@@ -183,12 +183,12 @@
                             <tr>
                                 <th class="text-center">No.</th>
                                 <th class="text-center">Invoice No.</th>
-                                <th class="text-center">Reference No.</th>
+                                <!--<th class="text-center">Reference No.</th>-->
                                 <th class="text-center">Date</th>
                                 <th class="text-center">Branch</th>
                                 <th class="text-center">Customer</th>
                                 <th class="text-center">Sale Man</th>
-                                <th class="text-center">Office Sale Man</th>
+                                <!--<th class="text-center">Office Sale Man</th>-->
                                 <th class="text-center">Total Amount</th>
                             </tr>
                         </thead>
@@ -197,20 +197,20 @@
                                 <tr>
                                     <td class="text-right"></td>
                                     <td class="textalign">{{sale.invoice_no}}</td>
-                                    <td class="textalign">{{sale.reference_no}}</td>
+                                    <!--<td class="textalign">{{sale.reference_no}}</td>-->
                                     <td class="textalign">{{sale.invoice_date}}</td>
                                     <td v-if="sale.branch != null" class="textalign">{{sale.branch.branch_name}}</td>
                                     <td v-else></td>
                                     <td class="mm-txt">{{sale.customer.cus_name}}</td>
-                                    <td class="mm-txt textalign" v-if="sale.order != null && sale.order.sale_man != null">{{sale.order.sale_man.name}}</td>
-                                    <td v-else></td>
-                                    <td class="mm-txt textalign" v-if="sale.office_sale_man_id != null">{{sale.office_sale_man.name}}</td>
+                                    <!--<td class="mm-txt textalign" v-if="sale.order != null && sale.order.sale_man != null">{{sale.order.sale_man.name}}</td>
+                                    <td v-else></td>-->
+                                    <td class="mm-txt textalign" v-if="sale.office_sale_man_id != null">{{sale.sale_man.sale_man}}</td>
                                             <td v-else></td>
-                                    <td class="text-right">{{sale.total_amount}}</td>
+                                    <td class="text-right">{{sale.net_total}}</td>
                                 </tr>
                             </template>
                             <tr>
-                                <th colspan="8" class="text-right">Total</th>
+                                <th colspan="6" class="text-right">Total</th>
                                 <th class="text-right">{{priceTotal}}</th>
                             </tr>
                         </tbody>
@@ -393,8 +393,13 @@
 
         methods: {
 
-            initSaleMan() {
+            /**initSaleMan() {
               axios.get("/sale_man").then(({ data }) => (this.sale_mans = data.data));
+              $("#sale_man_id").select2();
+            },**/
+
+            initSaleMan() {
+              axios.get("/sale_men").then(({ data }) => (this.sale_mans = data.data));              
               $("#sale_man_id").select2();
             },
 
@@ -610,8 +615,8 @@
             let app = this;
               app.sales.forEach(function(sale) {
 
-                if(sale.total_amount != null && sale.total_amount != '') {
-                  sum += (parseFloat(sale.total_amount));  
+                if(sale.net_total != null && sale.net_total != '') {
+                  sum += (parseFloat(sale.net_total));  
                 }
 
               });
