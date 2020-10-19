@@ -257,9 +257,6 @@ trait GetReport{
                 $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
                 // $net_inv_amt+=$i->total_amount; $net_paid_amt+=$i->paid_amount;$net_balance_amt+=$i->balance_amount;
             }
-            // $invoices[$key]->per_inv_amt=$per_inv_amt;
-            // $invoices[$key]->per_paid_amt=$per_paid_amt;
-            // $invoices[$key]->per_bal_amt=$per_bal_amt;
             $p_outstandings[$key]->out_list=$invoices;
             $p_outstandings[$key]->total_inv_amt=$per_inv_amt;
             $p_outstandings[$key]->total_paid_amt=$per_paid_amt;
@@ -409,7 +406,5 @@ trait GetReport{
         
                 $html .= '<tr><td colspan ="7" style="text-align: right;"><strong>Total</strong></td><td class="text-center">'.number_format($total_paid).'</td><td class="text-center">'.number_format($total_discount).'</td></tr>';
                 return $html;
-        //
             }
-
 }
