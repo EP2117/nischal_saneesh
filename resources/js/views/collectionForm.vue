@@ -74,7 +74,7 @@
                                 <select multiple class="form-control invoices"
                                     name="invoices[]" v-model="form.invoices" :required="isRequired" style="width:100%"
                                 >
-                                    <option v-for="sale in sale_invoices" :value="sale.id">{{sale.invoice_no}}_{{sale.total_amount-(sale.discount+sale.collection_amount+sale.pay_amount)}}</option>
+                                    <option v-for="sale in sale_invoices" :value="sale.id">{{sale.invoice_no}}_{{sale.total_amount-(sale.discount+sale.collection_amount+sale.pay_amount)}}_{{sale.invoice_date}}</option>
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
