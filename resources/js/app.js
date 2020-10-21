@@ -104,7 +104,8 @@ import CustomerOpeningBalanceForm from "./views/CustomerOpeningBalance/CustomerO
 import PurchaseOutstandingReport from "./views/Report/PurchaseOutstandingReport";
 import SaleOutstandingReport from "./views/Report/SaleOutstandingReport";
 import CreditCollectionReport from "./views/Report/CreditCollectionReport";
-
+import InventoryAdjustment from "./views/Inventory/InventoryAdjustment";
+import InventoryAdjustmentForm from "./views/Inventory/InventoryAdjustmentForm";
 const routes = [
     {
       name: 'home',
@@ -510,7 +511,20 @@ const routes = [
   path:'/report/credit_collection',
   component: CreditCollectionReport,
 },
-
+{
+  name:'inventory_adjustment',
+  path:'/inventory/adjustment',
+  component:InventoryAdjustment,
+},
+{
+//  name:'inventory_adjustment_create',
+ path:'/inventory/create_adjustment',
+ component:InventoryAdjustmentForm,
+},
+{
+ path:'/inventory_adjustment/:id/edit',
+ component:InventoryAdjustmentForm,
+}
 ];
 
 const router = new VueRouter({routes: routes});

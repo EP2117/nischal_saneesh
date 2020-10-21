@@ -286,6 +286,14 @@
                 <i class="fas fa-sign-in-alt"></i>
                 <span>Internal Receive</span>
             </a>
+        </router-link>  
+        <hr class="sidebar-divider">
+
+        <router-link  tag="li" to="/inventory/adjustment" class="nav-item">
+            <a class="nav-link" >
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Inventory Adjustment</span>
+            </a>
         </router-link>
 
 

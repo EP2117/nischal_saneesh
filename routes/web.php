@@ -222,4 +222,6 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
         Route::patch('update/{id}',['\App\Http\Controllers\CustomerOpeningBalanceController','update']);
         Route::delete('{id}/destroy',['\App\Http\Controllers\CustomerOpeningBalanceController','destroy']);
     });
+    Route::resource('inventory_adjustment','InventoryAdjustmentController');
+
 });

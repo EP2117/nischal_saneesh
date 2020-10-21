@@ -266,7 +266,7 @@ trait GetReport{
         return $p_outstandings;
     }
     public function getSaleOutstandingReport($request){
-        // dd($request->all());
+
         $purchase_outstanding=Sale::where('payment_type','credit');
         $cus=Sale::where('payment_type','credit');
         if($request->customer_id!=null){
@@ -351,7 +351,7 @@ trait GetReport{
                 {
                     $collections->whereBetween('collections.collection_date', array($request->from_date, $request->to_date));
                 } else if($request->from_date != '') {
-                    $collection->whereDate('collections.collection_date', '>=', $request->from_date);
+                    $collections->whereDate('collections.collection_date', '>=', $request->from_date);
                 }else if($request->to_date != '') {
                     $collections->whereDate('collections.collection_date', '<=', $request->to_date);
                 }
@@ -364,8 +364,8 @@ trait GetReport{
                 if($request->branch_id!=null){
                     $collections->where('collections.branch_id',$request->branch_id);
                 }
-                if($request->supplier_id!=null){
-                    $collections->where('collections.supplier_id',$request->supplier_id);
+                if($request->customer_id!=null){
+                    $collections->where('collections.customer_id',$request->customer_id);
                 }
                 if($request->state_id!=null){
                     $collections->where('customers.state_id',$request->state_id);

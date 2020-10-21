@@ -140,7 +140,7 @@
                                     <td>{{product.saleQty = product.sale_qty == null ? '0' : product.sale_qty}}</td>
 <!--                                    <td>{{(parseFloat(product.product_opening) + parseFloat(product.inQty)+parseInt(product.in_purchase_qty)+parseFloat(product.product_opening) + parseFloat(product.receiveQty) ) - (parseFloat(product.saleQty)  + parseFloat(product.transferQty))}}</td>-->
                                     <td>
-                                        {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) +parseFloat(product.product_opening)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty))}}
+                                        {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) +parseFloat(product.product_opening)+ parseFloat(product.receiveQty) +parseFloat(product.add_qty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+parseInt(product.out_qty))}}
                                     </td>
                                 </tr>
                                 </template>
@@ -168,7 +168,7 @@
                                     <td>{{product.saleQty = product.sale_qty == null ? '0' : product.sale_qty}}</td>
 <!--                                    <td>{{(parseFloat(product.product_opening) + parseFloat(product.inQty) + parseFloat(product.receiveQty) + parseFloat(product.reviseQty)) - (parseFloat(product.saleQty) + parseFloat(product.saleOrder) + parseFloat(product.reviseSaleQty) + parseFloat(product.transferQty))}}</td>-->
                                     <td>
-                                        {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) + parseFloat(product.receiveQty))-(parseFloat(product.saleQty)+ parseFloat(product.transferQty))}}
+                                        {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) + parseFloat(product.receiveQty)+parseFloat(product.add_qty))-(parseFloat(product.saleQty)+ parseFloat(product.transferQty)+parseInt(product.out_qty))}}
                                     </td>
                             </tr>
                             </template>
