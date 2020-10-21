@@ -147,6 +147,7 @@
         @if(Auth::user()->role->role_name == 'system')
 
         <!-- Divider -->
+        @if(Auth::user()->email != "demo@mail.com")
         <hr class="sidebar-divider">
 
         <router-link  tag="li" to="/import" class="nav-item">
@@ -189,7 +190,7 @@
                 </div>
             </div>
         </router-link>
-
+        @endif
         <hr class="sidebar-divider">
 
         <router-link  tag="li" to="/branch" class="nav-item">
@@ -216,7 +217,7 @@
                 <span>Sale Man</span>
             </a>
         </router-link>
-
+        @if(Auth::user()->email != "demo@mail.com")
         <hr class="sidebar-divider">
 
         <router-link  tag="li" to="/users" class="nav-item">
@@ -225,7 +226,7 @@
                 <span>User Setting</span>
             </a>
         </router-link>
-
+        @endif
         @endif
 
 
