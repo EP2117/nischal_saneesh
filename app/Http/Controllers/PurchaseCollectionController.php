@@ -97,7 +97,7 @@ class PurchaseCollectionController extends Controller
                 'total_paid_amount'=>$total_paid_amount,
                 'created_by' => Auth::user()->id,
             ]);
-            $description=$p_collection->collection_no.",Inv Date ".$p_collection->collection_date." by " .$p_collection->supplier->name;
+            $description=$p_collection->collection_no.",Date ".$p_collection->collection_date." by " .$p_collection->supplier->name;
 
             $sub_account_id=config('global.credit_payment');    /*sub account id for credit payment */
             if($p_collection){
@@ -186,7 +186,7 @@ class PurchaseCollectionController extends Controller
             $collection->updated_by = Auth::user()->id;
             $collection->save();
             $sub_account_id=config('global.credit_payment');    /*sub account id for credit payment */
-            $description=$collection->collection_no.",Inv Date ".$collection->collection_date." to " .$collection->supplier->name;
+            $description=$collection->collection_no.", Date ".$collection->collection_date." to " .$collection->supplier->name;
             if($collection){
                 if($collection->total_paid_amount!=0){
                     AccountTransition::where('purchase_id',$c_id)->update([

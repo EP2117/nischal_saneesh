@@ -498,7 +498,6 @@
                     app.form.pay_amount = "";
                     app.form.is_auto = false;
                     app.isReadonly = false;
-
                     if(app.isEdit) {
                         $('.pay_amt:visible').attr('readonly',false);
                         $('.pay_amt:visible').attr('required',true);

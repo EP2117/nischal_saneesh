@@ -498,7 +498,7 @@ class SaleController extends Controller
         $description=$sale->invoice_no.", Date ".$sale->invoice_date." by " .$cus->cus_name;
         if($sale){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
-                    AccountTransition::where('purchase_id',$id)->update([
+                    AccountTransition::where('sale_id',$id)->update([
                         'sub_account_id' => $sub_account_id,
                         'transition_date' => $sale->invoice_date,
                         'sale_id' => $sale->id,
