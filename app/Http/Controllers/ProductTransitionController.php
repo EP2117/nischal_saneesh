@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Auth;
-use App\ProductTransition;
+use DB;
+use App\Sale;
+use APp\User;
+use App\Product;
 use App\Transfer;
 use Carbon\Carbon;
-use App\Product;
-use APp\User;
-use App\Sale;
 use App\Collection;
+use App\ProductTransition;
+use Illuminate\Http\Request;
 use App\Exports\InventoryExport;
-use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Traits\Report\GetReport;
+use Illuminate\Validation\ValidationException;
 
 class ProductTransitionController extends Controller
 {
-
+    use GetReport;
 	public function getProductsByUserWarehouse() {
 		$data = DB::table("product_transitions")
 
@@ -356,15 +357,16 @@ class ProductTransitionController extends Controller
         if($request->branch_id != "") {
             $where .= " AND branch_id =".$request->branch_id;
         }
+        // SUM(CASE  WHEN transition_type = 'in' AND transition_adjustment_id IS NOT NULL THEN product_quantity  ELSE 0 END) as add_qty,
+
         $products = DB::table("products")
-                ->select(DB::raw("products.id as product_id, products.product_name, products.brand_id,pt.warehouse_id, products.product_code,uom_id,uoms.uom_name,brands.brand_name,categories.category_name, pt.in_qty, pt.receive_qty,pt.add_qty, pt.out_qty, pt.transfer_qty, pt.sale_qty, pt.branch_id, pt.transition_date, pt.approval_qty, pt.revise_qty, pt.approval_sale_qty, pt.revise_sale_qty"))
+                ->select(DB::raw("products.id as product_id, products.product_name, products.brand_id,pt.warehouse_id, products.product_code,uom_id,uoms.uom_name,brands.brand_name,categories.category_name, pt.in_qty, pt.receive_qty, pt.out_qty, pt.transfer_qty, pt.sale_qty, pt.branch_id, pt.transition_date, pt.approval_qty, pt.revise_qty, pt.approval_sale_qty, pt.revise_sale_qty"))
                   ->leftjoin(DB::raw("(SELECT product_id, warehouse_id, transition_date, branch_id,
-                            SUM(CASE  WHEN transition_type = 'in' AND (transition_entry_id IS NOT NULL OR transition_purchase_id IS NOT NULL)  THEN product_quantity  ELSE 0 END) as in_qty,
+                            SUM(CASE  WHEN transition_type = 'in' AND (transition_entry_id IS NOT NULL OR transition_purchase_id IS NOT NULL OR transition_adjustment_id IS NOT NULL)  THEN product_quantity  ELSE 0 END) as in_qty,
                              SUM(CASE  WHEN transition_type = 'in' AND transition_transfer_id IS NOT NULL THEN product_quantity  ELSE 0 END) as receive_qty,
                               SUM(CASE  WHEN product_transitions.transition_type = 'out' THEN product_quantity  ELSE 0 END) as out_qty,
                                SUM(CASE  WHEN transition_type = 'out' AND transition_transfer_id IS NOT NULL THEN product_quantity  ELSE 0 END)  as transfer_qty,
                                 SUM(CASE  WHEN transition_type = 'in' AND transition_approval_id IS NOT NULL THEN product_quantity  ELSE 0 END) as revise_qty,
-                                SUM(CASE  WHEN transition_type = 'in' AND transition_adjustment_id IS NOT NULL THEN product_quantity  ELSE 0 END) as add_qty,
                                  SUM(CASE  WHEN transition_type = 'out' AND transition_approval_id IS NOT NULL AND is_revise IS NULL THEN product_quantity  ELSE 0 END)  as approval_qty, 
                                  SUM(CASE  WHEN transition_type = 'out' AND transition_approval_id IS NOT NULL AND transition_sale_id IS NOT NULL AND is_revise IS NULL THEN product_quantity  ELSE 0 END)  as approval_sale_qty, SUM(CASE  WHEN transition_type = 'out' AND transition_approval_id IS NOT NULL AND transition_sale_id IS NOT NULL AND is_revise IS NOT NULL THEN product_quantity  ELSE 0 END)  as revise_sale_qty, SUM(CASE  WHEN transition_type = 'out' AND transition_sale_id IS NOT NULL AND transition_approval_id IS NULL THEN product_quantity  ELSE 0 END)  as sale_qty
 
@@ -484,7 +486,18 @@ class ProductTransitionController extends Controller
         //end for order prouct
 
 		return response(compact('data','op_data','order_data'), 200);
-	}
+    }
+    public function getValuationReport(Request $request){
+        $data=$this->getValuation($request);
+        $total_valuation=0;
+        foreach($data as $p){
+            $bal=(int)$p->in_qty-(int)$p->out_qty;
+            $p->balance=$bal;
+            $total_valuation+=$p->valuation_amount;
+        }
+
+        return compact('data','total_valuation');
+    }
 
 	public function exportInventoryReport(Request $request)
     {

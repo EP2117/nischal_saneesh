@@ -12,7 +12,6 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Product;
 use Carbon\Carbon;
 use DB;
-
 class ProductController extends Controller
 {
 	public function index(Request $request)
@@ -29,12 +28,18 @@ class ProductController extends Controller
                   'products.*',
                   'uoms.uom_name',
                   'brands.brand_name',
-                  'categories.category_name'
+                  'categories.category_name',
                 ]);
 
         $data->leftjoin('uoms', 'uoms.id','products.uom_id');
         $data->leftjoin('brands', 'brands.id','products.brand_id');
         $data->leftjoin('categories', 'categories.id','products.category_id');
+    //     $data->leftjoin(DB::raw("(SELECT product_id,AVG(price) as avg_valuation
+    //     FROM product_purchase 
+    //    GROUP BY product_purchase.product_id
+    //    ) as pp"),function($join){
+    //        $join->on("pp.product_id","=","products.id");
+    //    });
 
         if($request->brand_id != "") {
             $data->where('products.brand_id',  $request->brand_id);
@@ -129,6 +134,8 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::with('selling_uoms','uom')->find($id);
+        $to_get_cost_price=DB::table('product_purchase')->where('product_id',$id)->avg('price');
+        dd($to_get_cost_price);
         return compact('product');
     }
 

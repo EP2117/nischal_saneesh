@@ -407,4 +407,49 @@ trait GetReport{
                 $html .= '<tr><td colspan ="7" style="text-align: right;"><strong>Total</strong></td><td class="text-center">'.number_format($total_paid).'</td><td class="text-center">'.number_format($total_discount).'</td></tr>';
                 return $html;
             }
+    public function getValuation($request){
+        $products = DB::table("products")
+        ->select(DB::raw("products.id as product_id, pp.valuation_amount,products.product_name,products.minimum_qty, products.brand_id,pt.warehouse_id, products.product_code,uom_id,uoms.uom_name,brands.brand_name,categories.category_name, pt.in_qty,pt.out_qty"))
+        ->leftjoin(DB::raw("(SELECT product_id,product_quantity,transition_type,transition_purchase_id, warehouse_id, transition_date, branch_id,
+                         SUM(CASE  WHEN transition_type = 'in'  THEN product_quantity  ELSE 0 END) as in_qty,
+                         SUM(CASE  WHEN transition_type = 'out'  THEN product_quantity  ELSE 0 END) as out_qty
+                         FROM product_transitions
+                          GROUP BY product_transitions.product_id
+                           )as pt"),function($join){
+                        $join->on("pt.product_id","=","products.id");
+                   })
+                   ->leftjoin(DB::raw("(SELECT product_id,SUM(price) as valuation_amount
+                    FROM product_purchase 
+                   GROUP BY product_purchase.product_id
+                   ) as pp"),function($join){
+                       $join->on("pp.product_id","=","products.id");
+                   })
+	    		->leftjoin('uoms', 'uoms.id', '=', 'products.uom_id')
+	    		->leftjoin('brands', 'brands.id', '=', 'products.brand_id')
+                ->leftjoin('categories', 'categories.id', '=', 'products.category_id');
+               
+        if($request->product_name != "") {
+            $products->where('products.product_name', 'LIKE', "%$request->product_name%");
+        }
+        if($request->brand_id != "") {
+            $products->where('products.brand_id', $request->brand_id);
+        }
+        if($request->product_code != "") {
+            $products->where('products.product_code', $request->product_code);
+        }
+        if($request->category_id != "") {
+            $products->where('products.category_id', $request->category_id);
+        }
+        /*if($request->warehouse_id != "") {
+            $products->where('pt.warehouse_id', $request->warehouse_id);
+        }*/
+        $data  = $products->orderBy("product_name")->get();
+        // foreach($data as $p){
+        //     $bal=(int)$p->in_qty-(int)$p->out_qty;
+        //     $p->balance=$bal;
+        // }
+        // dd($data);
+        return $data;
+        // dd($request->all());
+    }
 }
