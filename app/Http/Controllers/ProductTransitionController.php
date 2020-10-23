@@ -484,18 +484,26 @@ class ProductTransitionController extends Controller
 
         $order_data  = $order_products->orderBy("products.product_name")->groupBy("po.product_id")->get();
         //end for order prouct
-
 		return response(compact('data','op_data','order_data'), 200);
     }
     public function getValuationReport(Request $request){
         $data=$this->getValuation($request);
+        // dd($data);
         $total_valuation=0;
         foreach($data as $p){
-            $bal=(int)$p->in_qty-(int)$p->out_qty;
+            $bal=($p->entry_qty+(int)$p->in_qty)-(int)$p->out_qty;
+        
             $p->balance=$bal;
-            $total_valuation+=$p->valuation_amount;
-        }
+            // $p->s_valuation_amount=$p->s_valuation_amount==null ? 0 : (int)$p->s_valuation_amount;
+            $p->p_valuation_amount=$p->p_valuation_amount==null ? 0 :(int)$p->p_valuation_amount;
+            $p->s_qty=$p->s_qty==null?0 :(int)$p->s_qty;
+            // $p->cost_price=$p->cost_price==null?0 :(int)$p->cost_price;
+            $total_valuation+=($p->entry_qty * $p->purchase_price)+((int)$p->p_valuation_amount-(int)$p->cost_price);
+            $p->t_valuation_amount=((int)$p->entry_qty * (int)$p->purchase_price)+(int)((int)$p->p_valuation_amount-(int)$p->cost_price);
 
+        }
+        // dd($data);
+        // dd($total_valuation);
         return compact('data','total_valuation');
     }
 

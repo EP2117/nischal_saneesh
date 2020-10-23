@@ -409,25 +409,39 @@ trait GetReport{
             }
     public function getValuation($request){
         $products = DB::table("products")
-        ->select(DB::raw("products.id as product_id, pp.valuation_amount,products.product_name,products.minimum_qty, products.brand_id,pt.warehouse_id, products.product_code,uom_id,uoms.uom_name,brands.brand_name,categories.category_name, pt.in_qty,pt.out_qty"))
+        ->select(DB::raw("products.id as product_id,ps.s_valuation_amount,pt.cost_price,products.purchase_price,ps.s_qty, pp.p_valuation_amount,pt.entry_qty,products.product_name,products.minimum_qty, products.brand_id,pt.warehouse_id, products.product_code,uom_id,uoms.uom_name,brands.brand_name,categories.category_name, pt.in_qty,pt.out_qty"))
         ->leftjoin(DB::raw("(SELECT product_id,product_quantity,transition_type,transition_purchase_id, warehouse_id, transition_date, branch_id,
-                         SUM(CASE  WHEN transition_type = 'in'  THEN product_quantity  ELSE 0 END) as in_qty,
+                         SUM(CASE  WHEN transition_type = 'in'  AND transition_entry_id IS NOT NULL THEN product_quantity  ELSE 0 END) as entry_qty,
+                         SUM(CASE  WHEN transition_type = 'in' AND transition_entry_id IS NULL THEN product_quantity  ELSE 0 END) as in_qty,
+                         SUM(CASE  WHEN transition_type = 'out' AND transition_sale_id IS NOT NULL THEN cost_price  ELSE 0 END) as cost_price,
                          SUM(CASE  WHEN transition_type = 'out'  THEN product_quantity  ELSE 0 END) as out_qty
                          FROM product_transitions
                           GROUP BY product_transitions.product_id
                            )as pt"),function($join){
                         $join->on("pt.product_id","=","products.id");
                    })
-                   ->leftjoin(DB::raw("(SELECT product_id,SUM(price) as valuation_amount
+                   ->leftjoin(DB::raw("(SELECT product_id,SUM(total_amount) as p_valuation_amount
                     FROM product_purchase 
                    GROUP BY product_purchase.product_id
                    ) as pp"),function($join){
                        $join->on("pp.product_id","=","products.id");
                    })
+                       ->leftjoin(DB::raw("(SELECT product_id,SUM(total_amount) as s_valuation_amount,product_quantity as s_qty
+                       FROM product_sale 
+                      GROUP BY product_sale.product_id
+                      ) as ps"),function($join){
+                          $join->on("ps.product_id","=","products.id");
+                      })
+                    //   ->leftjoin(DB::raw("(SELECT product_id,product_quantity as pm_qty
+                    //   FROM product_mainwarehouse_entry 
+                    //  GROUP BY product_mainwarehouse_entry.product_id
+                    //  ) as pm"),function($join){
+                    //      $join->on("ps.product_id","=","products.id");
+                    //  })
 	    		->leftjoin('uoms', 'uoms.id', '=', 'products.uom_id')
 	    		->leftjoin('brands', 'brands.id', '=', 'products.brand_id')
                 ->leftjoin('categories', 'categories.id', '=', 'products.category_id');
-               
+                // SUM(value) / COUNT(DISTINCT order_date) AS order_average
         if($request->product_name != "") {
             $products->where('products.product_name', 'LIKE', "%$request->product_name%");
         }
@@ -444,12 +458,30 @@ trait GetReport{
             $products->where('pt.warehouse_id', $request->warehouse_id);
         }*/
         $data  = $products->orderBy("product_name")->get();
-        // foreach($data as $p){
-        //     $bal=(int)$p->in_qty-(int)$p->out_qty;
-        //     $p->balance=$bal;
-        // }
+
+    
         // dd($data);
         return $data;
         // dd($request->all());
     }
+    public function getCostPrice($p_id){
+        $data=DB::table('product_transitions')->where('product_id',$p_id)
+                         ->select(DB::raw("pp.p_valuation_amount"))
+                         ->select(DB::raw(
+                             "SUM(CASE WHEN transition_type = 'out' AND transition_sale_id IS NOT NULL THEN cost_price  ELSE 0 END) as cost_price,
+                         SUM(CASE  WHEN transition_type = 'in'  AND transition_entry_id IS NOT NULL THEN product_quantity  ELSE 0 END) as entry_qty,
+                         SUM(CASE  WHEN transition_type = 'in'  AND transition_entry_id IS NULL THEN product_quantity  ELSE 0 END) as entry_qty
+                         "))
+                        //  ->leftjoin(DB::raw("(SELECT product_id,SUM(total_amount) as p_valuation_amount
+                        //  FROM product_purchase 
+                        // GROUP BY product_purchase.product_id
+                        // ) as pp"),function($join){
+                        //     $join->on("pp.product_id","=","transition_product.id");
+                        // })
+        ->groupBy('product_id')
+        ->get();
+        dd($data);
+    }
+    // SUM(CASE  WHEN transition_type = 'out' AND transition_sale_id IS NOT NULL THEN cost_price  ELSE 0 END) as cost_price,
+
 }

@@ -9,7 +9,6 @@ class Product extends Model
 {
     use SoftDeletes;
     protected $with=['product_transition','uom'];
-
     public function product_transition(){
         return $this->hasMany(ProductTransition::class);
     }

@@ -449,6 +449,7 @@
                         $('#product_code_div').show();
                     }
                     app.form.product_name = response.data.product.product_name;
+                    app.form.cost_price=parseInt(response.data.cost_price);
                     app.form.product_code = response.data.product.product_code;
                     app.form.brand_id = response.data.product.brand_id;
                     app.form.product_code_type = response.data.product.product_code_type;

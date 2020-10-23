@@ -8,12 +8,14 @@ use Illuminate\Support\Facades\Auth;
 use App\Imports\ProductImport;
 use App\Imports\ProductMinQtyImport;
 use App\Exports\ProductExport;
+use App\Http\Traits\Report\GetReport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Product;
 use Carbon\Carbon;
 use DB;
 class ProductController extends Controller
 {
+    use GetReport;
 	public function index(Request $request)
     {
         $limit = 30;
@@ -134,9 +136,18 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::with('selling_uoms','uom')->find($id);
-        $to_get_cost_price=DB::table('product_purchase')->where('product_id',$id)->avg('price');
-        dd($to_get_cost_price);
-        return compact('product');
+        $pp=DB::table('product_purchase')->where('product_id',$id)->get();
+        $cost_price=$this->getCostPrice($id);
+        // $q=$m=0;
+        // foreach($pp as $p){
+        //     $q+=$p->product_quantity;
+        //     $m+=$p->total_amount;
+        // }
+        // $cost_price=(int)$m/$q;
+        // if($cost_price==null){
+        //     $cost_price=0;
+        // }
+        return compact('product','cost_price');
     }
 
     /**
