@@ -18,11 +18,13 @@ use Illuminate\Http\Response;
 use App\Exports\DailySaleExport;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Traits\Report\GetReport;
 use App\Exports\DailySaleProductExport;
 use Illuminate\Validation\ValidationException;
 
 class SaleController extends Controller
 {
+    use GetReport;
     public function index(Request $request)
     {
         $login_year = Session::get('loginYear');
@@ -409,13 +411,10 @@ class SaleController extends Controller
                 //for pre-defined product uom
                 $relation_val = 1;
             }
-            $pp=DB::table('product_purchase')->where('product_id',$request->product[$i])->get();
-        $q=$m=0;
-        foreach($pp as $p){
-            $q+=$p->product_quantity;
-            $m+=$p->total_amount;
-        }
-        $cost_price=(int)$m/$q;
+            // $pp=DB::table('product_purchase')->where('product_id',$request->product[$i])->get();
+        // $q=$m=0;
+        $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
+
             //add products in transition table=> transition_type = out (for sold out)
             $obj = new ProductTransition;
             $obj->product_id            = $request->product[$i];
@@ -595,6 +594,8 @@ class SaleController extends Controller
                     //for pre-defined product uom
                     $relation_val = 1;
                 }
+        $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
+
 
                 //add products in transition table=> transfer_type = out (for sold out)
                 $obj = new ProductTransition;

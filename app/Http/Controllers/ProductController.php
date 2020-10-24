@@ -137,16 +137,7 @@ class ProductController extends Controller
     {
         $product = Product::with('selling_uoms','uom')->find($id);
         $pp=DB::table('product_purchase')->where('product_id',$id)->get();
-        $cost_price=$this->getCostPrice($id);
-        // $q=$m=0;
-        // foreach($pp as $p){
-        //     $q+=$p->product_quantity;
-        //     $m+=$p->total_amount;
-        // }
-        // $cost_price=(int)$m/$q;
-        // if($cost_price==null){
-        //     $cost_price=0;
-        // }
+        $cost_price=$this->getCostPrice($id)->product_cost_price;
         return compact('product','cost_price');
     }
 

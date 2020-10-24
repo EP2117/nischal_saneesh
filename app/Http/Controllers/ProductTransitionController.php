@@ -312,8 +312,6 @@ class ProductTransitionController extends Controller
 
                     ->leftjoin('uoms', 'uoms.id', '=', 'products.uom_id');
         }
-
-
         $data  = $data->where('products.is_active',1);
         if($request->brand_id != '') {
             $data->where('products.brand_id',$request->brand_id);
@@ -369,9 +367,7 @@ class ProductTransitionController extends Controller
                                 SUM(CASE  WHEN transition_type = 'in' AND transition_approval_id IS NOT NULL THEN product_quantity  ELSE 0 END) as revise_qty,
                                  SUM(CASE  WHEN transition_type = 'out' AND transition_approval_id IS NOT NULL AND is_revise IS NULL THEN product_quantity  ELSE 0 END)  as approval_qty, 
                                  SUM(CASE  WHEN transition_type = 'out' AND transition_approval_id IS NOT NULL AND transition_sale_id IS NOT NULL AND is_revise IS NULL THEN product_quantity  ELSE 0 END)  as approval_sale_qty, SUM(CASE  WHEN transition_type = 'out' AND transition_approval_id IS NOT NULL AND transition_sale_id IS NOT NULL AND is_revise IS NOT NULL THEN product_quantity  ELSE 0 END)  as revise_sale_qty, SUM(CASE  WHEN transition_type = 'out' AND transition_sale_id IS NOT NULL AND transition_approval_id IS NULL THEN product_quantity  ELSE 0 END)  as sale_qty
-
                             FROM product_transitions Where ".$where."
-
                             GROUP BY product_transitions.product_id
 
                             ) as pt"),function($join){
@@ -500,7 +496,6 @@ class ProductTransitionController extends Controller
             // $p->cost_price=$p->cost_price==null?0 :(int)$p->cost_price;
             $total_valuation+=($p->entry_qty * $p->purchase_price)+((int)$p->p_valuation_amount-(int)$p->cost_price);
             $p->t_valuation_amount=((int)$p->entry_qty * (int)$p->purchase_price)+(int)((int)$p->p_valuation_amount-(int)$p->cost_price);
-
         }
         // dd($data);
         // dd($total_valuation);

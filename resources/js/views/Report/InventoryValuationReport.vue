@@ -44,23 +44,16 @@
                         <input type="text" class="form-control" id="product_code" name="product_code"
                         v-model="search.product_code">
                     </div>
-                    <!-- <div class="form-group col-md-4 col-lg-3">
-                        <label for="warehouse_id">Warehouse</label>
-                        <select id="warehouse_id" class="form-control"
-                            name="warehouse_id" v-model="search.warehouse_id" style="width:100%" required
-                        >
-                            <option value="">Select One</option>
-                            <option v-for="warehouse in warehouses" :value="warehouse.id"  >{{warehouse.warehouse_name}}</option>
-                        </select>
-                    </div> -->
+                      <div class="form-group col-md-4 col-lg-3">
+                        <label for="from_date"> Date</label>
+                        <input type="text" class="form-control datetimepicker" id="date" name="date"
+                        v-model="search.date">
+                    </div>
                      <div class="form-group col-md-4 col-lg-3">
                         <label for="product_name">Product Name</label>
                         <input type="text" class="form-control" id="product_name" name="product_name"
                         v-model="search.product_name">
                     </div>
-
-                   
-
                     <div class="form-group col-md-3 col-lg-2">
                         <label class="small" >&nbsp;</label>
                         <button
@@ -166,6 +159,7 @@
         data() {
             return {
                 search: {
+                    date:'',
                     category_id: "",
                     product_name: "",
                     brand_id: "",
@@ -216,6 +210,36 @@
                 var data = e.params.data;
                 app.search.brand_id = data.id;
             });
+              $("#date")
+                .datetimepicker({
+            icons: {
+                    time: "fa fa-clock-o",
+                    date: "fa fa-calendar",
+                    up: "fa fa-chevron-up",
+                    down: "fa fa-chevron-down",
+                    previous: "fa fa-chevron-left",
+                    next: "fa fa-chevron-right",
+                    today: "fa fa-screenshot",
+                    clear: "fa fa-trash",
+                    close: "fa fa-remove"
+                },
+                format:"YYYY-MM-DD",
+                minDate: app.user_year+"-01-01",
+                maxDate: app.user_year+"-12-31",
+            })
+            .on("dp.show", function(e) {
+                var y = new Date().getFullYear();
+                if(app.user_year < y) { 
+                  if(app.search.date == app.user_year+"-12-31" || app.search.from_date == '') {
+                    app.search.date = app.user_year+"-12-31";
+                  }
+                }
+            })
+            .on("dp.change", function(e) {
+                var formatedValue = e.date.format("YYYY-MM-DD");
+                //console.log(formatedValue);
+                app.search.date = formatedValue;
+            });
         },
 
         methods: {
@@ -234,6 +258,7 @@
               axios.get("/report_brands").then(({ data }) => (this.brands = data.data));
               $("#brand_id").select2();
             },
+           
 
             // getSO(product_id) {
             //     let app = this;
@@ -253,6 +278,7 @@
             //     return qty;
             // },
 
+
             getInventoryValuation(page = 1) {
 
                 // if(this.search.from_date == "" || this.search.branch_id == "") {
@@ -263,6 +289,8 @@
                 $("#loading").show();
                 let app = this;
                 var search =
+                 "&date=" +
+                    app.search.date +
                     "&category_id=" +
                     app.search.category_id +
                     "&brand_id=" +
