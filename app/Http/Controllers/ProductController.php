@@ -8,13 +8,14 @@ use Illuminate\Support\Facades\Auth;
 use App\Imports\ProductImport;
 use App\Imports\ProductMinQtyImport;
 use App\Exports\ProductExport;
+use App\Http\Traits\Report\GetReport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Product;
 use Carbon\Carbon;
 use DB;
-
 class ProductController extends Controller
 {
+    use GetReport;
 	public function index(Request $request)
     {
         $limit = 30;
@@ -29,12 +30,18 @@ class ProductController extends Controller
                   'products.*',
                   'uoms.uom_name',
                   'brands.brand_name',
-                  'categories.category_name'
+                  'categories.category_name',
                 ]);
 
         $data->leftjoin('uoms', 'uoms.id','products.uom_id');
         $data->leftjoin('brands', 'brands.id','products.brand_id');
         $data->leftjoin('categories', 'categories.id','products.category_id');
+    //     $data->leftjoin(DB::raw("(SELECT product_id,AVG(price) as avg_valuation
+    //     FROM product_purchase 
+    //    GROUP BY product_purchase.product_id
+    //    ) as pp"),function($join){
+    //        $join->on("pp.product_id","=","products.id");
+    //    });
 
         if($request->brand_id != "") {
             $data->where('products.brand_id',  $request->brand_id);
@@ -129,7 +136,9 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::with('selling_uoms','uom')->find($id);
-        return compact('product');
+        $pp=DB::table('product_purchase')->where('product_id',$id)->get();
+        $cost_price=$this->getCostPrice($id)->product_cost_price;
+        return compact('product','cost_price');
     }
 
     /**

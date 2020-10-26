@@ -93,27 +93,13 @@
                                 <input class="form-control" type="text"
                                        v-model="form.selling_price" required >
                             </div>
-
-<!--                            <div class="col-lg-9">-->
-<!--                                <div class="float-left col-form-label">Retail 1 &nbsp;</div>-->
-<!--                                <div class="float-left">-->
-<!--                                    <input class="form-control float_num price_txtbox" type="text"-->
-<!--                                    id="retail1_price" style="width:90px;" name="retail1_price"-->
-<!--                                    v-model="form.retail1_price">&nbsp;-->
-<!--                                </div>-->
-<!--                                <div class="float-left col-form-label">&nbsp; Retail 2 &nbsp;</div>-->
-<!--                                <div class="float-left">-->
-<!--                                    <input class="form-control float_num price_txtbox" type="text"-->
-<!--                                    id="retail2_price" style="width:90px;" name="retail2_price"-->
-<!--                                    v-model="form.retail2_price">-->
-<!--                                </div>-->
-<!--                                <div class="float-left col-form-label">&nbsp; Wholesale &nbsp;</div>-->
-<!--                                <div class="float-left">-->
-<!--                                    <input style="width:90px;" class="form-control float_num price_txtbox" type="text"-->
-<!--                                    id="wholesale_price" name="wholesale_price"-->
-<!--                                    v-model="form.wholesale_price">-->
-<!--                                </div>-->
-<!--                            </div>-->
+                        </div>
+                        <div class="form-group row ">
+                            <label class="col-lg-3 text-right col-form-label form-control-label">Cost Price</label>
+                            <div class="col-lg-6">
+                                <input class="form-control" type="text"
+                                       v-model="form.cost_price" readonly >
+                            </div>
                         </div>
                         <div class="form-group row" >
                             <label class="col-lg-3 col-form-label text-right form-control-label">Warehouse UMO Purchase Price</label>
@@ -463,6 +449,7 @@
                         $('#product_code_div').show();
                     }
                     app.form.product_name = response.data.product.product_name;
+                    app.form.cost_price=parseInt(response.data.cost_price);
                     app.form.product_code = response.data.product.product_code;
                     app.form.brand_id = response.data.product.brand_id;
                     app.form.product_code_type = response.data.product.product_code_type;

@@ -67,8 +67,7 @@
                                     >
                                         <option value="">Select One</option>
                                         <option v-for="product in products" :data-uom="product.uom.uom_name" 
-                                        :data-uomid="product.uom.id" :value="product.id" 
-                                        data-pivotid = "0">{{product.product_name}}</option>
+                                        :data-uomid="product.uom.id" :value="product.id" data-pivotid = "0">{{product.product_name}}</option>
                                     </select>
                                 </div>
                             </div>

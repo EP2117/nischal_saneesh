@@ -18,11 +18,13 @@ use Illuminate\Http\Response;
 use App\Exports\DailySaleExport;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Traits\Report\GetReport;
 use App\Exports\DailySaleProductExport;
 use Illuminate\Validation\ValidationException;
 
 class SaleController extends Controller
 {
+    use GetReport;
     public function index(Request $request)
     {
         $login_year = Session::get('loginYear');
@@ -285,9 +287,7 @@ class SaleController extends Controller
         } else {
             $max_id = 1;
         }
-
         $invoice_no = "SI".str_pad($max_id,5,"0",STR_PAD_LEFT);
-
         $sale->invoice_no = $invoice_no;
         $sale->branch_id = Auth::user()->branch_id;
         //$sale->reference_no = $request->reference_no;
@@ -300,7 +300,6 @@ class SaleController extends Controller
         if($request->sale_order == true) {
             $sale->order_id = $request->order_id;
         }
-
         $sale->pay_amount = $request->pay_amount;
         $sale->sale_type  = $request->sale_type;
 
@@ -351,7 +350,6 @@ class SaleController extends Controller
             //get product pre-defined UOM
             $product_result = Product::select('uom_id')->find($request->product[$i]);
             $main_uom_id = $product_result->uom_id;
-
             //add product into pivot table
             /**$pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);**/
             if($request->sale_order == true) {
@@ -413,6 +411,9 @@ class SaleController extends Controller
                 //for pre-defined product uom
                 $relation_val = 1;
             }
+            // $pp=DB::table('product_purchase')->where('product_id',$request->product[$i])->get();
+        // $q=$m=0;
+        $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
 
             //add products in transition table=> transition_type = out (for sold out)
             $obj = new ProductTransition;
@@ -423,6 +424,7 @@ class SaleController extends Controller
             $obj->branch_id  = Auth::user()->branch_id;
             $obj->warehouse_id          = Auth::user()->warehouse_id;
             $obj->transition_date       = $request->invoice_date;
+            $obj->cost_price            =$cost_price *$request->qty[$i] * $relation_val;
             $obj->transition_product_uom_id        = $request->uom[$i];
             $obj->transition_product_quantity      = $request->qty[$i];
             $obj->product_uom_id        = $main_uom_id;
@@ -592,6 +594,8 @@ class SaleController extends Controller
                     //for pre-defined product uom
                     $relation_val = 1;
                 }
+        $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
+
 
                 //add products in transition table=> transfer_type = out (for sold out)
                 $obj = new ProductTransition;

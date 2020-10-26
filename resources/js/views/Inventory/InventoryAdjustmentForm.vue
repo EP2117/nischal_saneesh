@@ -68,7 +68,7 @@
                                         :data-uom="product.uom.uom_name" 
                                         :data-uomid="product.uom.id" 
                                         :value="product.id" 
-                                        :data-pivotid = "0">{{product.product_name}}</option>
+                                        data-pivotid = "0">{{product.product_name}}</option>
                                     </select>
                                 </div>
                             </div>
