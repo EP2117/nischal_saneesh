@@ -408,10 +408,8 @@ trait GetReport{
                 return $html;
             }
     public function getValuation($request){
-        // dd($request->all());
         $where="";
         if($request->date != '') {
-            //$products->whereDate('product_transitions.transition_date', '<=', $request->to_date);
             $where.= "product_transitions.transition_date <= '".$request->date."'";
         } else{
             $today=Carbon::now()->today();
