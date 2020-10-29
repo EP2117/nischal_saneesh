@@ -517,8 +517,9 @@
                     app.search.sort_by;
 
 
-                var baseurl = window.location.origin;
-                window.open(baseurl+'/product_export?'+search);
+                //var baseurl = window.location.origin;
+                this.site_path
+                window.open(app.site_path+'/product_export?'+search);
             },
 
             deleteProduct(id) {

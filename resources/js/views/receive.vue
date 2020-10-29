@@ -67,7 +67,7 @@
                                         type="checkbox"
                                         :id="'transfer_'+transfer.id"
                                         :name="'transfer_'+transfer.id"
-                                        v-if="user_role !='admin' && user_role !='system'"
+                                        v-if="user_role !='admin'"
                                         @change="acceptTransfer($event.target,transfer.id)"
                                     >
                                     <input
