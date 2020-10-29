@@ -24,7 +24,6 @@ class ProductImport implements ToCollection
             //
         ]);
     }
-
     public function collection(Collection $rows)
     {
         $user_id = Auth::user()->id;
@@ -34,7 +33,7 @@ class ProductImport implements ToCollection
             
             if($j > 0) {
                 $check = Product::where('product_code', $row[0])->first();
-                if(!$check) {
+                if(!$check){
                     //check and get brand id
                     $brand = Brand::where('brand_name', $row[1])->first();
                     if($brand) {

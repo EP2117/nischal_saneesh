@@ -65,7 +65,7 @@ class PurchaseInvoiceController extends Controller
         }else{
             $no=$latest->id;
         }
-        $invoice_no = "PI".str_pad((int)$no + 1,5,"0",STR_PAD_LEFT);
+                                 $invoice_no = "PI".str_pad((int)$no + 1,5,"0",STR_PAD_LEFT);
         $p->invoice_no = $invoice_no;
         $p->branch_id = Auth::user()->branch_id;
         $p->reference_no = $request->reference_no;

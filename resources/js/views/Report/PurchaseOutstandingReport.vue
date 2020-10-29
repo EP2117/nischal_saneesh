@@ -161,7 +161,8 @@
                         <tbody id="result" >
                             <template v-for="(po,k) in purchase_outstandings">
                                 <tr v-for="(c,key) in po.out_list">
-                                <td class="text-center"></td>
+                                    <template v-if="c.t_balance_amount!=0">
+                                        <td class="text-center"></td>
                                 <td class="text-center">{{c.invoice_no}}</td>
                                 <td class="text-center">{{c.invoice_date}}</td>
                                 <!--                            <td class="text-center">{{c.vochur_no}}</td>-->
@@ -177,6 +178,8 @@
                                     <td class="text-center">{{po.total_paid_amt}}</td>
                                     <td class="text-center">{{po.total_bal_amt}}</td>
                                 </tr>
+                                    </template>
+                                
                             </template>
                             <tr>
                                 <td></td>

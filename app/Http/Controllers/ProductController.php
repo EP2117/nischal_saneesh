@@ -327,7 +327,6 @@ class ProductController extends Controller
     {
         $path1 = request()->file('file')->store('temp');
         $path=storage_path('app').'/'.$path1;
-
         $import = new ProductImport();
         Excel::import($import,$path);
         //return duplicate chessi no count

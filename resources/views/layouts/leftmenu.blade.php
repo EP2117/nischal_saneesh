@@ -460,6 +460,13 @@
                                 <span>Cashbook</span>
                             </a>
                         </router-link>
+                        <hr class="sidebar-divider">
+                        <router-link  tag="li" to="/ledger" class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-receipt"></i>
+                                <span>Ledger</span>
+                            </a>
+                        </router-link>
                     @endif
 
 
