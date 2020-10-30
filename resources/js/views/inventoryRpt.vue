@@ -158,6 +158,7 @@
                                 <template>
                                   <td style="display:none">{{p_add_qty=product.add_qty ==null ? 0 : parseInt(product.add_qty)}}</td>
                                   <td style="display:none">{{p_out_qty=product.out_qty ==null ? 0 : parseInt(product.out_qty)}}</td>
+                                   <td style="display:none">{{p_adjust_out_qty=product.adjust_out_qty ==null ? 0 : parseInt(product.adjust_out_qty)}}</td>
                                 </template>
                                 <td></td>
                                     <td>{{product.brand_name}}</td>
@@ -180,7 +181,7 @@
 <!--                                    <td>{{(parseFloat(product.product_opening) + parseFloat(product.inQty) + parseFloat(product.receiveQty) + parseFloat(product.reviseQty)) - (parseFloat(product.saleQty) + parseFloat(product.saleOrder) + parseFloat(product.reviseSaleQty) + parseFloat(product.transferQty))}}</td>-->
 
                                     <td>
-                                        {{(parseFloat(product.product_opening) + p_add_qty+ parseFloat(product.inQty)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+p_out_qty)}}
+                                        {{(parseFloat(product.product_opening) + parseFloat(product.inQty)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty) + parseFloat(p_adjust_out_qty))}}
 
                                         <!-- {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) + parseFloat(product.receiveQty))-(parseFloat(product.saleQty)+ parseFloat(product.transferQty)+parseInt(product.out_qty))}} -->
                                     </td>
