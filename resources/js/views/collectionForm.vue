@@ -516,7 +516,7 @@
 
                         $(".balance_amt:visible").each(function() {
                             var bal_sale_id = $(this).attr('data-id');
-                            total_balance += parseInt($('#inv_amt'+bal_sale_id).val()) - parseInt($('#prev_amt'+bal_sale_id).val());
+                            total_balance += parseInt($('#inv_amt'+bal_sale_id).val()) - (parseInt($('#prev_amt'+bal_sale_id).val())  + parseInt($('#discount_amt'+bal_sale_id).val()));
                             //total_balance = parseInt(total_balance) + parseInt($(this).val());
                         });
 

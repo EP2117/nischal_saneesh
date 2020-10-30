@@ -355,7 +355,7 @@ class ProductTransitionController extends Controller
         if($request->branch_id != "") {
             $where .= " AND branch_id =".$request->branch_id;
         }
-        // SUM(CASE  WHEN transition_type = 'in' AND transition_adjustment_id IS NOT NULL THEN product_quantity  ELSE 0 END) as add_qty,
+        
         $products = DB::table("products")
                 ->select(DB::raw("products.id as product_id, products.product_name, products.brand_id,pt.warehouse_id, products.product_code,pt.add_qty,uom_id,uoms.uom_name,brands.brand_name,categories.category_name, pt.in_qty, pt.receive_qty, pt.out_qty, pt.transfer_qty, pt.sale_qty, pt.branch_id, pt.transition_date, pt.approval_qty, pt.revise_qty, pt.approval_sale_qty, pt.revise_sale_qty, adjust_out_qty"))
                   ->leftjoin(DB::raw("(SELECT product_id, warehouse_id, transition_date, branch_id,
