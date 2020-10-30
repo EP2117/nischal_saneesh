@@ -251,15 +251,27 @@ trait GetReport{
                 $invoices=$invoices->get();
                 // dd($invoices);
                 foreach($invoices as $k=>$i){
-                    $i->t_paid_amount=$i->pay_amount+$i->collection_amount;
-                    $i->t_balance_amount=$i->balance_amount-$i->collection_amount;
-                    $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
+                    if(($i->collection_amount+$i->discount)!=$i->balance_amount){
+                        $invoices[$key]->type="paid";
+                    }
+                        $i->t_paid_amount=$i->pay_amount+$i->collection_amount;
+                        $i->t_balance_amount=$i->balance_amount-$i->collection_amount;
+                        if(($i->collection_amount+$i->discount)!=$i->balance_amount){
+                            $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
+
+                        }
+                    // }
+                   
                     // $net_inv_amt+=$i->total_amount; $net_paid_amt+=$i->paid_amount;$net_balance_amt+=$i->balance_amount;
                 }
+
                 $p_outstandings[$key]->out_list=$invoices;
-                $p_outstandings[$key]->total_inv_amt=$per_inv_amt;
-                $p_outstandings[$key]->total_paid_amt=$per_paid_amt;
-                $p_outstandings[$key]->total_bal_amt=$per_bal_amt;
+                // if($per_bal_amt!=0){
+                    $p_outstandings[$key]->total_inv_amt=$per_inv_amt;
+                    $p_outstandings[$key]->total_paid_amt=$per_paid_amt;
+                    $p_outstandings[$key]->total_bal_amt=$per_bal_amt;
+                // }
+                
             }
             // dd($p_outstandings);
             // return $p_outstandings;
@@ -315,9 +327,15 @@ trait GetReport{
                 }
                 $invoices=$invoices->get();
                 foreach($invoices as $k=>$i){
+                    if(($i->collection_amount+$i->discount)!=$i->balance_amount){
+                        $invoices[$key]->type="paid";
+                    }
                     $i->t_paid_amount=$i->pay_amount+$i->collection_amount;
                     $i->t_balance_amount=$i->balance_amount-$i->collection_amount;
-                    $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
+                    if(($i->collection_amount+$i->discount)!=$i->balance_amount){
+                        $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
+
+                    }
                     // $net_inv_amt+=$i->total_amount; $net_paid_amt+=$i->paid_amount;$net_balance_amt+=$i->balance_amount;
                 }
                 // $invoices[$key]->per_inv_amt=$per_inv_amt;

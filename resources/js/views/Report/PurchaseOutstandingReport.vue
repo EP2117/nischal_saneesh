@@ -144,7 +144,7 @@
                     <button class="btn btn-primary btn-icon btn-sm" @click="exportExcel()"><i class="fas fa-file-excel"></i> &nbsp;Export to Excel</button>
                 </div>-->
                 <div class="table-responsive" v-if="out_count>0">
-                    <table class="table table-bordered table-striped table_no" id="dataTable" width="100%" cellspacing="0">  <!--kamlesh-->
+                    <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">  <!--kamlesh-->
                         <thead>
                         <tr>
                             <th class="text-center">No.</th>
@@ -160,8 +160,8 @@
                         </thead>
                         <tbody id="result" >
                             <template v-for="(po,k) in purchase_outstandings">
-                                <tr v-for="(c,key) in po.out_list">
-                                    <!-- <template v-if="c.t_balance_amount!=0"> -->
+                                <template v-for="(c,key) in po.out_list">
+                                    <tr v-if="c.type=='paid'">
                                         <td class="text-center"></td>
                                 <td class="text-center">{{c.invoice_no}}</td>
                                 <td class="text-center">{{c.invoice_date}}</td>
@@ -171,7 +171,8 @@
                                 <td class="text-center">{{c.total_amount}} </td>
                                 <td class="text-center">{{c.t_paid_amount}} </td>
                                 <td class="text-center">{{c.t_balance_amount}} </td>
-                                </tr>
+                                    </tr>
+                                </template>
                                 <tr class="">
                                     <td colspan="5" class="text-right mm-txt"><b>Total</b></td>
                                     <td class="text-center">{{po.total_inv_amt}}</td>

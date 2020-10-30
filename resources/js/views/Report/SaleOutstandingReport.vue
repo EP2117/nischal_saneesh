@@ -160,7 +160,8 @@
                         </thead>
                         <tbody id="result" >
                             <template v-for="(po,k) in sale_outstandings">
-                                <tr v-for="(c,key) in po.out_list">
+                                <template v-for="(c,key) in po.out_list">
+                                    <tr v-if="c.type='paid'">
                                 <td class="text-center"></td>
                                 <td class="text-center">{{c.invoice_no}}</td>
                                 <td class="text-center">{{c.invoice_date}}</td>
@@ -170,7 +171,8 @@
                                 <td class="text-center">{{c.total_amount}} </td>
                                 <td class="text-center">{{c.t_paid_amount}} </td>
                                 <td class="text-center">{{c.t_balance_amount}} </td>
-                                </tr>
+                                    </tr>
+                                </template>
                                 <tr class="">
                                     <td colspan="5" class="text-right mm-txt"><b>Total</b></td>
                                     <td class="text-center">{{po.total_inv_amt}}</td>
