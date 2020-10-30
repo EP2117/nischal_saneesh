@@ -226,7 +226,7 @@
                                                     <i class="fas fa-print"></i>
                                                 </a>
                                             </a>
-                                            <a class="dropdown-item" v-if="p.collection_amount==0">
+                                            <a class="dropdown-item" v-if="(p.collection_amount==0 && p.payment_type=='credit') || p.payment_type=='cash' ">
                                                 <a title="Delete" class="text-danger" @click="removePurchase(p.id)" v-if="(user_role == 'system' || user_role == 'office_user') ">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
