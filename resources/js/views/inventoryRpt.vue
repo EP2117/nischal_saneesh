@@ -120,6 +120,10 @@
                         <tbody>
                             <template v-if="user_role == 'Country Head'">
                                 <template v-for="product in products">
+                                    <template>
+                                  <td style="display:none">{{p_add_qty=product.add_qty ==null ? 0 : parseInt(product.add_qty)}}</td>
+                                  <td style="display:none">{{p_out_qty=product.out_qty ==null ? 0 : parseInt(product.out_qty)}}</td>
+                                </template>
                                 <tr v-if="brands.findIndex(x => x.id == product.brand_id) > -1">
                                     <td></td>
                                     <td>{{product.brand_name}}</td>
@@ -128,7 +132,7 @@
                                     <td>{{product.product_name}}</td>
                                     <td>{{product.uom_name}}</td>
                                     <td>{{product.product_opening = getOpening(product.product_id)}}</td>
-                                    <td>{{ parseInt(product.in_qty)}}</td>
+                                    <td>{{ product.inQty=product.in_qty==null? 0 :parseInt(product.in_qty)}}</td>
 <!--                                    <td>{{// product.inQty = product.in_qty == null ? '0' : product.in_qty}}</td>-->
                                     <td>{{product.receiveQty = product.receive_qty == null ? '0' : product.receive_qty}}</td>
                                     <td>{{product.transferQty = product.transfer_qty == null ? '0' : product.transfer_qty}}</td>
@@ -140,7 +144,10 @@
                                     <td>{{product.saleQty = product.sale_qty == null ? '0' : product.sale_qty}}</td>
 <!--                                    <td>{{(parseFloat(product.product_opening) + parseFloat(product.inQty)+parseInt(product.in_purchase_qty)+parseFloat(product.product_opening) + parseFloat(product.receiveQty) ) - (parseFloat(product.saleQty)  + parseFloat(product.transferQty))}}</td>-->
                                     <td>
-                                        {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) +parseFloat(product.product_opening)+ parseFloat(product.receiveQty) +parseFloat(product.add_qty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+parseInt(product.out_qty))}}
+                                        {{(parseFloat(product.product_opening) + p_add_qty+ parseFloat(product.inQty)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+p_out_qty)}}
+
+                                        <!-- {{(parseFloat(product.product_opening) + parseFloat(product.inQty)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+p_out_qty)}} -->
+
                                     </td>
                                 </tr>
                                 </template>
@@ -148,6 +155,10 @@
 
                             <template v-else>
                             <tr v-for="product in products">
+                                <template>
+                                  <td style="display:none">{{p_add_qty=product.add_qty ==null ? 0 : parseInt(product.add_qty)}}</td>
+                                  <td style="display:none">{{p_out_qty=product.out_qty ==null ? 0 : parseInt(product.out_qty)}}</td>
+                                </template>
                                 <td></td>
                                     <td>{{product.brand_name}}</td>
                                     <td>{{product.category_name}}</td>
@@ -155,7 +166,7 @@
                                     <td>{{product.product_name}}</td>
                                     <td>{{product.uom_name}}</td>
                                     <td>{{product.product_opening = getOpening(product.product_id)}}</td>
-                                <td>{{parseInt(product.in_qty)}}</td>
+                                <td>{{ product.inQty=product.in_qty==null? 0 :parseInt(product.in_qty)}}</td>
 
                                 <!--                                    <td>{{product.inQty = product.in_qty == null ? '0' : product.in_qty}}</td>-->
                                     <td>{{product.receiveQty = product.receive_qty == null ? '0' : product.receive_qty}}</td>
@@ -167,12 +178,11 @@
 <!--                                    <td>{{product.approvalSaleQty = product.approval_sale_qty == null ? '0' : product.approval_sale_qty}}</td>-->
                                     <td>{{product.saleQty = product.sale_qty == null ? '0' : product.sale_qty}}</td>
 <!--                                    <td>{{(parseFloat(product.product_opening) + parseFloat(product.inQty) + parseFloat(product.receiveQty) + parseFloat(product.reviseQty)) - (parseFloat(product.saleQty) + parseFloat(product.saleOrder) + parseFloat(product.reviseSaleQty) + parseFloat(product.transferQty))}}</td>-->
-                                   <!-- <td>
-                                        {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) + parseFloat(product.receiveQty))-(parseFloat(product.saleQty)+ parseFloat(product.transferQty)+parseInt(product.out_qty))}}
-                                    </td> -->
 
                                     <td>
-                                        {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) +parseFloat(product.product_opening)+ parseFloat(product.receiveQty))-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+parseInt(product.out_qty))}}
+                                        {{(parseFloat(product.product_opening) + p_add_qty+ parseFloat(product.inQty)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+p_out_qty)}}
+
+                                        <!-- {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) + parseFloat(product.receiveQty))-(parseFloat(product.saleQty)+ parseFloat(product.transferQty)+parseInt(product.out_qty))}} -->
                                     </td>
                             </tr>
                             </template>
@@ -404,7 +414,6 @@
                 }else{
                     return 0;
                 }
-
                 /***** for (var key in app.op_products) {
                     if(app.op_products[key].product_id == id) {
                         in_count = in_count +parseFloat(app.op_products[key].in_qty);
@@ -413,6 +422,7 @@
                 }*****/
 
                 count = in_count - out_count;
+                // alert(count);
 
                 return count;
 

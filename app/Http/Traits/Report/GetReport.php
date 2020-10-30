@@ -170,9 +170,6 @@ trait GetReport{
                     $total_credit += $at->credit;
 
                 }
-//                $account_transition[$k]->total_credit=$total_credit;
-//                $account_transition[$k]->total_debit=$total_debit;
-//                dd($account_transition);
                 $cashbook[$key]->total_credit=$total_credit;
                 $cashbook[$key]->total_debit=$total_debit;
                 $cashbook[$key]->date=$d;
@@ -188,8 +185,6 @@ trait GetReport{
                 $cashbook[$key]->closing_balance = $cashbook[$key-1]->closing_balance;
                 $cashbook[$key]->cashbook_list= [];
             }else{
-//                is from_date'data is null in database
-//                $is_from_date=AccountTransition::whereDate('transition_date','<',$d)->where('is_cashbook',1)->latest()->first();
                 $is_from_date=AccountTransition::whereDate('transition_date','<',$d)->where('is_cashbook',1)->latest()->first();
                 $opening_balance = $this->getOpening($request,$d);
                 $total_debit=0;
@@ -206,7 +201,7 @@ trait GetReport{
     }
     public function getPurchaseOutStandingReport($request){
         // dd($request->all());
-        $purchase_outstanding=PurchaseInvoice::where('payment_type','credit');
+        // $purchase_outstanding=PurchaseInvoice::where('payment_type','credit');
         $sup=PurchaseInvoice::where('payment_type','credit');
         if($request->supplier_id!=null){
             $sup->where('supplier_id',$request->supplier_id);
@@ -241,33 +236,40 @@ trait GetReport{
             // $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
         }
         $sup=$sup->groupBy('supplier_id')->get();
+        // dd($sup);
         // $net_inv_amt=$net_paid_amt=$net_balance_amt=0;
-        foreach($sup as $key=>$s){
-            // dd($s);
-            $per_inv_amt=$per_paid_amt=$per_bal_amt=0;
-            $p_outstandings[$key]=new \stdClass();
-            $invoices=PurchaseInvoice::where('supplier_id',$s->supplier_id);
-            if($request->invoice_no!=null){
-                $invoices->where('invoice_no',$request->invoice_no);
+        if($sup->isNotEmpty()){
+            foreach($sup as $key=>$s){
+                // dd($s);
+                $per_inv_amt=$per_paid_amt=$per_bal_amt=0;
+                $p_outstandings[$key]=new \stdClass();
+                $invoices=PurchaseInvoice::where('supplier_id',$s->supplier_id)->where('payment_type','credit');
+                // dd($invoices);
+                if($request->invoice_no!=null){
+                    $invoices->where('invoice_no',$request->invoice_no);
+                }
+                $invoices=$invoices->get();
+                // dd($invoices);
+                foreach($invoices as $k=>$i){
+                    $i->t_paid_amount=$i->pay_amount+$i->collection_amount;
+                    $i->t_balance_amount=$i->balance_amount-$i->collection_amount;
+                    $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
+                    // $net_inv_amt+=$i->total_amount; $net_paid_amt+=$i->paid_amount;$net_balance_amt+=$i->balance_amount;
+                }
+                $p_outstandings[$key]->out_list=$invoices;
+                $p_outstandings[$key]->total_inv_amt=$per_inv_amt;
+                $p_outstandings[$key]->total_paid_amt=$per_paid_amt;
+                $p_outstandings[$key]->total_bal_amt=$per_bal_amt;
             }
-            $invoices=$invoices->get();
-            foreach($invoices as $k=>$i){
-                $i->t_paid_amount=$i->pay_amount+$i->collection_amount;
-                $i->t_balance_amount=$i->balance_amount-$i->collection_amount;
-                $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
-                // $net_inv_amt+=$i->total_amount; $net_paid_amt+=$i->paid_amount;$net_balance_amt+=$i->balance_amount;
-            }
-            $p_outstandings[$key]->out_list=$invoices;
-            $p_outstandings[$key]->total_inv_amt=$per_inv_amt;
-            $p_outstandings[$key]->total_paid_amt=$per_paid_amt;
-            $p_outstandings[$key]->total_bal_amt=$per_bal_amt;
+            // dd($p_outstandings);
+            // return $p_outstandings;
+        }else{
+           $p_outstandings=[];
         }
-        // dd($p_outstandings);
         return $p_outstandings;
+       
     }
     public function getSaleOutstandingReport($request){
-
-        $purchase_outstanding=Sale::where('payment_type','credit');
         $cus=Sale::where('payment_type','credit');
         if($request->customer_id!=null){
             $cus->where('customer_id',$request->customer_id);
@@ -302,32 +304,37 @@ trait GetReport{
             // $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
         }
         $cus=$cus->groupBy('customer_id')->get();
-        // $net_inv_amt=$net_paid_amt=$net_balance_amt=0;
-        foreach($cus as $key=>$s){
-            // dd($s);
-            $per_inv_amt=$per_paid_amt=$per_bal_amt=0;
-            $p_outstandings[$key]=new \stdClass();
-            $invoices=Sale::where('customer_id',$s->customer_id);
-            if($request->invoice_no!=null){
-                $invoices->where('invoice_no',$request->invoice_no);
+        if($cus->isNotEmpty()){
+            foreach($cus as $key=>$s){
+                // dd($s);
+                $per_inv_amt=$per_paid_amt=$per_bal_amt=0;
+                $p_outstandings[$key]=new \stdClass();
+                $invoices=Sale::where('customer_id',$s->customer_id);
+                if($request->invoice_no!=null){
+                    $invoices->where('invoice_no',$request->invoice_no);
+                }
+                $invoices=$invoices->get();
+                foreach($invoices as $k=>$i){
+                    $i->t_paid_amount=$i->pay_amount+$i->collection_amount;
+                    $i->t_balance_amount=$i->balance_amount-$i->collection_amount;
+                    $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
+                    // $net_inv_amt+=$i->total_amount; $net_paid_amt+=$i->paid_amount;$net_balance_amt+=$i->balance_amount;
+                }
+                // $invoices[$key]->per_inv_amt=$per_inv_amt;
+                // $invoices[$key]->per_paid_amt=$per_paid_amt;
+                // $invoices[$key]->per_bal_amt=$per_bal_amt;
+                $p_outstandings[$key]->out_list=$invoices;
+                $p_outstandings[$key]->total_inv_amt=$per_inv_amt;
+                $p_outstandings[$key]->total_paid_amt=$per_paid_amt;
+                $p_outstandings[$key]->total_bal_amt=$per_bal_amt;
             }
-            $invoices=$invoices->get();
-            foreach($invoices as $k=>$i){
-                $i->t_paid_amount=$i->pay_amount+$i->collection_amount;
-                $i->t_balance_amount=$i->balance_amount-$i->collection_amount;
-                $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
-                // $net_inv_amt+=$i->total_amount; $net_paid_amt+=$i->paid_amount;$net_balance_amt+=$i->balance_amount;
-            }
-            // $invoices[$key]->per_inv_amt=$per_inv_amt;
-            // $invoices[$key]->per_paid_amt=$per_paid_amt;
-            // $invoices[$key]->per_bal_amt=$per_bal_amt;
-            $p_outstandings[$key]->out_list=$invoices;
-            $p_outstandings[$key]->total_inv_amt=$per_inv_amt;
-            $p_outstandings[$key]->total_paid_amt=$per_paid_amt;
-            $p_outstandings[$key]->total_bal_amt=$per_bal_amt;
+            // dd($p_outstandings);
+            // return $p_outstandings;
+        }else{
+            $p_outstandings=[];
         }
-        // dd($p_outstandings);
         return $p_outstandings;
+        
     }
     public function getCreditCollection($request){
                 $collections =DB::table('collection_sale')
@@ -510,7 +517,13 @@ trait GetReport{
                     // $p->cost_price=$p->cost_price==null?0 :(int)$p->cost_price;
                     $total_valuation+=($p->entry_qty * $p->purchase_price)+((int)$p->p_valuation_amount-(int)$p->cost_price);
                     $p->t_valuation_amount=((int)$p->entry_qty * (int)$p->purchase_price)+(int)((int)$p->p_valuation_amount-(int)$p->cost_price);
-                    $p->product_cost_price=(int)$p->t_valuation_amount/$p->balance;
+                    if($p->t_valuation_amount==0 && $p->balance==0){
+                        $p->product_cost_price=0;
+                    }else{
+                        $p->product_cost_price=(int)$p->t_valuation_amount/$p->balance;
+                    }
+                    // $p->product_cost_price=(int)$p->t_valuation_amount/$p->balance;
+
                 // }
                 return $p;
                 // dd($products);

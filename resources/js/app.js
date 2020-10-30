@@ -107,6 +107,8 @@ import CreditCollectionReport from "./views/Report/CreditCollectionReport";
 import InventoryAdjustment from "./views/Inventory/InventoryAdjustment";
 import InventoryAdjustmentForm from "./views/Inventory/InventoryAdjustmentForm";
 import InventoryValuation from "./views/Report/InventoryValuationReport";
+import Ledger from "./views/Ledger/Ledger";
+
 const routes = [
     {
       name: 'home',
@@ -506,7 +508,7 @@ const routes = [
 },
 {
   path:'/report/sale_outstanding',
-  component: SaleOutstandingReport,
+  component: SaleOutstandingReport,  
 },
 {
   path:'/report/credit_collection',
@@ -529,6 +531,11 @@ const routes = [
 {
   path:'/report/valuation',
   component:InventoryValuation,
+ },
+ {
+   name:'ledger',
+  path:'/ledger',
+  component:Ledger,
  }
 ];
 
