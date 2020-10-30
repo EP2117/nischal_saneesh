@@ -328,13 +328,12 @@ trait GetReport{
                 $invoices=$invoices->get();
                 foreach($invoices as $k=>$i){
                     if(($i->collection_amount+$i->discount)!=$i->balance_amount){
-                        $invoices[$key]->type="paid";
+                        $invoices[$k]->type="paid";
                     }
                     $i->t_paid_amount=$i->pay_amount+$i->collection_amount;
                     $i->t_balance_amount=$i->balance_amount-$i->collection_amount;
                     if(($i->collection_amount+$i->discount)!=$i->balance_amount){
                         $per_inv_amt+=$i->total_amount; $per_paid_amt+=$i->pay_amount+$i->collection_amount;$per_bal_amt+=$i->balance_amount-$i->collection_amount;
-
                     }
                     // $net_inv_amt+=$i->total_amount; $net_paid_amt+=$i->paid_amount;$net_balance_amt+=$i->balance_amount;
                 }
