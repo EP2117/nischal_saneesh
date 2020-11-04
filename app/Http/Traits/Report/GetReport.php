@@ -49,12 +49,6 @@ trait GetReport{
             $payments->where('suppliers.township_id',$request->township_id);
         }
         $payments=$payments->get();
-//        if($request->supplier_id!=null){
-//            $payments->where('collection_no',$request->payment_no);
-//        }
-//        if($request->invoice_no!=null){
-//            $payments->where('collection_no',$request->payment_no);
-//        }
         $total_paid=0;
         $total_discount=0;
         $html="";
