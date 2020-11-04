@@ -245,6 +245,17 @@ trait GetReport{
                 $p_outstandings[$key]=new \stdClass();
                 $invoices=PurchaseInvoice::where('supplier_id',$s->supplier_id)->where('payment_type','credit');
                 // dd($invoices);
+                if($request->from_date != '' && $request->to_date != '')
+                {
+                    $invoices->whereBetween('invoice_date', array($request->from_date, $request->to_date));
+                } else if($request->from_date != '') {
+                    $invoices->whereDate('invoice_date', '>=', $request->from_date);
+
+                }else if($request->to_date != '') {
+                    $invoices->whereDate('invoice_date', '<=', $request->to_date);
+                } else {
+                    // $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
+                }
                 if($request->invoice_no!=null){
                     $invoices->where('invoice_no',$request->invoice_no);
                 }
@@ -321,9 +332,20 @@ trait GetReport{
                 // dd($s);
                 $per_inv_amt=$per_paid_amt=$per_bal_amt=0;
                 $p_outstandings[$key]=new \stdClass();
-                $invoices=Sale::where('customer_id',$s->customer_id);
+                $invoices=Sale::where('customer_id',$s->customer_id)->where('payment_type','credit');
                 if($request->invoice_no!=null){
                     $invoices->where('invoice_no',$request->invoice_no);
+                }
+                if($request->from_date != '' && $request->to_date != '')
+                {
+                    $invoices->whereBetween('invoice_date', array($request->from_date, $request->to_date));
+                } else if($request->from_date != '') {
+                    $invoices->whereDate('invoice_date', '>=', $request->from_date);
+
+                }else if($request->to_date != '') {
+                    $invoices->whereDate('invoice_date', '<=', $request->to_date);
+                } else {
+                    // $data->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
                 }
                 $invoices=$invoices->get();
                 foreach($invoices as $k=>$i){
