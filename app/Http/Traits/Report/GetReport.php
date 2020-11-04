@@ -200,8 +200,6 @@ trait GetReport{
         return $cashbook;
     }
     public function getPurchaseOutStandingReport($request){
-        // dd($request->all());
-        // $purchase_outstanding=PurchaseInvoice::where('payment_type','credit');
         $sup=PurchaseInvoice::where('payment_type','credit');
         if($request->supplier_id!=null){
             $sup->where('supplier_id',$request->supplier_id);
