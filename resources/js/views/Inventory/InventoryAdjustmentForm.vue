@@ -83,25 +83,25 @@
                                             <th scope="col" class="text-center"></th>
                                         </tr>
                                     </thead>
-                                    <tbody>
                                         <template v-if="isEdit && ex_products.length > 0">
-                                            <tr id="1">
-                                                <template v-for="ex_prod in ex_products" >
+                                            <tbody v-for="(ex_prod,k) in ex_products">
+                                            <tr :id="k+1">
+                                                <!-- <template v-for="ex_prod in ex_products" > -->
                                                      <td style="width:40%">
                                                     <select class="form-control txt_product"
                                                         name="product[]" style="min-width:150px;" readonly
                                                     >
-                                                        <option :value="ex_prod.id" :data-pivotid="ex_prod.pivot.id">{{ ex_prod.product_name }}</option>
+                                                        <option :value="ex_prod.id"  :data-pivotid="ex_prod.pivot.id">{{ ex_prod.product_name }}</option>
                                                     </select>
                                                 </td>
                                                 <td>
                                                     <input type="text"  class="form-control txt_uom" name="uom[]" :data-id="ex_prod.uom.id" :value = "ex_prod.uom.uom_name" readonly />
                                                 </td>
                                                 <td>
-                                                    <input type="text" id="add_qty_1" class="form-control add_filter_qty num_txt"  name="add_qty[]" :value = "ex_prod.pivot.add_qty" />
+                                                    <input type="text" :id="'add_qty_'+(k+1)" class="form-control add_filter_qty num_txt"  name="add_qty[]" :value = "ex_prod.pivot.add_qty" />
                                                 </td>
                                                 <td>
-                                                    <input type="text" id="less_qty_1" class="form-control less_filter_qty num_txt" name="less_qty[]" :value = "ex_prod.pivot.less_qty"  />
+                                                    <input type="text" :id="'less_qty_'+(k+1)" class="form-control less_filter_qty num_txt" name="less_qty[]" :value = "ex_prod.pivot.less_qty"  />
                                                 </td>
                                                 <!-- <td>
                                                     <input type="text" class="form-control num_txt" name="qty[]" :value = "ex_prod.pivot.product_quantity" required />
@@ -109,11 +109,13 @@
                                                 <td class="text-center">
                                                     <a class='red-icon' title='Remove' @click="removeProduct(ex_prod.pivot.product_id)" v-if="user_role == 'office_user' || user_role == 'system'"><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>
                                                 </td>
-                                                </template>
+                                                <!-- </template> -->
                                                
-                                            </tr>   
+                                            </tr> 
+                                            </tbody>
                                         </template>
-                                        <template v-else>                                        
+                                        <template v-else>  
+                                            <tbody>                                      
                                             <tr id="1">
                                                 <td style="width:40%">
                                                     <select class="form-control txt_product"
@@ -131,10 +133,10 @@
                                                     <input type="text" class="form-control txt_uom" name="uom[]" data-id="" readonly />
                                                 </td>
                                                 <td>
-                                                    <input type="text"  id="add_qty_1" class="form-control add_filter_qty num_txt" name="add_qty[]" style="min-width:60px;" />
+                                                    <input type="text"  :id="add_qty_1" class="form-control add_filter_qty num_txt" name="add_qty[]" style="min-width:60px;" />
                                                 </td>
                                                 <td>
-                                                    <input type="text" id="less_qty_1" class="form-control less_filter_qty num_txt "  style="min-width:60px;" name="less_qty[]"   />
+                                                    <input type="text" :id="less_qty_1" class="form-control less_filter_qty num_txt "  style="min-width:60px;" name="less_qty[]"   />
                                                 </td>
                                                 <!-- <td>
                                                     <input type="text" class="form-control num_txt" name="qty[]" required />
@@ -143,8 +145,9 @@
                                                     <a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>
                                                 </td>
                                             </tr>
+                                            </tbody>
+
                                         </template>
-                                    </tbody>
                                 </table>
                             </div>                         
 

@@ -169,17 +169,15 @@ trait GetReport{
                 $cashbook[$key]->date=$d;
                 $cashbook[$key]->opening_balance =$opening_balance;
                 $cashbook[$key]->closing_balance = $this->getClosing($request,$d, $opening_balance);
-
-
                 $cashbook[$key]->cashbook_list= $account_transition;
             } elseif($account_transition->isNotEmpty() && count($date_arr)>1){
-
                 $cashbook[$key]->date=$d;
                 $cashbook[$key]->opening_balance =$cashbook[$key-1]->closing_balance;
                 $cashbook[$key]->closing_balance = $cashbook[$key-1]->closing_balance;
                 $cashbook[$key]->cashbook_list= [];
             }else{
-                $is_from_date=AccountTransition::whereDate('transition_date','<',$d)->where('is_cashbook',1)->latest()->first();
+                
+                // $is_from_date=AccountTransition::whereDate('transition_date','<',$d)->where('is_cashbook',1)->latest()->first();
                 $opening_balance = $this->getOpening($request,$d);
                 $total_debit=0;
                 $total_credit=0;
@@ -187,8 +185,6 @@ trait GetReport{
                 $cashbook[$key]->opening_balance =$opening_balance;
                     $cashbook[$key]->closing_balance = $opening_balance;
                 $cashbook[$key]->cashbook_list= [];
-
-
             }
         }
         return $cashbook;
