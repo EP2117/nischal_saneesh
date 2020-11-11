@@ -455,6 +455,8 @@ class SaleController extends Controller
         }**/
 
         $sale = Sale::find($id);
+        $old_sub_account_id=$sale->payment_type=='credit' ? config('global.sale_advance') : config('global.sale');
+
         $sale->invoice_no = $request->invoice_no;
         $sale->customer_id = $request->customer_id;
         $sale->branch_id = Auth::user()->branch_id;
@@ -500,7 +502,8 @@ class SaleController extends Controller
         $description=$sale->invoice_no.", Date ".$sale->invoice_date." by " .$cus->cus_name;
         if($sale){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
-                    AccountTransition::where('sale_id',$id)->update([
+                AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_sub_account_id)->delete();
+                    AccountTransition::create([
                         'sub_account_id' => $sub_account_id,
                         'transition_date' => $sale->invoice_date,
                         'sale_id' => $sale->id,
@@ -513,7 +516,9 @@ class SaleController extends Controller
                         'updated_by' => Auth::user()->id,
                     ]);
             }elseif($request->payment_type=='credit' && $request->pay_amount==0){
-                AccountTransition::where('purchase_id',$id)->delete();
+                AccountTransition::where('sale_id',$id)
+                ->where('sub_account_id',$old_sub_account_id)
+                ->delete();
             }
         }
         $ex_pivot_arr = $request->ex_product_pivot;

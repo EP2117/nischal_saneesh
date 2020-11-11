@@ -183,6 +183,8 @@ class PurchaseInvoiceController extends Controller
             ]);
         }
         $p = PurchaseInvoice::find($id);
+        $old_sub_account_id=$p->payment_type=='credit' ? config('global.purchase_advance') :config('global.purchase');
+
         $p->invoice_no = $request->invoice_no;
         $p->reference_no = $request->reference_no;
         $p->invoice_date = $request->invoice_date;
@@ -215,7 +217,8 @@ class PurchaseInvoiceController extends Controller
         $description=$p->invoice_no.",Inv Date ".$p->invoice_date." to " .$sup_name->name;
         if($p){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
-                    AccountTransition::where('purchase_id',$id)->update([
+                    AccountTransition::where('purchase_id',$id)->where('sub_account_id',$old_sub_account_id)->delete();
+                    AccountTransition::create([
                         'sub_account_id' => $sub_account_id,
                         'transition_date' => $p->invoice_date,
                         'purchase_id' => $p->id,
@@ -227,7 +230,9 @@ class PurchaseInvoiceController extends Controller
                         'updated_by' => Auth::user()->id,
                     ]);
             }elseif($request->payment_type=='credit' && $request->pay_amount==0){
-                AccountTransition::where('purchase_id',$id)->delete();
+                AccountTransition::where('purchase_id',$id)
+                ->where('sub_account_id',$old_sub_account_id)
+                ->delete();
             }
         }
         $ex_pivot_arr = $request->ex_product_pivot;
