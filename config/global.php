@@ -6,4 +6,7 @@
       'sale'=>8,
       'sale_advance'=>9,
       'sale_collection'=>10,
+      'cash_sale'=>12,
+      'cash_purchase'=>13,
+      'discount_allowed'=>14,
   ];

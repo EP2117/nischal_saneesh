@@ -39,12 +39,11 @@
                                        v-model="form.office_purchase_man" readonly>
                             </div>
                         </div>
-
                         <div class="row mt-3">
                             <div class="form-group col-md-4">
-                                <label for="customer_id">Supplier</label>
-                                <select id="customer_id" class="form-control mm-txt"
-                                        name="customer_id" v-model="form.supplier_id" style="width:100%" required :disabled="is_readonly">
+                                <label for="supplier_id">Supplier</label>
+                                <select id="supplier_id" class="form-control mm-txt"
+                                        name="supplier_id" v-model="form.supplier_id" style="width:100%" required :disabled="is_readonly">
                                     <option value="">Select One</option>
                                     <option v-for="sup in suppliers" :value="sup.id"  >{{sup.name}}</option>
                                 </select>
@@ -87,7 +86,6 @@
                                        v-model="form.credit_day" @blur="calcDueDate()" :readonly="is_readonly">
                             </div>
                         </div>
-
                         <div class="row mt-4 mb-3">
                             <div class="col-md-12">
                                 <span class="d-none d-sm-inline-block btn-sm btn-primary shadow-sm bg-blue"><i class="fas fa-search-plus text-white"></i> Product Details</span>
@@ -490,7 +488,7 @@ export default {
         $("#supplier_id").select2();
         $("#supplier_id").on("select2:select", function(e) {
             var data = e.params.data;
-            app.form.customer_id = data.id;
+            app.form.supplier_id = data.id;
             //get customer's previous balance
             axios.get("/purchase/"+data.id+"/get_previous_balance").then(({ data }) => (app.form.previous_balance = data.previous_balance));
         });
@@ -550,8 +548,8 @@ export default {
             $('#brand_'+row_id).val(product_brand).trigger('change');
             $('#category_'+row_id).val(product_category).trigger('change');
             app.selling_uoms = [];
-
             var uom      = e.target.options[e.target.options.selectedIndex].dataset.uom;
+            // console.log(uom);
             var uom_id   = e.target.options[e.target.options.selectedIndex].dataset.uomid;
             var price    = e.target.options[e.target.options.selectedIndex].dataset.price;
 
@@ -604,6 +602,7 @@ export default {
 
         $(".txt_uom").select2();
         $(".txt_uom").on("select2:select", function(e) {
+            // alert('a');
             // app.checkQty(e.target.options[e.target.options.selectedIndex]);
             var uom_relation = e.target.options[e.target.options.selectedIndex].dataset.relation;
             // console.log(e.target.options[e.target.options.selectedIndex].dataset);
@@ -1057,7 +1056,7 @@ export default {
             $("#supplier_id").on("select2:select", function(e) {
 
                 var data = e.params.data;
-                app.form.customer_id = data.id;
+                app.form.supplier_id = data.id;
 
                 //get customer's previous balance
                 axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
