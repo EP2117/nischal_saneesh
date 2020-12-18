@@ -20,11 +20,13 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Traits\Report\GetReport;
 use App\Exports\DailySaleProductExport;
+use App\Http\Traits\AccountReport\Ledger;
 use Illuminate\Validation\ValidationException;
 
 class SaleController extends Controller
 {
     use GetReport;
+    use Ledger;
     public function index(Request $request)
     {
         $login_year = Session::get('loginYear');
@@ -272,19 +274,18 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all());
         /**if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
             $validatedData = $request->validate([
                 'reference_no' => 'max:255|unique:sales',
             ]);
         }**/
-
         $sale = new Sale;
-
         //auto generate invoice no;
         $max_id = Sale::where('sale_type', $request->sale_type)->max('id');
         if($max_id) {
             $max_id = $max_id + 1;
-        } else {
+        }else {
             $max_id = 1;
         }
         $invoice_no = "SI".str_pad($max_id,5,"0",STR_PAD_LEFT);
@@ -296,22 +297,25 @@ class SaleController extends Controller
         $sale->customer_id = $request->customer_id;
         //$sale->delivery_approve = 0;
         $sale->office_sale_man_id = $request->office_sale_man_id;
-        
         if($request->sale_order == true) {
             $sale->order_id = $request->order_id;
         }
         $sale->pay_amount = $request->pay_amount;
         $sale->sale_type  = $request->sale_type;
-
         $sale->total_amount = $request->sub_total;
         $sale->cash_discount = $request->cash_discount;
         $sale->net_total = $request->net_total;
         $sale->tax = $request->tax;
         $sale->tax_amount = $request->tax_amount;
         $sale->balance_amount = $request->balance_amount;
-
+        // if($request->cash_discount!=null || $request->cash_discount!= 0){
+        //     $discount_allowed_sub_account_id=config('global.discount_allowed');     /*sub account_id for Discount allowed*/
+        // }else{
+        //     $discount_allowed_sub_account_id=null;     /*sub account_id for Discount allowed*/
+        // }
         if($request->payment_type == 'credit') {
-            $sub_account_id=config('global.sale_advance');     /*sub account_id for sale advance*/
+            $sub_account_id=config('global.sale_advance');                 /*sub account_id for sale advance*/
+            // $discount_allowed_sub_account_id=config('global.discount_allowed');     /*sub account_id for Discount allowed*/
             if($request->pay_amount!=0){
                 $amount=$request->pay_amount;
             }
@@ -319,7 +323,8 @@ class SaleController extends Controller
             $sale->due_date = $request->due_date;
             $sale->credit_day = $request->credit_day;
         } else {
-            $sub_account_id=config('global.sale');     /*sub account_id for sale*/
+            $sub_account_id=config('global.sale');     /*sub account_id for sale Account*/
+            $sale_common_account_id=config('global.cash_sale');     /*sub account_id for cash sale */
             $amount=$request->pay_amount;
             $sale->payment_type = 'cash';
         }
@@ -342,11 +347,11 @@ class SaleController extends Controller
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
                 ]);
+                $sale->payment_type=='cash' ?$this->storetInLedger($sale,$sub_account_id,$sale_common_account_id)  :  $this->storetCreditSaleInLedger($sale,$sub_account_id,$sale_common_account_id=null);
             }
         }
         $sale_id = $sale->id;
         for($i=0; $i<count($request->product); $i++) {
-
             //get product pre-defined UOM
             $product_result = Product::select('uom_id')->find($request->product[$i]);
             $main_uom_id = $product_result->uom_id;
@@ -455,6 +460,11 @@ class SaleController extends Controller
         }**/
 
         $sale = Sale::find($id);
+        $old_sub_account_id=$sale->payment_type=='credit' ? config('global.sale_advance') : config('global.sale');
+        if($sale->payment_type=='cash'){
+           $old_cash_sale_account_id= config('global.cash_sale');
+           $old_discount_allowed_account_id= config('global.discount_allowed');
+        }
         $sale->invoice_no = $request->invoice_no;
         $sale->customer_id = $request->customer_id;
         $sale->branch_id = Auth::user()->branch_id;
@@ -489,6 +499,7 @@ class SaleController extends Controller
             $sale->credit_day = $request->credit_day;
         } else {
             $sub_account_id=config('global.sale');     /*sub account_id for sale*/
+            $cash_sale_account_id=config('global.cash_sale');     /*sub account_id for cash sale */
             $amount=$request->pay_amount;
             $sale->payment_type = 'cash';
         }
@@ -500,20 +511,26 @@ class SaleController extends Controller
         $description=$sale->invoice_no.", Date ".$sale->invoice_date." by " .$cus->cus_name;
         if($sale){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
-                    AccountTransition::where('sale_id',$id)->update([
+                AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_sub_account_id)->delete();
+                AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_cash_sale_account_id)->delete();
+                AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_discount_allowed_account_id)->delete();
+                    AccountTransition::create([
                         'sub_account_id' => $sub_account_id,
                         'transition_date' => $sale->invoice_date,
                         'sale_id' => $sale->id,
                         'is_cashbook' => 1,
                         'debit' => $amount,
                         'description'=>$description,
-
                         'vochur_no'=>$request->invoice_no,
                         'created_by' => Auth::user()->id,
                         'updated_by' => Auth::user()->id,
                     ]);
+                    $sale->payment_type=='cash' ?$this->storetInLedger($sale,$sub_account_id,$cash_sale_account_id)  :  $this->storetCreditSaleInLedger($sale,$sub_account_id,$cash_sale_account_id=null);
+
             }elseif($request->payment_type=='credit' && $request->pay_amount==0){
-                AccountTransition::where('purchase_id',$id)->delete();
+                AccountTransition::where('sale_id',$id)
+                ->where('sub_account_id',$old_sub_account_id)
+                ->delete();
             }
         }
         $ex_pivot_arr = $request->ex_product_pivot;

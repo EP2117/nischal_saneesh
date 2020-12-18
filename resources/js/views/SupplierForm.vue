@@ -190,7 +190,9 @@ export default {
         // },
         initCountries() {
             axios.get("/country").then(({ data }) => (this.countries = data.data));
-            $("#country_id").select2();
+            this.form.country_id=1;
+              $("#country_id").val(1).trigger('change');
+            // $("#country_id").select2();
         },
 
         initStates() {

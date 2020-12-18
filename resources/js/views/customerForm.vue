@@ -56,7 +56,7 @@
                                     name="country_id" v-model="form.country_id" style="width:100%" required
                                 >
                                     <option value="">Select One</option>
-                                    <option v-for="country in countries" :value="country.id"  >{{country.country_name}}</option>
+                                    <option v-for="country in countries" :value="country.id" >{{country.country_name}}</option>
                                 </select>
                             </div> 
 
@@ -184,9 +184,8 @@
                 app.townships = [];      
                 var data = e.params.data;
                 app.form.country_id = data.id;
-                axios.get("/state_by_country/"+ data.id).then(({ data }) => (app.states = data.data));
+                axios.get("/state_by_country/"+ 1).then(({ data }) => (app.states = data.data));
             });
-
             $("#state_id").select2();
             $("#state_id").on("select2:select", function(e) { 
                 app.townships = [];      
@@ -205,18 +204,22 @@
             app.initCountries();
             app.initStates();
             app.initTownships();
+            // $('#country_id').val(1).trigger('change');
+
         },
 
         methods: {
             initTypes() {
               axios.get("/customer_type").then(({ data }) => (this.cus_types = data.data));
-              //console.log(this.cus_types);
+            //   console.log(this.cus_types);
               $("#cus_type").select2();
             },
 
             initCountries() {
               axios.get("/country").then(({ data }) => (this.countries = data.data));
-              $("#country_id").select2();
+              this.form.country_id=1;
+              $("#country_id").val(1).trigger('change');
+            //   $("#country_id").select2();
             },
 
             initStates() {

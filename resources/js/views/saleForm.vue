@@ -29,6 +29,11 @@
                                 <label for="invoice_no">Invoice No.</label>
                                 <input type="text" class="form-control" id="invoice_no" name="invoice_no" v-model="form.invoice_no" readonly>
                             </div>
+                            <div class="form-group col-md-4" v-if="sale_type == 1">
+                                <label for="reference_no">Reference No.</label>
+                                 <input type="text" class="form-control" id="reference_no" name="reference_no"
+                                v-model="form.reference_no">
+                            </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-4">
@@ -74,11 +79,7 @@
                         <div class="row mt-3">
                              
 
-                            <!--<div class="form-group col-md-4" v-if="sale_type == 1">
-                                <label for="reference_no">Reference No.</label>
-                                 <input type="text" class="form-control" id="reference_no" name="reference_no"
-                                v-model="form.reference_no">
-                            </div>-->
+                            
                             <div class="form-group col-md-4">
                                 <label for="payment_type">Payment Type</label>
                                 <select id="payment_type" class="form-control"

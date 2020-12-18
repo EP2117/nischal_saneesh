@@ -6,7 +6,6 @@
                 <li class="breadcrumb-item"><a :href="site_path+'/'">Home</a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/report'">Report</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Inventory Report</li>
-
             </ol>
         </nav>
         <!-- Page Heading -->
@@ -16,7 +15,6 @@
                 <i class="fas fa-plus"></i> Add New Transfer
             </router-link>-->
         </div>
-
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Search By</h6>
@@ -42,7 +40,7 @@
                             name="branch_id" v-model="search.branch_id" style="width:100%"
                         >
                             <option value="">Select One</option>
-                            <option v-for="branch in branches" :value="branch.id"  >{{branch.branch_name}}</option>
+                            <option v-for="branch in branches" :value="branch.id"  :key="branch.id">{{branch.branch_name}}</option>
                         </select>
                     </div>
 
@@ -144,15 +142,12 @@
                                     <td>{{product.saleQty = product.sale_qty == null ? '0' : product.sale_qty}}</td>
 <!--                                    <td>{{(parseFloat(product.product_opening) + parseFloat(product.inQty)+parseInt(product.in_purchase_qty)+parseFloat(product.product_opening) + parseFloat(product.receiveQty) ) - (parseFloat(product.saleQty)  + parseFloat(product.transferQty))}}</td>-->
                                     <td>
-                                        {{(parseFloat(product.product_opening) + p_add_qty+ parseFloat(product.inQty)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+p_out_qty)}}
-
-                                        <!-- {{(parseFloat(product.product_opening) + parseFloat(product.inQty)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+p_out_qty)}} -->
-
+                                        <!-- {{(parseFloat(product.product_opening) + p_add_qty+ parseFloat(product.inQty)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+p_out_qty)}} -->
+                                        {{(parseFloat(product.product_opening) + parseFloat(product.inQty)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+p_out_qty)}}
                                     </td>
                                 </tr>
                                 </template>
                             </template>
-
                             <template v-else>
                             <tr v-for="product in products">
                                 <template>
@@ -181,8 +176,7 @@
 <!--                                    <td>{{(parseFloat(product.product_opening) + parseFloat(product.inQty) + parseFloat(product.receiveQty) + parseFloat(product.reviseQty)) - (parseFloat(product.saleQty) + parseFloat(product.saleOrder) + parseFloat(product.reviseSaleQty) + parseFloat(product.transferQty))}}</td>-->
 
                                     <td>
-                                        {{(parseFloat(product.product_opening) + parseFloat(product.inQty)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty) + parseFloat(p_adjust_out_qty))}}
-
+                                        {{(parseFloat(product.product_opening) + parseFloat(product.inQty)+ parseFloat(product.receiveQty) )-(parseFloat(product.saleQty) + parseFloat(product.transferQty)+p_out_qty)}}
                                         <!-- {{(parseFloat(product.product_opening) + parseFloat(product.in_qty) + parseFloat(product.receiveQty))-(parseFloat(product.saleQty)+ parseFloat(product.transferQty)+parseInt(product.out_qty))}} -->
                                     </td>
                             </tr>
@@ -215,6 +209,7 @@
                 op_products: [],
                 order_products: [],
                 brands: [],
+                def_branch_id:'',
                 warehouses:[],
                 user_year: '',
                 user_role: '',
@@ -239,10 +234,11 @@
             $("#loading").hide();
             let app = this;
 
-            //app.initWarehouses();
             app.initBrands();
             app.initBranches();
+            app.initWarehouses();
 
+            // console.log(this.search.branch_id);
             $("#from_date")
                 .datetimepicker({
             icons: {
@@ -304,18 +300,35 @@
                 //console.log(formatedValue);
                 app.search.to_date = formatedValue;
             });
-
-            $("#branch_id").on("select2:select", function(e) {
-
-                var data = e.params.data;
-                app.search.branch_id = data.id;
-                app.warehouses = [];
-                if(data.id != "") {
-                    axios.get("warehouses_bybranch/"+ data.id).then(({ data }) => (app.warehouses = data.data));
-                } else {
-                    axios.get("warehouses_bybranch/null").then(({ data }) => (app.warehouses = data.data));
-                }
-            });
+            // $(document).ready(function(e){
+            //     var branch_id=$('#branch_id').val();
+            //     if(branch_id) {
+            //         axios.get("warehouses_bybranch/"+ branch_id).then(
+            //             // ({ data }) => (app.warehouses = data.data));
+            //             (data)=>{
+            //                 this.warehouses=data.data.data;
+            //                 const id=this.warehouses.map(a=>a.id);
+            //                 console.log('id is '+id[0]);
+            //                 app.search.warehouse_id=id[0];
+            //                 // console.log(app.search.warehouse_id);
+            //                 $('#warehouse_id').val(id[0]).trigger('change');
+            //             }
+            //         );
+            //     } else {
+            //         alert('a');
+            //         axios.get("warehouses_bybranch/null").then(({ data }) => (app.warehouses = data.data));
+            //     }
+            // });
+            // $(document).on("select2:select",'#branch_id', function(e) {
+            //     var data=e.params.data;
+            //     this.search.branch_id=data.id;
+            //     app.warehouses = [];
+                // if(data.id != "") {
+                //     axios.get("warehouses_bybranch/"+ data.id).then(({ data }) => (app.warehouses = data.data));
+                // } else {
+                //     axios.get("warehouses_bybranch/null").then(({ data }) => (app.warehouses = data.data));
+                // }
+            // });
 
             $("#warehouse_id").on("select2:select", function(e) {
 
@@ -331,17 +344,33 @@
         },
 
         methods: {
-
             initBranches() {
-              axios.get("/branches_byuser").then(({ data }) => (this.branches = data.data));
-              $("#branch_id").select2();
+            let app = this;
+              axios.get("/branches_byuser").then(
+                  (data)=>{
+                    app.branches = data.data.data;
+                     const branch=app.branches.find(a=>a.branch_name=='Main Branch');
+                      app.search.branch_id=branch.id;
+                      app.def_branch_id=branch.id;
+                      $('branch_id').val(branch.id).trigger('change');
+                      $("#branch_id").select2();
+                  });
             },
-
             initWarehouses() {
-              axios.get("/warehouses").then(({ data }) => (this.warehouses = data.data));
-              $("#warehouse_id").select2();
+                let app = this;
+                // console.log(this.search.branch_id);
+              axios.get("/warehouses").then(
+                //   ({ data }) => (this.warehouses = data.data)
+                (data)=>{
+                    app.warehouses=data.data.data;
+                     const id=app.warehouses.find(a=>a.branch.branch_name=='Main Branch');
+                     app.search.warehouse_id=id.id;
+                      $('#warehouse_id').val(id.id).trigger('change');
+                      $("#warehouse_id").select2();
+                }
+                  );
+            //   $("#warehouse_id").select2();
             },
-
             initBrands() {
               axios.get("/report_brands").then(({ data }) => (this.brands = data.data));
               $("#brand_id").select2();
