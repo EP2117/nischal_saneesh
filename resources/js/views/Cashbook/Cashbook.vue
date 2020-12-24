@@ -94,7 +94,6 @@
                                 </td>
                             </tr>
                             <template v-if="at.cashbook_list.length>0">
-
                                 <tr v-for="(c,key) in at.cashbook_list">
                                     <td class="text-right"></td>
                                     <td class="text-center">{{c.vochur_no}}</td>

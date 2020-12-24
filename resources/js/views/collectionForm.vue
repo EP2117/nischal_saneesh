@@ -329,6 +329,7 @@
                 app.selected_invoices.push(data.id); 
 
                 var unique_invoices = app.selected_invoices.filter((a, b) => app.selected_invoices.indexOf(a) === b);
+                // console.log(unique_invoices);
                 app.selected_invoices = unique_invoices;
 
                 $('.invoices').val(app.selected_invoices).trigger('change');
@@ -727,7 +728,7 @@
                         html += '</td></tr>';
 
                         if(!s2.find('option[value="'+value.id+'"]').length) {
-                        console.log(s2.find('option[value="'+value.id+'"]').length);
+                        // console.log(s2.find('option[value="'+value.id+'"]').length);
                             s2.append($('<option value="'+value.id+'">').text(value.invoice_no));
                         }
                     });
@@ -767,7 +768,7 @@
                     this.form
                       .post("/collection")
                       .then(function(data) {
-                        console.log(data.data);
+                        // console.log(data.data);
                         if(data.status == "success") {
                             $("#loading").hide(); 
                             swal({

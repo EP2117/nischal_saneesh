@@ -246,10 +246,13 @@ trait GetReport{
                     $invoices->where('invoice_no',$request->invoice_no);
                 }
                 $invoices=$invoices->get();
+                // dd($invoices);
                 // if($invoices->isNotEmpty()){
                     foreach($invoices as $k=>$i){
+                        // dd($invoices[1]);
+                        // dd($i); 
                         if(($i->collection_amount+$i->discount)!=$i->balance_amount){
-                            $invoices[$key]->type="paid";
+                            $invoices[$k]->type="paid";
                         }
                             $i->t_paid_amount=$i->pay_amount+$i->collection_amount;
                             $i->t_balance_amount=$i->balance_amount-$i->collection_amount;

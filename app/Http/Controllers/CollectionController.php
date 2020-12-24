@@ -8,6 +8,7 @@ use App\Sale;
 use Carbon\Carbon;
 use App\Collection;
 use App\AccountTransition;
+use App\Http\Traits\AccountReport\Ledger;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,7 @@ use Illuminate\Validation\ValidationException;
 class CollectionController extends Controller
 {
     use GetReport;
+    use Ledger;
 	public function index(Request $request)
     {
         $login_year = Session::get('loginYear');
@@ -76,6 +78,7 @@ class CollectionController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $collection = new Collection;
 
         //auto generate collection no;
@@ -104,7 +107,7 @@ class CollectionController extends Controller
         //$collection->updated_by = Auth::user()->id;
         $collection->save();
         $description="Inv ".$collection->collection_no.",Inv Date ".$collection->collection_date." to " .$collection->customer->cus_name;
-        $sub_account_id=config('global.sale_collection');   /*sub account  id for sale collection*/
+        $sub_account_id=config('global.credit_collection');   /*sub account  id for sale collection*/
         if($collection){
             AccountTransition::create([
                 'sub_account_id' => $sub_account_id,
@@ -112,11 +115,13 @@ class CollectionController extends Controller
                 'sale_id' => $collection->id,
                 'is_cashbook' => 1,
                 'description'=>$description,
+                'customer_id'=>$collection->customer_id,
                 'vochur_no'=>$collection_no,
                 'debit' => $collection->total_paid_amount,
                 'created_by' => Auth::user()->id,
                 'updated_by' => Auth::user()->id,
             ]);
+            $this->storeSaleCollectionInLedger($collection,$request);
         }
         for($i=0; $i<count($request->invoices); $i++) {
         	//add invoices into pivot table
@@ -171,25 +176,33 @@ class CollectionController extends Controller
         $collection->updated_at = time();
         $collection->updated_by = Auth::user()->id;
         $collection->save();
-        $sub_account_id=10;    /*sub account id for credit payment */
+        $sub_account_id=config('global.credit_collection');    /*sub account id for credit payment */
         $description=$collection->collection_no.",Date ".$collection->collection_date." to " .$collection->customer->cus_name;
         if($collection){
             if($collection->total_paid_amount!=0){
-                AccountTransition::where('sale_id',$id)->update([
+                    AccountTransition::where([
+                    ['sale_id',$id],['is_cashbook',1]])->update([
                     'sub_account_id' => $sub_account_id,
                     'transition_date' => $request->collection_date,
                     'sale_id' => $collection->id,
                     'vochur_no'=>$request->collection_no,
                     'description'=>$description,
                     'is_cashbook' => 1,
+                    'customer_id'=>$collection->customer_id,
                     'debit' => $collection->total_paid_amount,
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
                 ]);
-            }elseif($collection->total_paid_amount==0){
-                AccountTransition::where('sale_id',$id)->delete();
-            }
+                // update sale collection in ledger 
+                $this->updateSaleCollectionInLedger($collection,$request);
+                // update sale collection in ledger 
 
+            }elseif($collection->total_paid_amount==0){
+                AccountTransition::
+                where(['sale_id'=>$id,'status'=>'sale_collection','is_cashbook'=>1])->delete();
+                AccountTransition::
+                where(['sale_id'=>$id,'status'=>'sale_collection','is_cashbook'=>0])->delete();
+            }
         }
         //update collection amount for removed sales
     	foreach($request->remove_pivot_id as $key => $val) {

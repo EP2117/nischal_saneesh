@@ -3,12 +3,23 @@ namespace App\Http\Traits\AccountReport;
 use Carbon\Carbon;
 use App\AccountTransition;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 trait Cashbook{
+    // public function __construct(){
+        // $this->purchase_account=config('global.purchase'); 
+        // $this->cash_purchase=config('global.cash_purchase'); 
+        // $this->purchase_advance=config('global.purchase_advance'); 
+        // $this->discount_received=config('global.discount_received'); 
+        // $this->credit_payment=config('global.credit_payment'); 
+    // }
     public function getDateArr($request){
-        $to = \Carbon\Carbon::createFromFormat('Y-m-d',$request->from_date);
-        $from = \Carbon\Carbon::createFromFormat('Y-m-d',$request->to_date);
-
+        $from = \Carbon\Carbon::createFromFormat('Y-m-d',$request->from_date);
+        if(!is_null($request->to_date)){
+            $to = \Carbon\Carbon::createFromFormat('Y-m-d',$request->to_date);
+        }else{
+            $to = Carbon::today();
+        }
         $count_of_days = $to->diffInDays($from);
 
         $from_date=new Carbon($request->from_date);
@@ -48,7 +59,6 @@ trait Cashbook{
     public function getClosing($request,$a,$opening_balance){
         $ac=AccountTransition::where('is_cashbook',1);
         $ac->whereDate('transition_date',$a);
-
 //        if($request->sub_account!=null){
 //            $ac->where('sub_account_id',$request->sub_account);
 //        }
@@ -107,7 +117,6 @@ trait Cashbook{
                 $cashbook[$key]->closing_balance = $cashbook[$key-1]->closing_balance;
                 $cashbook[$key]->cashbook_list= [];
             }else{
-            
                 // $is_from_date=AccountTransition::whereDate('transition_date','<',$d)->where('is_cashbook',1)->latest()->first();
                 $opening_balance = $this->getOpening($request,$d);
                 $total_debit=0;
@@ -120,4 +129,69 @@ trait Cashbook{
         }
         return $cashbook;
     }
+    // public function storePurchaseInLedger($p){
+    //     $p_account=AccountTransition::create([
+    //         'sub_account_id' => $this->purchase_account,
+    //         'transition_date' => $p->invoice_date,
+    //         'p_id' => $p->id,
+    //         'supplier_id'=>$p->supplier_id,
+    //         'vochur_no'=>$p->invoice_no,
+    //         'description'=>'',
+    //         'is_cashbook' => 0,
+    //         'status'=>'purchase',
+    //         'credit' => $p->pay_amount,
+    //         'created_by' => Auth::user()->id,
+    //         'updated_by' => Auth::user()->id,
+    //     ]);
+    //     if($p->payment_type=='cash' ||  ($p->payment_type=='credit' && $p->pay_amount!=0)){
+    //         $p_type=$p_account->replicate()->fill([
+    //             'sub_account_id' => $p->payment_type=='cash' ? $this->cash_purchase : $this->purchase_advance,
+    //             'debit' => $p->pay_amount,
+    //             'status'=>'purchase',
+    //             'credit'=>null,
+    //         ]);
+    //         $p_type->save();
+    //     }
+    // }
+    // public function updatePurchaseInLedger($p){
+    //     AccountTransition::where([
+    //         ['is_cashbook',0],
+    //         ['purchase_id',$p->id],
+    //         ['status','purchase'],
+    //     ])->delete();
+    //     $this->storetPurchaseInLedger($p);
+    // }
+    // public function storeCreditPaymentInLedger($cp,$request){
+    //     $discounts=array_sum($request->discounts);
+    //     $credit_payment=AccountTransition::create([
+    //         'sub_account_id' => $this->credit_payment,
+    //         'transition_date' => $cp->collection_date,
+    //         'purchase_id' => $cp->id,
+    //         'supplier_id'=>$cp->supplier_id,
+    //         'vochur_no'=>$cp->collection_no,
+    //         'description'=>'',
+    //         'is_cashbook' => 0,
+    //         'status'=>'credit_payment',
+    //         'debit' => $cp->total_pay_amount,
+    //         'created_by' => Auth::user()->id,
+    //         'updated_by' => Auth::user()->id,
+    //     ]);
+    //     if($discounts!=null || $discounts!=0){
+    //         $discount_acc=$credit_payment->replicate()->fill([
+    //             'sub_account_id' => $this->discount_allowed,
+    //             'debit' => $discounts,
+    //             'status'=>'discount_received',
+    //         ]);
+    //         $discount_acc->save();
+    //     }
+    // }
+    // public function updateCreditPaymentInLedger($cp,$request){
+    //     AccountTransition::where([
+    //         ['is_cashbook',0],
+    //         ['purchase_id',$cp->id],
+    //         ['status','credit_payment'],
+    //     ])->delete();
+    //     $this->storetCreditPaymentInLedger($cp,$request);
+    // }
+    
 }

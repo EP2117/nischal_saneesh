@@ -23,6 +23,7 @@ class AccountHeadController extends Controller
         $account_head=$account_head->paginate(30);
         return response(compact('account_head'));
     }
+   
     public function getFinancialType($type){
         if($type==1){
             $financial_type=FinancialType::where('type','type1')->get();

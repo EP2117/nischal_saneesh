@@ -274,7 +274,7 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         /**if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
             $validatedData = $request->validate([
                 'reference_no' => 'max:255|unique:sales',
@@ -335,6 +335,7 @@ class SaleController extends Controller
         $description=$sale->invoice_no.", Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
         /* Cash Book  for sale*/
         if($sale) {
+            // cashbook
             if ($request->payment_type == 'cash' || ($request->payment_type == 'credit' && $request->pay_amount != 0)) {
                 AccountTransition::create([
                     'sub_account_id' => $sub_account_id,
@@ -347,8 +348,12 @@ class SaleController extends Controller
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
                 ]);
-                $sale->payment_type=='cash' ?$this->storetInLedger($sale,$sub_account_id,$sale_common_account_id)  :  $this->storetCreditSaleInLedger($sale,$sub_account_id,$sale_common_account_id=null);
             }
+            // end cashbook 
+
+            // for ledger 
+           $this->storeSaleInLedger($sale);
+            // end ledger
         }
         $sale_id = $sale->id;
         for($i=0; $i<count($request->product); $i++) {
@@ -458,7 +463,6 @@ class SaleController extends Controller
                 'reference_no' => 'max:255|unique:sales,reference_no,'.$id,
             ]);
         }**/
-
         $sale = Sale::find($id);
         $old_sub_account_id=$sale->payment_type=='credit' ? config('global.sale_advance') : config('global.sale');
         if($sale->payment_type=='cash'){
@@ -511,10 +515,11 @@ class SaleController extends Controller
         $description=$sale->invoice_no.", Date ".$sale->invoice_date." by " .$cus->cus_name;
         if($sale){
             if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
-                AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_sub_account_id)->delete();
-                AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_cash_sale_account_id)->delete();
-                AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_discount_allowed_account_id)->delete();
-                    AccountTransition::create([
+                $update_cashbook=AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_sub_account_id)->where('is_cashbook',1)->delete();
+                // dd($update_cashbook);
+                // AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_cash_sale_account_id)->delete();
+                // AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_discount_allowed_account_id)->delete();
+                   AccountTransition::create([
                         'sub_account_id' => $sub_account_id,
                         'transition_date' => $sale->invoice_date,
                         'sale_id' => $sale->id,
@@ -525,7 +530,7 @@ class SaleController extends Controller
                         'created_by' => Auth::user()->id,
                         'updated_by' => Auth::user()->id,
                     ]);
-                    $sale->payment_type=='cash' ?$this->storetInLedger($sale,$sub_account_id,$cash_sale_account_id)  :  $this->storetCreditSaleInLedger($sale,$sub_account_id,$cash_sale_account_id=null);
+                    $this->updatesSaleInLedger($sale);
 
             }elseif($request->payment_type=='credit' && $request->pay_amount==0){
                 AccountTransition::where('sale_id',$id)
@@ -548,7 +553,6 @@ class SaleController extends Controller
                 ->where('transition_sale_id', $id)
                 ->delete();
         }
-
         //update in product pivot table
         for($i=0; $i<count($request->product); $i++) {
 

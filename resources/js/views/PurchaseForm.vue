@@ -261,7 +261,7 @@
                                 <input type="submit" class="btn btn-primary btn-sm" value="Save Entry"  :disabled = "isDisabled">
                             </div>
 
-                            <div class="col-md-12" v-if="(user_role == 'system' || user_role == 'admin') && isEdit && !isDisabled">
+                            <div class="col-md-12" v-if="(user_role == 'system' || user_role == 'admin') && isEdit && isDisabled">
                                 <input type="submit" class="btn btn-primary btn-sm" value="Update">
                             </div>
 
