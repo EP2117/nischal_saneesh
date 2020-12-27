@@ -142,15 +142,27 @@
                                         <!-- <td class="text-center">{{c.vochur_no}}</td> -->
                                         <template >
                                              <td class="text-center" v-if="type=='customer'" >
+                                                 <span v-if='c.sub_account.sub_account_name=="Sale Account" || c.sub_account.sub_account_name=="Cash Sale"'>
                                                     To {{c.sub_account.sub_account_name }} For Inv {{c.vochur_no}} Invoice
+                                                 </span>
+                                                <span v-else>
+                                                    By {{c.sub_account.sub_account_name }} For Inv {{c.vochur_no}} Invoice
+                                                 </span>
                                              </td>
                                                 <td class="text-center" v-if="type=='supplier'">
-                                                By {{c.sub_account.sub_account_name }} For Inv {{c.vochur_no}} Invoice
+                                                <span v-if='c.sub_account.sub_account_name=="Purchase Account" || c.sub_account.sub_account_name=="Cash Purchase"'>
+                                                    To {{c.sub_account.sub_account_name }} For Inv {{c.vochur_no}} Invoice
+                                                 </span>
+                                                <span v-else>
+                                                    By {{c.sub_account.sub_account_name }} For Inv {{c.vochur_no}} Invoice
+                                                 </span>
+                                                <!-- By {{c.sub_account.sub_account_name }} For Inv {{c.vochur_no}} Invoice -->
                                                 </td>
                                             <td class="text-center" v-if=' type=="other" && c.supplier_id!=null'>
-                                            By {{c.supplier.name }} For Inv {{c.vochur_no}} Invoice</td>
+
+                                              By {{c.supplier.name }} For Inv {{c.vochur_no}} Invoice</td>
                                             <td class="text-center" v-if=' type=="other" && c.customer_id!=null'>
-                                            By {{c.cus_name }} For Inv {{c.vochur_no}} Invoice</td> 
+                                               By {{c.customer.cus_name }} For Inv {{c.vochur_no}} Invoice</td> 
                                             <td class="text-center" v-if=' type=="other" && c.payment_id!=null'>
                                                 {{c.description}}
                                              </td>  

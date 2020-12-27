@@ -206,7 +206,7 @@ Route::group(['prefix' => '',  'middleware' => 'auth'], function () {
         Route::get('get_sale_outstanding',['App\Http\Controllers\CollectionController','getSaleOutstanding']);
         Route::get('get_credit_collection',['App\Http\Controllers\CollectionController','getCreditCollectionReport']);
         Route::get('get_valuation',['App\Http\Controllers\ProductTransitionController','getValuationReport']);
-
+        Route::get('profit_and_loss',['App\Http\Controllers\AccountTransitionController','getProfitAndLossReport']);
     });
     Route::group(['prefix' => 'supplier_ob'], function () {
         Route::get('',['\App\Http\Controllers\SupplierOpeningBalanceController','index']);

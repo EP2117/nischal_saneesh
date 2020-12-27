@@ -392,7 +392,7 @@ trait Ledger
     }
     function getDatesFromRange($request,$format = 'Y-m-d') { 
         $start=$request->from_date;
-        $end=$request->to_date;
+        $end=$request->to_date!=null ? $request->to_date : now()->today();
         // Declare an empty array 
         $array = array(); 
         // Variable that store the date interval 
@@ -401,7 +401,6 @@ trait Ledger
   
         $realEnd = new DateTime($end); 
         $realEnd->add($interval); 
-  
         $period = new DatePeriod(new DateTime($start), $interval, $realEnd); 
   
         // Use loop to store date into array 
@@ -500,26 +499,6 @@ trait Ledger
                     $cl_credit+=$c->debit;
                 }
             }
-            // dd($cl_debit);
-            // if($request->sub_account_id==$this->sale_account){
-            //     $closing_balance=((-1 *$opening_balance)+$cl_debit)+$cl_credit;
-            // }elseif($request->sub_account_id==$this->sale_advance){
-            //     $closing_balance=((-1 *$opening_balance)+$cl_debit)+$cl_credit;
-            // }elseif($request->sub_account_id==$this->credit_collection){
-            //     $closing_balance=((-1 *$opening_balance)+$cl_debit)+$cl_credit;
-            // }elseif($request->sub_account_id==$this->discount_allowed){
-            //     $closing_balance=((-1 *$opening_balance)+$cl_debit)+$cl_credit;
-            // }elseif($request->sub_account_id==$this->purchase_account){
-            //     $closing_balance=((-1 *$opening_balance)+$cl_debit)+$cl_credit;
-            // }elseif($request->sub_account_id==$this->purchase_advance){
-            //     $closing_balance=((-1 *$opening_balance)+$cl_debit)+$cl_credit;
-            // }elseif($request->sub_account_id==$this->credit_payment){
-            //     $closing_balance=((-1 *$opening_balance)+$cl_debit)+$cl_credit;
-            // }elseif($request->sub_account_id==$this->discount_received){
-            //     $closing_balance=((-1 *$opening_balance)+$cl_debit)+$cl_credit;
-            // }
-            // dd($opening_balance);
-            // dd($cl_credit);
             $closing_balance=(($opening_balance)+$cl_debit)-$cl_credit;
         }else{
             $closing_balance=0;
@@ -550,7 +529,7 @@ trait Ledger
                 $this->opening_balance=$ledger[$key]->closing_balance;
             }
             elseif($ats->isNotEmpty() && count($date_arr)>1){
-                dd('Hell00');
+                // dd('Hell00');
                 $ledger[$key]->date=$date;
                 $ledger[$key]->opening_balance =$ledger[$key-1]->opening_balance;
                 $ledger[$key]->closing_balance = $ledger[$key-1]->closing_balance;

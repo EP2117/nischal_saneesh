@@ -563,6 +563,13 @@
                         <span>Inventory Valuation Report</span>
                     </a>
                 </router-link>
+                <hr class="sidebar-divider">
+                <router-link  tag="li" to="/report/profit_and_loss" class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Profit & Loss Report</span>
+                    </a>
+                </router-link>
 
         @if(Auth::user()->role->id != 6 && Auth::user()->role->id != 7)
        <!-- <router-link  tag="li" to="/report/ara-daily-sale-rpt" class="nav-item">

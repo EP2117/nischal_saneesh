@@ -530,7 +530,7 @@ class SaleController extends Controller
                         'created_by' => Auth::user()->id,
                         'updated_by' => Auth::user()->id,
                     ]);
-                    $this->updatesSaleInLedger($sale);
+                    $this->updateSaleInLedger($sale);
 
             }elseif($request->payment_type=='credit' && $request->pay_amount==0){
                 AccountTransition::where('sale_id',$id)
@@ -616,8 +616,6 @@ class SaleController extends Controller
                     $relation_val = 1;
                 }
         $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
-
-
                 //add products in transition table=> transfer_type = out (for sold out)
                 $obj = new ProductTransition;
                 $obj->product_id            = $request->product[$i];
