@@ -15,4 +15,7 @@ class AccountHead extends Model
     public function financial_type2(){
         return $this->belongsTo(FinancialType::class,'financial_type2_id','id');
     }
+    // public function sub_accounts(){
+    //     return $this->hasMany(SubAccount::class,'sub_account_id');
+    // }
 }

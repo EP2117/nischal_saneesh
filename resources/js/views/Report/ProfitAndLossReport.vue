@@ -55,94 +55,117 @@
         </div>
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Profit & Loss Report</h6>
+                <h4 class="m-0 font-weight-bold text-primary">Profit And Loss </h4>
             </div>
             <div class="card-body">
-                <div class="table-responsive" v-if="receipt_count > 0">
-                    <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">  <!--kamlesh-->
-                        <thead>
+                <!-- <div class="table-responsive" > -->
+                <div class="table-responsive" v-if="profit_and_loss!='' || expense !='' || income!=''">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">  <!--kamlesh-->
+                        <thead class="thead-light">
                         <tr>
-                            <th class="text-center">No.</th>
-                            <th class="text-center">Title</th>
+                            <!-- <th class="text-center">No.</th> -->
+                            <th class="text-center"></th>
                             <th class="text-center">Amount</th>
                         </tr>
                         </thead>
                         <tfoot>
                         <tr>
-                            <th class="text-center">No.</th>
-                            <th class="text-center">Title</th>
+                            <th class="text-center"></th>
                             <th class="text-center">Amount</th>
                         </tr>
                         </tfoot>
-                         <tbody>
-                        <tr v-for="(r,index) in receipt">
-                            <td class="text-center">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
-                            <td class="text-center">{{r.cash_receipt_no}}</td>
-                            <td class="text-center">{{r.date}}</td>
-                            <td class="text-center">{{r.debit.sub_account_name}}</td>
-                            <td class="text-center">{{r.credit.sub_account_name}}</td>
-                            <td class="text-center">{{r.amount}}</td>
-                            <td class="text-center">{{r.remark}}</td>
-                            <td class="text-left">
-                                <div class="dropdown">
-                                    <a class="btn btn-sm btn-icon-only text-danger " href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                        <a class="dropdown-item">
-                                            <router-link tag="span" :to="'/receipt/edit/' + r.id" >
-                                                <a href="#" title="Edit/View" class="">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>&nbsp;
-                                            </router-link>
-                                        </a>
-                                        <a class="dropdown-item">
-                                            <a title="Delete" class="text-danger" @click="destroyReceipt(r.id)" v-if="user_role == 'admin' || user_role == 'system'">
-                                                <i class="fas fa-trash"></i>
-                                            </a>&nbsp;
-                                        </a>
-                                    </div>
-                                </div>
-
-                            </td>
-                        </tr>
+                         <tbody >
+                        <template v-for="(pl,index) in profit_and_loss">
+                            <template v-if='index== "Revenue"' >
+                                <h3 style="margin-left:100px">{{index}}</h3>
+                              <!-- <tr v-for="(r,i) in pl.revenue"> -->
+                              <tr v-for="(r,i) in pl" >  
+                                <td class="text-center">
+                                    {{r.name}}
+                                </td>
+                                 <td class="text-center">
+                                    {{r.amount.toLocaleString()}}
+                                </td>
+                              </tr>
+                            </template>
+                            <template v-if='index=="Cost of Revenue"'>
+                                <h3 style="margin-left:100px">{{index}}</h3>
+                                 <tr v-for="(cor,i) in pl">
+                                    <td class="text-center">
+                                        {{cor.name}}
+                                    </td>
+                                     <td class="text-center">
+                                        {{cor.amount.toLocaleString()}}
+                                    </td>
+                                  </tr>
+                            </template>
+                              
+                            <!-- <td class="text-center">{{((currentPage * perPage) - perPage) + (index+1)}}</td> -->
+                        </template>
+                        <tr class="total_row table-secondary " v-if='profit_and_loss!=" " '  >
+                               <td colspan="1" class="text-right mm-text" v-if="gross_profit>0">
+                                   <strong><h3>Gross Profit </h3></strong> 
+                                    </td>
+                               <td colspan="1" class="text-right mm-text" v-else-if="gross_profit<0"><strong><h3>Loss Profit </h3></strong>  </td>
+                               <td colspan="1" class="text-center" >{{gross_profit.toLocaleString()}}</td>
+                          </tr>
+                        <!-- <tr class="total_row table-secondary " v-else-if='profit_and_loss!="" && gross_profit<0'  >
+                               <td colspan="1" class="text-right mm-text"><strong>Loss Profit </strong>  </td>
+                               <td colspan="1" class="text-center ">{{(-1) *gross_profit}}</td>
+                          </tr> -->
+                        <template v-if="income!=null">
+                             <h3 style="margin-left:100px">Income</h3>
+                            <template v-for='(inc,k) in income'>
+                                <h5  style="margin-left:250px">{{inc.account_head_name}}</h5>
+                                          <tr v-for="(i,index) in inc.income" >  
+                                              <!-- <h4>{{k}}</h4> -->
+                                            <td class="text-center">
+                                                {{i.sub_account_name}}
+                                            </td>
+                                             <td class="text-center">
+                                                {{i.amount.toLocaleString()}}
+                                            </td>
+                                          </tr>
+                                            <tr class="total_row">
+                                                <td colspan="1" class="text-right mm-text"><strong>{{inc.account_head_name}} Total</strong>  </td>
+                                                <td colspan="1" class="text-center ">{{inc.total.toLocaleString()}}</td>
+                                            </tr>
+                                                        
+                            </template>
+                             <tr class="total_row table-secondary" v-if="income!=null">
+                                   <td colspan="1" class="text-right mm-text"><strong>Total Income </strong>  </td>
+                                   <td colspan="1" class="text-center ">{{total_income.toLocaleString()}}</td>
+                              </tr>
+                        </template>
+                        <template v-if="expense!=null">
+                            <h3 style="margin-left:100px">Expense</h3>
+                            <template v-for='(exp,k) in expense'>
+                                <template v-if="exp.expense.length > 0">
+                                     <h5 style="margin-left:250px">{{exp.account_head_name}}</h5>
+                                      <tr v-for="(e,index) in exp.expense" >  
+                                        <td class="text-center">
+                                            {{e.sub_account_name}}
+                                        </td>
+                                         <td class="text-center">
+                                            {{e.amount.toLocaleString()}}
+                                        </td>
+                                      </tr>
+                                </template>
+                            </template>
+                            <tr class="total_row" v-if="expense!=null" >
+                                   <td colspan="1" class="text-right mm-text"><strong>Total Expense </strong>  </td>
+                                   <td colspan="1" class="text-center ">{{total_expense.toLocaleString()}}</td>
+                              </tr>
+                        </template>
+                            <tr class="total_row table-secondary" v-if="net_profit!=''">
+                                   <td colspan="1" class="text-right mm-text"><strong> <h3>Net Profit </h3></strong>  </td>
+                                   <td colspan="1" class="text-center ">{{net_profit.toLocaleString()}}</td>
+                              </tr>
                         </tbody> 
                     </table>
                 </div>
                 <div v-else>
                     <h5 class="text-center m-5">No Profit & Loss found!</h5>
-                </div>
-            </div>
-
-            <div class="card-footer text-center">
-                <!-- pagination start -->
-                <div class="row" style="overflow:auto">
-                    <div class="col-12">
-                        <template v-if="receipt_count > 0">
-                            <div class="overflow-auto text-center" style="display:inline-block">
-                                <!-- Use text in props -->
-                                <b-pagination
-                                    v-model="currentPage"
-                                    :total-rows="rows"
-                                    :per-page="perPage"
-                                    first-text="First"
-                                    prev-text="Prev"
-                                    next-text="Next"
-                                    last-text="Last">
-                                    <template v-slot:first-text><span class="text-success" v-on:click="getReceipt(1)">First</span></template>
-                                    <template v-slot:prev-text><span class="text-danger" v-on:click="getReceipt(currentPage)">Prev</span></template>
-                                    <template v-slot:next-text><span class="text-warning" v-on:click="getReceipt(currentPage)">Next</span></template>
-                                    <template v-slot:last-text><span class="text-info" v-on:click="getReceipt(pagination.last_page)">Last</span></template>
-                                    <template v-slot:ellipsis-text>
-                                    </template>
-                                    <template v-slot:page="{ page, active }">
-                                        <span v-if="active"><b>{{ page }}</b></span>
-                                        <span v-else @click="getReceipt(page)"><p>{{ page }}</p></span>
-                                    </template>
-                                </b-pagination>
-                            </div>
-                        </template>
-                    </div>
                 </div>
             </div>
         </div>
@@ -168,24 +191,30 @@ export default {
                 current_page: '',
                 next_page_url:""
             },
-            receipt:[],
+            profit_and_loss:[],
+            expense:[],
+            income:[],
+            net_profit:'',
+            total_income:'',
+            total_expense:'',
             month:[],
             year:[],
-            receipt_count:0,
+            count_of_expense:0,
+            count_of_revenue:0,
+            count_of_income:0,
+            gross_profit:'',
             perPage: 30,
             currentPage: 1,
             user_year:'',
             rows:'',
             credit:[],
             debit:[],
-
         }
     },
     created() {
         // console.log(this.perPage);
         this.user_role = document.querySelector("meta[name='user-role']").getAttribute('content');
         this.user_year = document.querySelector("meta[name='user-year-likelink']").getAttribute('content');
-
         this.site_path = document.querySelector("meta[name='site-path']").getAttribute('content');
         //this.site_path = this.site_path.substring(this.site_path.lastIndexOf('/')+1);
         this.storage_path = document.querySelector("meta[name='storage-path']").getAttribute('content');
@@ -294,7 +323,12 @@ export default {
         //     axios.get('/sub_account/get_sub_account/'+"credit").then(({data})=>(this.credit=data.sub_account));
         // },
         getProfitAndLoss(page=1) {
-            // $("#loading").show();
+            // let app= this;
+              if(this.search.from_date == "" && this.search.to_date == "" && this.search.month == "" && this.search.year == "" ) {
+                swal("Warning!", "Please must be filtered at least one!", "warning")
+                return false;
+            }
+            $("#loading").show();
             // alert(page);
             let app = this;
             var search =
@@ -307,22 +341,26 @@ export default {
                 "&year=" +
                 app.search.year 
             axios.get('/report/profit_and_loss?page='+ page+search ).then(response=>{
+            // console.log(response);
                 $("#loading").hide();
                 // console.log(response);
-                let data=response.data.receipt;
-                app.receipt=data.data;
-                // console.log(app.sub_account);
-                // if(typeof app.sub_account!== "undefined"){
-                app.receipt_count = app.receipt.length;
-                // }
-                // app.pagination.last_page = data.last_page;
-                // app.pagination.next = data.next_page_url;
-                // app.pagination.prev = data.prev_page_url;
-                // app.pagination.total = data.total;
-                // app.pagination.current_page = data.current_page;
-                // app.pagination.next_page_url = data.next_page_url;
-                // app.currentPage = data.current_page;
-                // app.rows = data.total;
+                app.profit_and_loss=response.data.profit_and_loss;
+                app.gross_profit=response.data.gross_profit;
+                app.income=response.data.income;
+                app.total_income=response.data.total_income;
+                // $.each(app.income,function(k,v){
+                    // console.log(v.income);
+                // });
+                app.expense=response.data.expense;
+                app.total_expense=response.data.total_expense;
+                // app.count_of_income=Object.keys(response.data.income).length
+                // app.count_of_expense=Object.keys(response.data.expense).length
+                // app.count_of_revenue=Object.keys(response.data.profit_and_loss).length
+                // app.gross_profit=response.data.gross_profit.toLocaleString();
+                app.net_profit=response.data.net_profit;
+                // // app.receipt=data.data;
+                
+               
             });
         },
         destroyReceipt(id) {

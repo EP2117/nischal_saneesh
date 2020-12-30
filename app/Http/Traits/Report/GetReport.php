@@ -2,6 +2,7 @@
 namespace App\Http\Traits\Report;
 use App\Sale;
 use stdClass;
+use App\Product;
 use Carbon\Carbon;
 use App\SubAccount;
 use App\AccountHead;
@@ -12,7 +13,7 @@ use App\PurchaseCollection;
 use Illuminate\Support\Facades\DB;
 
 trait GetReport{
-    
+   
     public function getPaymentReport($request){
 //        dd($request->all());
         $payments =DB::table('collection_purchase')
@@ -560,171 +561,114 @@ trait GetReport{
         // return $data;
     }
     public function getProfitAndLoss($request){
-          
-        //  $pl->select(DB::raw('Sum(credit) as sale_total'),DB::raw(                                                                                                                   ));
-
-         //  $pl->when(!is_null($request->month),function($q){
-        //     return  $q->whereMonth('transition_date',request('month'));
-        //  });
-        //  $pl->when(!is_null($request->year),function($q){
-        //     return  $q->whereYear('transition_date',request('year'));
-        //  });
-         $sale_amount=0;
-         $account_head=AccountHead::whereHas('financial_type1',function($q){
-            $q->where('name','P&L');
-        })->get();
-        foreach($account_head as $key=>$ah){
-            $profitAndLoss[$key]=new stdClass();
-            // $sub_account=SubAccount::where('account_head_id',$ah->id)->get();
-            // foreach($sub_account as $k=>$sub){
-                    // $pl=AccountTransition::where('sub_account_id',$sub->id);
-                    $pl=AccountTransition::whereHas('sub_account.account_head',function($q)use($ah){
-                        $q->whereId($ah->id);
-                    });
-                    $request->to_date= $request->to_date !=null ? $request->to_date : now()->today();
-                    $pl->when(!is_null($request->from_date),function($q)use($request){
-                        return  $q->whereDate('transition_date','>=',$request->from_date);
-                    });
-                    $pl->when(!is_null($request->from_date),function($q){
-                        return  $q->whereBetween('transition_date',[request('from_date'),request('to_date')]);
-                    });
-                    // $pl=$
-            // foreach($pl as $p){
-                // dd($p->sub_account->account_head)
-                if($ah->name=='Revenue'){
-                    $pl=$pl->selectRaw('*, sum(credit) as sale_amount')->groupBy('sub_account_id')->get();
-                    // dd($pl);
-                    if($pl->isNotEmpty()){
-                        foreach($pl as $k=>$p){
-                            $revenue[$k]=new stdClass();
-                            $revenue[$k]->name=$p->sub_account->sub_account_name;
-                            $revenue[$k]->amount=$p->sale_amount;
-                        }
-                        $profitAndLoss[$key]->revenue=$revenue;
-                    }else{
-                        $profitAndLoss[$key]->revenue=null;
-                    }
-                }
-                elseif($ah->name==='Other Income'){
-                    $pl=$pl->selectRaw('*, sum(credit) as amount')->groupBy('sub_account_id')->get();
-                    if($pl->isNotEmpty()){
-                        foreach($pl as $k=>$p){
-                            $income[$k]=new stdClass();
-                            $income[$k]->sub_account_name=$p->sub_account->sub_account_name;
-                            $income[$k]->amount=$p->amount;
-                        }
-                        $profitAndLoss[$key]->income=$income;
-                    }else{
-                        $profitAndLoss[$key]->income=null;
-                    }
-                  
-                }
-                else if($ah->name=='Expense'){
-                    $pl=$pl->selectRaw('*, sum(debit) as amount')->groupBy('sub_account_id')->get();
-                    if($pl->isNotEmpty()){
-                        foreach($pl as $k=>$p){
-                            $expense[$k]=new stdClass();
-                            $expense[$k]->sub_account_name=$p->sub_account->sub_account_name;
-                            $expense[$k]->amount=$p->amount;
-
-                        }
-                        $profitAndLoss[$key]->expense=$expense;
-                    }
-                    else{
-                        $profitAndLoss[$key]->expense=null;
-                    }
-                }
-                else if($ah->name=='Cost Of Revenue'){
-                    $sale=config('global.sale');
-                    // dd($pl);
-                    // dd($pl->get());
-                    $pl=$pl->where('sub_account_id',$sale)->get();
-                    dd($pl);
-                }
-        }
-        dd($profitAndLoss);
-        
-        // dd($account_head->sub_accounts());
-       
-        //  ->whereHas('account_head',function($q){
-        //     $q->orderBy('id','asc');
-        // })      
-        // ->get();
-
-
-
-        //   $revenue=$pl->filter(function($value,$k){
-        //       return $value->sub_account->account_head->financial_type2->name==='Sale';
-        //     });
-        //     $income=$pl->filter(function($value,$k){
-        //         return $value->sub_account->account_head->financial_type2->name=='Income';
-        //       });
-        //     //   dd($income);
-        //       $expense=$pl->filter(function($value,$k){
-        //         return $value->sub_account->account_head->financial_type2->name=='Expense';
-        //       });
-        //     //   dd($expense);
-        // for($i=0; $i<=$count ;$i++){
-        //     $profitAndLoss[$i]=new stdClass();
-        //     // revenue list
-
-        //     foreach($revenue as $k=>$r){
-        //         $sale_amount+=$r->credit;
-        //         $revenue_name=$r->sub_account->account_head->name;
-        //     }
-        //     // $profitAndLoss[$i]->revenue=new stdClass();
-        //     $profitAndLoss[$i]->revenue_amount=$sale_amount;
-        //     $profitAndLoss[$i]->revenue_account_head=$r->sub_account->account_head->name;
-        //     $profitAndLoss[$i]->revenue_sub_account=$r->sub_account->account_head->financial_type2->name;
-        
-        //     // income list
-        //     foreach($income as $k=>$in){
-        //         // $income_arr->income_account_head=new stdClass();
-        //         $profitAndLoss[$i]->income[$k]=new stdClass();
-        //         $profitAndLoss[$i]->income[$k]->income_sub_account=$in->sub_account->account_head->financial_type2->name;
-        //         $profitAndLoss[$i]->income[$k]->income_account_head=$in->sub_account->account_head->name;
-        //         $acc_name=$in->sub_account->name;
-        //         $amt=$income->map(function($v,$k)use($acc_name){
-        //             if($v->sub_account->name==$acc_name){
-        //                 $a=0;
-        //                 $a+=$v->credit;
-        //                 return $a;
+   
+        //  $sale_amount=0;
+        //  $account_head=AccountHead::whereHas('financial_type1',function($q){
+        //     $q->where('name','P&L');
+        // })->get();
+        // foreach($account_head as $key=>$ah){
+        //     $profitAndLoss[$ah->name]=new stdClass();
+        //     // $sub_account=SubAccount::where('account_head_id',$ah->id)->get();
+        //     // foreach($sub_account as $k=>$sub){
+        //             // $pl=AccountTransition::where('sub_account_id',$sub->id);
+        //             $pl=AccountTransition::whereHas('sub_account.account_head',function($q)use($ah){
+        //                 $q->whereId($ah->id);
+        //             });
+        //             $request->to_date= $request->to_date !=null ? $request->to_date : now()->today();
+        //             $pl->when(!is_null($request->from_date),function($q)use($request){
+        //                 return  $q->whereDate('transition_date','>=',$request->from_date);
+        //             });
+        //             $pl->when(!is_null($request->from_date),function($q){
+        //                 return  $q->whereBetween('transition_date',[request('from_date'),request('to_date')]);
+        //             });
+        //             // $pl=$
+        //     // foreach($pl as $p){
+        //         // dd($p->sub_account->account_head)
+        //         if($ah->name=='Revenue'){
+        //             $pl=$pl->selectRaw('*, sum(credit) as sale_amount')->groupBy('sub_account_id')->get();
+        //             // dd($pl);
+        //             if($pl->isNotEmpty()){
+        //                 foreach($pl as $k=>$p){
+        //                     $revenue=new stdClass();
+        //                     $revenue->name=$p->sub_account->sub_account_name;
+        //                     $revenue->amount=(int)$p->sale_amount;
+        //                     $this->total_revenue=$p->sale_amount;
+        //                 }
+        //                 $profitAndLoss[$ah->name]->revenue=$revenue;
+        //             }else{
+        //                 $profitAndLoss[$ah->name]->revenue=null;
         //             }
-        //         })->toArray();
-        //         dd($amt);
-        //         // $profitAndLoss[$i]->income[$k]->income_amont=
-
-
-        //     }
-
-        //     // Expense List 
-        //     // foreach($expense as $k=>$exp){
-        //     //     // dd($exp);
-        //     //     $profitAndLoss[$i]->expense[$k]=new stdClass();
-        //     //     $profitAndLoss[$i]->expense[$k]->expense_sub_account=$exp->sub_account->account_head->financial_type2->name;
-        //     //     $profitAndLoss[$i]->expense[$k]->expense_account_head=$exp->sub_account->account_head->name;
-        //     // }
-        //     $count=0;
-
-        // }
-        //      $profitAndLoss=new stdClass();
-        //      foreach($pl as $key=>$p){
-        //          $revenue=new stdClass();
-        //         if($p->sub_account->account_head->financial_type2->name==='Sale'){
-        //             $revenue->name=$p->sub_account->account_head->name;
-        //             // dd($revenue);
-        //             $sale_amount+=$p->credit;
+        //             // *********** for cost of revenue *********
+                   
         //         }
-        //      }
-        //      $revenue->amount=$sale_amount;
-        //      dd($revenue);
-            //  $profitAndLoss->revenue=
-             
-               //  elseif($p->sub_account->head_account->financial_type2=='Income'){
-               //      dd('p');
-               //  }
-            
-        
+        //         elseif($ah->name==='Other Income'){
+        //             $pl=$pl->selectRaw('*, sum(credit) as amount')->groupBy('sub_account_id')->get();
+        //             if($pl->isNotEmpty()){
+        //                 $total=0;
+        //                 foreach($pl as $k=>$p){
+        //                     $income[$k]=new stdClass();
+        //                     $income[$k]->sub_account_name=$p->sub_account->sub_account_name;
+        //                     $income[$k]->amount=$p->amount;
+        //                     $total+=$p->amount;
+        //                     // $profitAndLoss[$[]]->name=$$p->sub_account->sub_account_name;
+        //                     // $profitAndLoss[$ah->name]->amount=$p->amount;
+
+        //                 }
+        //                 $profitAndLoss[$ah->name]->income=$income;
+        //                 $profitAndLoss[$ah->name]->total_income=$total;
+        //             }else{
+        //                 $profitAndLoss[$ah->name]->income=null;
+        //             }
+        //         }
+        //         else if($ah->name=='Expense'){
+        //             $pl=$pl->selectRaw('*, sum(debit) as amount')->groupBy('sub_account_id')->get();
+        //             $total=0;
+        //             if($pl->isNotEmpty()){
+        //                 foreach($pl as $k=>$p){
+        //                     $expense[$k]=new stdClass();
+        //                     $expense[$k]->sub_account_name=$p->sub_account->sub_account_name;
+        //                     $expense[$k]->amount=$p->amount;
+        //                     $total+=$p->amount;
+        //                 }
+        //                 $profitAndLoss[$ah->name]->expense=$expense;
+        //                 $profitAndLoss[$ah->name]->total_expense=$total;
+        //             }
+        //             else{
+        //                 $profitAndLoss[$ah->name]->expense=null;
+        //             }
+        //         }
+        //         else if($ah->name=='Cost Of Revenue'){
+        //             $sale=config('global.sale');
+        //             $pl=AccountTransition::where('sub_account_id',$sale);
+        //             // $pl->whereHas('sale.products',function($q){
+        //             //     $q->
+        //             // });
+        //             $request->to_date= $request->to_date !=null ? $request->to_date : now()->today();
+        //             $pl->when(!is_null($request->from_date),function($q)use($request){
+        //                 return  $q->whereDate('transition_date','>=',$request->from_date);
+        //             });
+        //             $pl->when(!is_null($request->from_date),function($q){
+        //                 return  $q->whereBetween('transition_date',[request('from_date'),request('to_date')]);
+        //             });
+        //             $pl=$pl->get();
+        //             $amount=0;
+        //             foreach($pl as $p){
+        //                 // $product_sale=DB::table('product_sale')->where('sale_id',$p->sale_id)->get();
+        //                 $product_sale=DB::table('product_transitions')->where('transition_sale_id',$p->sale_id)->get();
+        //                 foreach($product_sale as $ps){
+        //                     // $product=Product::find($ps->product_id);
+        //                     // $amount+=(int)$product->cost_price* (int)$ps->product_quantity;
+        //                     $amount+=(int)$ps->cost_price;
+        //                 }
+        //             }
+        //             $cost_of_revenue=new stdClass();
+        //             $cost_of_revenue->name='Cost Of Good Sold';
+        //             $cost_of_revenue->amount=$amount;
+        //             $this->total_cor=$amount;
+        //             $profitAndLoss[$ah->name]->cost_of_revenue=$cost_of_revenue;
+        //         }
+        // }
+        // return $profitAndLoss;
     }
     // SUM(CASE  WHEN transition_type = 'out' AND transition_sale_id IS NOT NULL THEN cost_price  ELSE 0 END) as cost_price,
 
