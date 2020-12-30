@@ -13,7 +13,7 @@ class PurchaseInvoice extends Model
     public function products()
     {
         return $this->belongsToMany('App\Product', 'product_purchase', 'purchase_id', 'product_id')->withPivot('id','uom_id','product_quantity','delivered_quantity','price','price_variant','total_amount','is_foc');
-    }
+    }   
     public function warehouse()
     {
         return $this->belongsTo('App\Warehouse', 'warehouse_id', 'id')->select('id', 'warehouse_name');

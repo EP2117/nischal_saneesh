@@ -201,6 +201,7 @@ class CollectionController extends Controller
                         'vochur_no'=>$request->collection_no,
                         'description'=>$description,
                         'is_cashbook' => 1,
+                        'status'=>'credit_collection',
                         'customer_id'=>$collection->customer_id,
                         'debit' => $collection->total_paid_amount,
                         'created_by' => Auth::user()->id,
@@ -338,7 +339,7 @@ class CollectionController extends Controller
 
         $collection->delete();
         AccountTransition::where('sale_id',$id)
-            ->where('sub_account_id',config('global.sale_collection'))
+            ->where('status','credit_collection')
             ->delete();
         return response(['message' => 'delete successful']);
     }

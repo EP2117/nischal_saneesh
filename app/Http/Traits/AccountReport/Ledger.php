@@ -333,7 +333,6 @@ trait Ledger
         $this->storeReceiptInLedger($receipt);
     }
     public function getOpenigBalanceForLedger($request,$date){
-        // dd($request->all());
         // dd($date);
         $opening=AccountTransition::whereDate('transition_date','<',$date)->where('is_cashbook',0);
         // if($request->sub_account!=null){
@@ -349,6 +348,11 @@ trait Ledger
                 return  $q->where('customer_id',request('customer_id'));
              });
             }
+            if($request->type=='Supplier'){
+                $opening->when(!is_null($request->supplier_id),function($q){
+                    return  $q->where('supplier_id',request('supplier_id'));
+                 });
+                }
         if($request->vochur_no!=null){
             $opening->where('vochur_no',$request->vochur_no);
         }
@@ -380,8 +384,18 @@ trait Ledger
                 //     $op_credit+=$op->credit;
                 //     $op_debit+=$op->debit;
                 // }
-                $op_debit+=$op->debit;
-                $op_credit+=$op->credit;
+               
+                if($request->type=="Customer"){
+                   
+                }elseif($request->type=='Supplier'){
+                    $op_debit+=$op->credit;
+                    $op_credit+=$op->debit;
+                }
+                else{
+                    $op_debit+=$op->debit;
+                    $op_credit+=$op->credit;
+                }
+               
             }
             $opening_balance=$op_debit-$op_credit;
         }else{

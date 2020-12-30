@@ -91,7 +91,7 @@ class PurchaseInvoiceController extends Controller
                 $p->due_date = $request->due_date;
                 $p->credit_day = $request->credit_day;
             } else {
-                $sub_account_id=config('global.purchase');        /*Purchase Sub account ID */
+                $sub_account_id=config('global.cash_purchase');        /*Purchase Sub account ID */
                 $amount=$request->pay_amount;
                 $p->payment_type = 'cash';
             }
@@ -197,7 +197,7 @@ class PurchaseInvoiceController extends Controller
             ]);
         }
         $p = PurchaseInvoice::find($id);
-        $old_sub_account_id=$p->payment_type=='credit' ? config('global.purchase_advance') :config('global.purchase');
+        $old_sub_account_id=$p->payment_type=='credit' ? config('global.purchase_advance') :config('global.cash_purchase');
         $p->invoice_no = $request->invoice_no;
         $p->reference_no = $request->reference_no;
         $p->invoice_date = $request->invoice_date;
@@ -220,7 +220,7 @@ class PurchaseInvoiceController extends Controller
         } else {
             $p->payment_type = 'cash';
             $amount=$request->sub_total;
-            $sub_account_id=config('global.purchase');        /*Purchase Sub account ID */
+            $sub_account_id=config('global.cash_purchase');        /*Purchase Sub account ID */
         }
 
         $p->updated_at = time();
@@ -352,7 +352,7 @@ class PurchaseInvoiceController extends Controller
             ->delete();
         $p->delete();
         if($p->payment_type=='cash'){
-            $sub_account_id=config('global.purchase');
+            $sub_account_id=config('global.cash_purchase');
         }else{
             $sub_account_id=config('global.purchase_advance');
         }
