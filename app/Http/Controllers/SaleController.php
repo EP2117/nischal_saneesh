@@ -328,7 +328,7 @@ class SaleController extends Controller
                 $sale->due_date = $request->due_date;
                 $sale->credit_day = $request->credit_day;
             } else {
-                $sub_account_id=config('global.sale');     /*sub account_id for sale Account*/
+                $sub_account_id=config('global.cash_sale');     /*sub account_id for sale Account*/
                 $sale_common_account_id=config('global.cash_sale');     /*sub account_id for cash sale */
                 $amount=$request->pay_amount;
                 $sale->payment_type = 'cash';
@@ -482,7 +482,7 @@ class SaleController extends Controller
 
         try {
             $sale = Sale::find($id);
-            $old_sub_account_id=$sale->payment_type=='credit' ? config('global.sale_advance') : config('global.sale');
+            $old_sub_account_id=$sale->payment_type=='credit' ? config('global.sale_advance') : config('global.cash_sale');
             if($sale->payment_type=='cash'){
                $old_cash_sale_account_id= config('global.cash_sale');
                $old_discount_allowed_account_id= config('global.discount_allowed');
@@ -520,7 +520,7 @@ class SaleController extends Controller
                 $sale->due_date = $request->due_date;
                 $sale->credit_day = $request->credit_day;
             } else {
-                $sub_account_id=config('global.sale');     /*sub account_id for sale*/
+                $sub_account_id=config('global.cash_sale');     /*sub account_id for sale*/
                 $cash_sale_account_id=config('global.cash_sale');     /*sub account_id for cash sale */
                 $amount=$request->pay_amount;
                 $sale->payment_type = 'cash';
@@ -1499,14 +1499,13 @@ class SaleController extends Controller
         } 
 
         $sale->products()->detach();
-
         DB::table('product_transitions')
                 ->where('transition_sale_id', $id)
                 ->delete();
 
         $sale->delete();
         if($sale->payment_type=='cash'){
-            $sub_account_id=config('global.sale');
+            $sub_account_id=config('global.cash_sale');
         }else{
             $sub_account_id=config('global.sale_advance');
         }

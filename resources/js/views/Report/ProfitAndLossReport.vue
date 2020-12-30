@@ -99,7 +99,6 @@
                                     </td>
                                   </tr>
                             </template>
-                              
                             <!-- <td class="text-center">{{((currentPage * perPage) - perPage) + (index+1)}}</td> -->
                         </template>
                         <tr class="total_row table-secondary " v-if='profit_and_loss!=" " '  >
@@ -117,7 +116,7 @@
                              <h3 style="margin-left:100px">Income</h3>
                             <template v-for='(inc,k) in income'>
                                 <h5  style="margin-left:250px">{{inc.account_head_name}}</h5>
-                                          <tr v-for="(i,index) in inc.income" >  
+                                          <tr v-for="(i,index) in inc.income">  
                                               <!-- <h4>{{k}}</h4> -->
                                             <td class="text-center">
                                                 {{i.sub_account_name}}
