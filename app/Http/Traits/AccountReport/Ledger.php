@@ -274,7 +274,7 @@ trait Ledger
         AccountTransition::where([
             ['is_cashbook', 0],
             ['purchase_id', $cp->id],
-            ['status', 'credit_payment'],
+            ['status', 'payment'],
         ])->delete();
         $this->storetCreditPaymentInLedger($cp, $request);
     }
