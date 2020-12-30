@@ -274,7 +274,7 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        //dd($request->all());
         /**if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
             $validatedData = $request->validate([
                 'reference_no' => 'max:255|unique:sales',
