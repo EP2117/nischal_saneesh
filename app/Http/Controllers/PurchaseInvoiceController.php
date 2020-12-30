@@ -52,109 +52,120 @@ class PurchaseInvoiceController extends Controller
     }
     public function store(Request  $request){
         // dd($request->all());
-        if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
-            $validatedData = $request->validate([
-                'reference_no' => 'max:255|unique:purchase_invoices',
-            ]);
-        }
-        $p = new PurchaseInvoice();
-        //auto generate invoice no;
-        $latest = PurchaseInvoice::orderBy('id','desc')->first();
-        if($latest==null){
-            $no=0;
-        }else{
-            $no=$latest->id;
-        }
-                                 $invoice_no = "PI".str_pad((int)$no + 1,5,"0",STR_PAD_LEFT);
-        $p->invoice_no = $invoice_no;
-        $p->branch_id = Auth::user()->branch_id;
-        $p->reference_no = $request->reference_no;
-        $p->invoice_date = $request->invoice_date;
-        $p->warehouse_id = Auth::user()->warehouse_id;
-        $p->supplier_id = $request->supplier_id;
-        $p->office_purchase_man_id = Auth::user()->id;
-        $p->total_amount = $request->sub_total;
-        $p->discount = $request->discount;
-        $p->pay_amount = $request->pay_amount;
-        $p->balance_amount = $request->balance_amount;
-        if($request->payment_type == 'credit') {
-            $sub_account_id=config('global.purchase_advance');       /*Credit Payment Sub account ID */
-            if($request->pay_amount!=0){
-                $amount=$request->pay_amount;
-            }else{
-                $amount=$request->pay_amount;
-            }
-            $p->payment_type = 'credit';
-            $p->due_date = $request->due_date;
-            $p->credit_day = $request->credit_day;
-        } else {
-            $sub_account_id=config('global.purchase');        /*Purchase Sub account ID */
-            $amount=$request->pay_amount;
-            $p->payment_type = 'cash';
-        }
-        $p->created_by = Auth::user()->id;
-        $p->updated_by = Auth::user()->id;
-        $p->save();
-        $description=$p->invoice_no.",Inv Date ".$p->invoice_date." to " .$p->supplier->name;
+        DB::beginTransaction();
 
-        if($p){
-            if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)){
-                AccountTransition::create([
-                    'sub_account_id' => $sub_account_id,
-                    'transition_date' => $p->invoice_date,
-                    'purchase_id' => $p->id,
-                    'supplier_id'=>$p->supplier_id,
-                    'vochur_no'=>$invoice_no,
-                    'description'=>$description,
-                    'is_cashbook' => 1,
-                    'status'=>'purchase',
-                    'credit' => $amount,
-                    'created_by' => Auth::user()->id,
-                    'updated_by' => Auth::user()->id,
+        try {
+            if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
+                $validatedData = $request->validate([
+                    'reference_no' => 'max:255|unique:purchase_invoices',
                 ]);
             }
-            $this->storePurchaseInLedger($p);
+            $p = new PurchaseInvoice();
+            //auto generate invoice no;
+            $latest = PurchaseInvoice::orderBy('id','desc')->first();
+            if($latest==null){
+                $no=0;
+            }else{
+                $no=$latest->id;
+            }
+                                     $invoice_no = "PI".str_pad((int)$no + 1,5,"0",STR_PAD_LEFT);
+            $p->invoice_no = $invoice_no;
+            $p->branch_id = Auth::user()->branch_id;
+            $p->reference_no = $request->reference_no;
+            $p->invoice_date = $request->invoice_date;
+            $p->warehouse_id = Auth::user()->warehouse_id;
+            $p->supplier_id = $request->supplier_id;
+            $p->office_purchase_man_id = Auth::user()->id;
+            $p->total_amount = $request->sub_total;
+            $p->discount = $request->discount;
+            $p->pay_amount = $request->pay_amount;
+            $p->balance_amount = $request->balance_amount;
+            if($request->payment_type == 'credit') {
+                $sub_account_id=config('global.purchase_advance');       /*Credit Payment Sub account ID */
+                if($request->pay_amount!=0){
+                    $amount=$request->pay_amount;
+                }else{
+                    $amount=$request->pay_amount;
+                }
+                $p->payment_type = 'credit';
+                $p->due_date = $request->due_date;
+                $p->credit_day = $request->credit_day;
+            } else {
+                $sub_account_id=config('global.purchase');        /*Purchase Sub account ID */
+                $amount=$request->pay_amount;
+                $p->payment_type = 'cash';
+            }
+            $p->created_by = Auth::user()->id;
+            $p->updated_by = Auth::user()->id;
+            $p->save();
+            $description=$p->invoice_no.",Inv Date ".$p->invoice_date." to " .$p->supplier->name;
 
+            if($p){
+                if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)){
+                    AccountTransition::create([
+                        'sub_account_id' => $sub_account_id,
+                        'transition_date' => $p->invoice_date,
+                        'purchase_id' => $p->id,
+                        'supplier_id'=>$p->supplier_id,
+                        'vochur_no'=>$invoice_no,
+                        'description'=>$description,
+                        'is_cashbook' => 1,
+                        'status'=>'purchase',
+                        'credit' => $amount,
+                        'created_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id,
+                    ]);
+                }
+                $this->storePurchaseInLedger($p);
+
+            }
+            for($i=0; $i<count($request->product); $i++) {
+                $product_result = Product::select('uom_id')->find($request->product[$i]);
+                $main_uom_id = $product_result->uom_id;
+                $pivot = $p->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
+                //get last pivot insert id
+                $last_row=DB::table('product_purchase')->orderBy('id', 'DESC')->first();
+                $pivot_id = $last_row->id;
+                //calculate quantity for product pre-defined UOM
+    //            $uom_relation = DB::table('product_selling_uom')
+    //                ->select('relation')
+    //                ->where('product_id',$request->product[$i])
+    //                ->where('uom_id',$request->uom[$i])
+    //                ->first();
+    //            if($uom_relation) {
+    //                $relation_val = $uom_relation->relation;
+    //            } else {
+    //                //for pre-defined product uom
+    //                $relation_val = 1;
+    //            }
+                //add products in transition table=> transition_type = out (for sold out)
+                $obj = new ProductTransition;
+                $obj->product_id            = $request->product[$i];
+                $obj->transition_type       = "in";
+                $obj->transition_purchase_id   = $p->id;
+                $obj->transition_product_pivot_id = $pivot_id;
+                $obj->branch_id  = Auth::user()->branch_id;
+                $obj->warehouse_id          = Auth::user()->warehouse_id;
+                $obj->transition_date       = $request->invoice_date;
+                $obj->transition_product_uom_id        = $request->uom[$i];
+                $obj->transition_product_quantity      = $request->qty[$i];
+                $obj->product_uom_id        = $main_uom_id;
+                $obj->product_quantity      = $request->qty[$i] ;
+                $obj->created_by = Auth::user()->id;
+                $obj->updated_by = Auth::user()->id;
+                $obj->save();
+            }
+            $status = "success";
+            $purchase_id = $p->id;
+            DB::commit();
+            return compact('status','purchase_id');
+        } catch (\Throwable $e) {
+            DB::rollback();
+            $status='fail';
+            return compact('status');
+            throw $e;
         }
-        for($i=0; $i<count($request->product); $i++) {
-            $product_result = Product::select('uom_id')->find($request->product[$i]);
-            $main_uom_id = $product_result->uom_id;
-            $pivot = $p->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
-            //get last pivot insert id
-            $last_row=DB::table('product_purchase')->orderBy('id', 'DESC')->first();
-            $pivot_id = $last_row->id;
-            //calculate quantity for product pre-defined UOM
-//            $uom_relation = DB::table('product_selling_uom')
-//                ->select('relation')
-//                ->where('product_id',$request->product[$i])
-//                ->where('uom_id',$request->uom[$i])
-//                ->first();
-//            if($uom_relation) {
-//                $relation_val = $uom_relation->relation;
-//            } else {
-//                //for pre-defined product uom
-//                $relation_val = 1;
-//            }
-            //add products in transition table=> transition_type = out (for sold out)
-            $obj = new ProductTransition;
-            $obj->product_id            = $request->product[$i];
-            $obj->transition_type       = "in";
-            $obj->transition_purchase_id   = $p->id;
-            $obj->transition_product_pivot_id = $pivot_id;
-            $obj->branch_id  = Auth::user()->branch_id;
-            $obj->warehouse_id          = Auth::user()->warehouse_id;
-            $obj->transition_date       = $request->invoice_date;
-            $obj->transition_product_uom_id        = $request->uom[$i];
-            $obj->transition_product_quantity      = $request->qty[$i];
-            $obj->product_uom_id        = $main_uom_id;
-            $obj->product_quantity      = $request->qty[$i] ;
-            $obj->created_by = Auth::user()->id;
-            $obj->updated_by = Auth::user()->id;
-            $obj->save();
-        }
-        $status = "success";
-        $purchase_id = $p->id;
-        return compact('status','purchase_id');
+      
     }
     public function edit($id){
 //        $access_brands = array();

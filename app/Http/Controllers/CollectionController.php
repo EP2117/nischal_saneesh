@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use DB;
 use Session;
 use App\Sale;
 use Carbon\Carbon;
 use App\Collection;
 use App\AccountTransition;
-use App\Http\Traits\AccountReport\Ledger;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\Report\GetReport;
+use App\Http\Traits\AccountReport\Ledger;
 use Illuminate\Validation\ValidationException;
 
 class CollectionController extends Controller
@@ -79,74 +79,86 @@ class CollectionController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
-        $collection = new Collection;
+        DB::beginTransaction();
 
-        //auto generate collection no;
-        $max_id = Collection::max('id');
-        if($max_id) {
-            $max_id = $max_id + 1;
-        } else {
-            $max_id = 1;
+        try {
+            $collection = new Collection;
+
+            //auto generate collection no;
+            $max_id = Collection::max('id');
+            if($max_id) {
+                $max_id = $max_id + 1;
+            } else {
+                $max_id = 1;
+            }
+            $collection_no = "C".str_pad($max_id,5,"0",STR_PAD_LEFT);
+
+            $collection->collection_no 		= $collection_no;
+            $collection->collection_date 	= $request->collection_date;
+            $collection->customer_id		= $request->customer_id;
+            $collection->collect_type       = $request->collect_type;
+            $collection->branch_id = $request->branch_id;
+            if($request->is_auto == true) {
+                $collection->auto_payment	= 1;
+                $collection->total_paid_amount	= $request->pay_amount;
+            } else {
+                $collection->auto_payment	= 0;
+                $collection->total_paid_amount	= $request->total_pay;
+            }
+
+            $collection->created_by = Auth::user()->id;
+            //$collection->updated_by = Auth::user()->id;
+            $collection->save();
+            $description="Inv ".$collection->collection_no.",Inv Date ".$collection->collection_date." to " .$collection->customer->cus_name;
+            $sub_account_id=config('global.credit_collection');   /*sub account  id for sale collection*/
+            if($collection){
+                AccountTransition::create([
+                    'sub_account_id' => $sub_account_id,
+                    'transition_date' => $request->collection_date,
+                    'sale_id' => $collection->id,
+                    'is_cashbook' => 1,
+                    'description'=>$description,
+                    'customer_id'=>$collection->customer_id,
+                    'vochur_no'=>$collection_no,
+                    'debit' => $collection->total_paid_amount,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
+                ]);
+                $this->storeSaleCollectionInLedger($collection,$request);
+            }
+            for($i=0; $i<count($request->invoices); $i++) {
+                //add invoices into pivot table
+                $pivot = $collection->sales()->attach($request->invoices[$i],['paid_amount' => $request->payments[$i], 'discount' => $request->discounts[$i]]);
+
+                //Get all collection amount and update collection_amount in each sale invoice
+
+                $collect_qry = DB::table("collection_sale")
+                                        ->select(DB::raw("SUM(paid_amount)  as total_paid, SUM(discount)  as total_discount"))
+                                        ->where('sale_id', $request->invoices[$i])
+                                        ->groupBy('sale_id')
+                                        ->first();
+                if($collect_qry) {
+                    $collection_amount = $collect_qry->total_paid + $collect_qry->total_discount;
+                } else {
+                    $collection_amount = 0;
+                }
+                $sale = Sale::find($request->invoices[$i]);
+                $sale->collection_amount = $collection_amount;
+                $sale->save();
+            }
+
+            $status = "success";
+            $collection_id = $collection->id;
+            DB::commit();
+
+            return compact('status','collection_id');
+        } catch (\Throwable $e) {
+            DB::rollback();
+            $status = "fail";
+            return compact('status');
+            throw $e;
         }
-        $collection_no = "C".str_pad($max_id,5,"0",STR_PAD_LEFT);
-
-        $collection->collection_no 		= $collection_no;
-        $collection->collection_date 	= $request->collection_date;
-        $collection->customer_id		= $request->customer_id;
-        $collection->collect_type       = $request->collect_type;
-        $collection->branch_id = $request->branch_id;
-        if($request->is_auto == true) {
-        	$collection->auto_payment	= 1;
-        	$collection->total_paid_amount	= $request->pay_amount;
-        } else {
-        	$collection->auto_payment	= 0;
-        	$collection->total_paid_amount	= $request->total_pay;
-        }
-
-        $collection->created_by = Auth::user()->id;
-        //$collection->updated_by = Auth::user()->id;
-        $collection->save();
-        $description="Inv ".$collection->collection_no.",Inv Date ".$collection->collection_date." to " .$collection->customer->cus_name;
-        $sub_account_id=config('global.credit_collection');   /*sub account  id for sale collection*/
-        if($collection){
-            AccountTransition::create([
-                'sub_account_id' => $sub_account_id,
-                'transition_date' => $request->collection_date,
-                'sale_id' => $collection->id,
-                'is_cashbook' => 1,
-                'description'=>$description,
-                'customer_id'=>$collection->customer_id,
-                'vochur_no'=>$collection_no,
-                'debit' => $collection->total_paid_amount,
-                'created_by' => Auth::user()->id,
-                'updated_by' => Auth::user()->id,
-            ]);
-            $this->storeSaleCollectionInLedger($collection,$request);
-        }
-        for($i=0; $i<count($request->invoices); $i++) {
-        	//add invoices into pivot table
-        	$pivot = $collection->sales()->attach($request->invoices[$i],['paid_amount' => $request->payments[$i], 'discount' => $request->discounts[$i]]);
-
-        	//Get all collection amount and update collection_amount in each sale invoice
-
-        	$collect_qry = DB::table("collection_sale")
-		      						->select(DB::raw("SUM(paid_amount)  as total_paid, SUM(discount)  as total_discount"))
-		      						->where('sale_id', $request->invoices[$i])
-		      						->groupBy('sale_id')
-		   							->first();
-    		if($collect_qry) {
-    			$collection_amount = $collect_qry->total_paid + $collect_qry->total_discount;
-	        } else {
-	        	$collection_amount = 0;
-	        }
-	        $sale = Sale::find($request->invoices[$i]);
-	        $sale->collection_amount = $collection_amount;
-	        $sale->save();
-        }
-
-        $status = "success";
-        $collection_id = $collection->id;
-        return compact('status','collection_id');
+       
 
     }
 
@@ -159,99 +171,108 @@ class CollectionController extends Controller
      */
     public function update(Request $request, $id)
     {
-
-        $collection = Collection::find($id);
-        $collection->collection_date 	= $request->collection_date;
-        $collection->collect_type       = $request->collect_type;
-        if($request->is_auto == true) {
-        	$collection->auto_payment	= 1;
-        	$collection->total_paid_amount	= $request->pay_amount;
-        } else {
-        	$collection->auto_payment	= 0;
-        	$collection->total_paid_amount	= $request->total_pay;
-        }
-
-        $collection->branch_id = $request->branch_id;
-
-        $collection->updated_at = time();
-        $collection->updated_by = Auth::user()->id;
-        $collection->save();
-        $sub_account_id=config('global.credit_collection');    /*sub account id for credit payment */
-        $description=$collection->collection_no.",Date ".$collection->collection_date." to " .$collection->customer->cus_name;
-        if($collection){
-            if($collection->total_paid_amount!=0){
-                    AccountTransition::where([
-                    ['sale_id',$id],['is_cashbook',1]])->update([
-                    'sub_account_id' => $sub_account_id,
-                    'transition_date' => $request->collection_date,
-                    'sale_id' => $collection->id,
-                    'vochur_no'=>$request->collection_no,
-                    'description'=>$description,
-                    'is_cashbook' => 1,
-                    'customer_id'=>$collection->customer_id,
-                    'debit' => $collection->total_paid_amount,
-                    'created_by' => Auth::user()->id,
-                    'updated_by' => Auth::user()->id,
-                ]);
-                // update sale collection in ledger 
-                $this->updateSaleCollectionInLedger($collection,$request);
-                // update sale collection in ledger 
-
-            }elseif($collection->total_paid_amount==0){
-                AccountTransition::
-                where(['sale_id'=>$id,'status'=>'sale_collection','is_cashbook'=>1])->delete();
-                AccountTransition::
-                where(['sale_id'=>$id,'status'=>'sale_collection','is_cashbook'=>0])->delete();
-            }
-        }
-        //update collection amount for removed sales
-    	foreach($request->remove_pivot_id as $key => $val) {
-    		//get paid amount and discount value before delete
-    		$relation = DB::table('collection_sale')
-                            ->select('sale_id','collection_id','paid_amount','discount')
-                            ->where('id',$val)
-                            ->first();
-            if($relation->discount == NULL) {
-            	$discount = 0;
+        DB::beginTransaction();
+        try {
+            $collection = Collection::find($id);
+            $collection->collection_date 	= $request->collection_date;
+            $collection->collect_type       = $request->collect_type;
+            if($request->is_auto == true) {
+                $collection->auto_payment	= 1;
+                $collection->total_paid_amount	= $request->pay_amount;
             } else {
-            	$discount = $relation->discount;
+                $collection->auto_payment	= 0;
+                $collection->total_paid_amount	= $request->total_pay;
             }
 
-            $sale_col_amt = $relation->paid_amount + $discount;
+            $collection->branch_id = $request->branch_id;
 
-            //update collection amount in sale
-            $sale = Sale::find($relation->sale_id);
-            $collection_amount = $sale->collection_amount - $sale_col_amt;
-        	$sale->collection_amount = $collection_amount;
-        	$sale->save();
+            $collection->updated_at = time();
+            $collection->updated_by = Auth::user()->id;
+            $collection->save();
+            $sub_account_id=config('global.credit_collection');    /*sub account id for credit payment */
+            $description=$collection->collection_no.",Date ".$collection->collection_date." to " .$collection->customer->cus_name;
+            if($collection){
+                if($collection->total_paid_amount!=0){
+                        AccountTransition::where([
+                        ['sale_id',$id],['is_cashbook',1]])->update([
+                        'sub_account_id' => $sub_account_id,
+                        'transition_date' => $request->collection_date,
+                        'sale_id' => $collection->id,
+                        'vochur_no'=>$request->collection_no,
+                        'description'=>$description,
+                        'is_cashbook' => 1,
+                        'customer_id'=>$collection->customer_id,
+                        'debit' => $collection->total_paid_amount,
+                        'created_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id,
+                    ]);
+                    // update sale collection in ledger 
+                    $this->updateSaleCollectionInLedger($collection,$request);
+                    // update sale collection in ledger 
+
+                }elseif($collection->total_paid_amount==0){
+                    AccountTransition::
+                    where(['sale_id'=>$id,'status'=>'sale_collection','is_cashbook'=>1])->delete();
+                    AccountTransition::
+                    where(['sale_id'=>$id,'status'=>'sale_collection','is_cashbook'=>0])->delete();
+                }
+            }
+            //update collection amount for removed sales
+            foreach($request->remove_pivot_id as $key => $val) {
+                //get paid amount and discount value before delete
+                $relation = DB::table('collection_sale')
+                                ->select('sale_id','collection_id','paid_amount','discount')
+                                ->where('id',$val)
+                                ->first();
+                if($relation->discount == NULL) {
+                    $discount = 0;
+                } else {
+                    $discount = $relation->discount;
+                }
+
+                $sale_col_amt = $relation->paid_amount + $discount;
+
+                //update collection amount in sale
+                $sale = Sale::find($relation->sale_id);
+                $collection_amount = $sale->collection_amount - $sale_col_amt;
+                $sale->collection_amount = $collection_amount;
+                $sale->save();
+            }
+
+            $collection->sales()->detach();
+
+            for($i=0; $i<count($request->invoices); $i++) {
+                //add invoices into pivot table
+                $pivot = $collection->sales()->attach($request->invoices[$i],['paid_amount' => $request->payments[$i], 'discount' => $request->discounts[$i]]);
+
+                //Get all collection amount and update collection_amount in each sale invoice
+                $collect_qry = DB::table("collection_sale")
+                                        ->select(DB::raw("SUM(paid_amount)  as total_paid, SUM(discount)  as total_discount"))
+                                        ->where('sale_id', $request->invoices[$i])
+                                        ->groupBy('sale_id')
+                                        ->first();
+                if($collect_qry) {
+                    $collection_amount = $collect_qry->total_paid + $collect_qry->total_discount;
+                } else {
+                    $collection_amount = 0;
+                }
+                $sale = Sale::find($request->invoices[$i]);
+                $sale->collection_amount = $collection_amount;
+                $sale->save();
+
+            }
+
+            $status = "success";
+            $collection_id = $collection->id;
+            return compact('status','collection_id');
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollback();
+            $status = "fail";
+            return compact('status');
+            throw $e;
         }
-
-        $collection->sales()->detach();
-
-        for($i=0; $i<count($request->invoices); $i++) {
-        	//add invoices into pivot table
-        	$pivot = $collection->sales()->attach($request->invoices[$i],['paid_amount' => $request->payments[$i], 'discount' => $request->discounts[$i]]);
-
-        	//Get all collection amount and update collection_amount in each sale invoice
-        	$collect_qry = DB::table("collection_sale")
-		      						->select(DB::raw("SUM(paid_amount)  as total_paid, SUM(discount)  as total_discount"))
-		      						->where('sale_id', $request->invoices[$i])
-		      						->groupBy('sale_id')
-		   							->first();
-    		if($collect_qry) {
-    			$collection_amount = $collect_qry->total_paid + $collect_qry->total_discount;
-	        } else {
-	        	$collection_amount = 0;
-	        }
-	        $sale = Sale::find($request->invoices[$i]);
-        	$sale->collection_amount = $collection_amount;
-        	$sale->save();
-
-        }
-
-        $status = "success";
-        $collection_id = $collection->id;
-        return compact('status','collection_id');
+       
 
     }
 
