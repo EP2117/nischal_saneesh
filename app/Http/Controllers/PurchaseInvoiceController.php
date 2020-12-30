@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\AccountTransition;
+use App\Http\Traits\AccountReport\Cashbook;
+use App\Http\Traits\AccountReport\Ledger;
 use App\Http\Traits\Report\GetReport;
 use App\Product;
 use App\ProductTransition;
@@ -16,12 +18,12 @@ use Illuminate\Support\Facades\DB;
 class PurchaseInvoiceController extends Controller
 {
     use GetReport;
+    use Ledger;
     public function index(Request  $request){
         $data=PurchaseInvoice::where('is_opening',0);
-        if($request->invoice_no != "") {
+        if($request->invoice_no != ""){
             $data->where('invoice_no', $request->invoice_no);
         }
-
         if($request->from_date != '' && $request->to_date != '')
         {
             $data->whereBetween('invoice_date', array($request->from_date, $request->to_date));
@@ -39,11 +41,9 @@ class PurchaseInvoiceController extends Controller
         if(isset($request->branch_id) && $request->branch_id != "") {
             $data->where('branch_id', $request->branch_id);
         }
-//
 //        if($request->office_purchase_man_id != "") {
 //            $data->where('office_sale_man_id', $request->office_purchase_man_id);
 //        }
-
         if($request->ref_no != "") {
             $data->where('reference_no','LIKE','%'.$request->ref_no.'%');
         }
@@ -51,13 +51,13 @@ class PurchaseInvoiceController extends Controller
         return compact('data');
     }
     public function store(Request  $request){
+        // dd($request->all());
         if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
             $validatedData = $request->validate([
                 'reference_no' => 'max:255|unique:purchase_invoices',
             ]);
         }
         $p = new PurchaseInvoice();
-
         //auto generate invoice no;
         $latest = PurchaseInvoice::orderBy('id','desc')->first();
         if($latest==null){
@@ -82,7 +82,7 @@ class PurchaseInvoiceController extends Controller
             if($request->pay_amount!=0){
                 $amount=$request->pay_amount;
             }else{
-                $amount=null;
+                $amount=$request->pay_amount;
             }
             $p->payment_type = 'credit';
             $p->due_date = $request->due_date;
@@ -103,15 +103,18 @@ class PurchaseInvoiceController extends Controller
                     'sub_account_id' => $sub_account_id,
                     'transition_date' => $p->invoice_date,
                     'purchase_id' => $p->id,
+                    'supplier_id'=>$p->supplier_id,
                     'vochur_no'=>$invoice_no,
                     'description'=>$description,
                     'is_cashbook' => 1,
+                    'status'=>'purchase',
                     'credit' => $amount,
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
                 ]);
-
             }
+            $this->storePurchaseInLedger($p);
+
         }
         for($i=0; $i<count($request->product); $i++) {
             $product_result = Product::select('uom_id')->find($request->product[$i]);
@@ -184,7 +187,6 @@ class PurchaseInvoiceController extends Controller
         }
         $p = PurchaseInvoice::find($id);
         $old_sub_account_id=$p->payment_type=='credit' ? config('global.purchase_advance') :config('global.purchase');
-
         $p->invoice_no = $request->invoice_no;
         $p->reference_no = $request->reference_no;
         $p->invoice_date = $request->invoice_date;
@@ -234,6 +236,7 @@ class PurchaseInvoiceController extends Controller
                 ->where('sub_account_id',$old_sub_account_id)
                 ->delete();
             }
+            $this->updatePurchaseInLedger($p);
         }
         $ex_pivot_arr = $request->ex_product_pivot;
         //remove id in pivot that are removed in sale Form
@@ -336,18 +339,16 @@ class PurchaseInvoiceController extends Controller
             ->where('transition_type','in')
             ->where('transition_purchase_id', $id)
             ->delete();
-
-
         $p->delete();
         if($p->payment_type=='cash'){
             $sub_account_id=config('global.purchase');
         }else{
             $sub_account_id=config('global.purchase_advance');
-
         }
-        AccountTransition::where('purchase_id',$id)
-            ->where('sub_account_id',$sub_account_id)
-            ->delete();
+        AccountTransition::where([
+            ['purchase_id',$id],
+            ['status','purchase']
+        ])->delete();
 
         return response(['message' => 'delete successful']);
     }
@@ -357,7 +358,7 @@ class PurchaseInvoiceController extends Controller
         $chk_balance = DB::table("purchase_invoices")
 
             ->select(DB::raw("SUM(CASE  WHEN balance_amount IS NOT NULL THEN balance_amount  ELSE 0 END)  as previous_balance"))
-            ->where('customer_id','=',$id)
+            ->where('supplier_id','=',$id)
             ->groupBy('supplier_id')
             ->first();
         if($chk_balance) {

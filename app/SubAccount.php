@@ -14,5 +14,5 @@ class SubAccount extends Model
     }
     public function account_type(){
         return $this->belongsTo(AccountType::class,'account_type_id','id');
-    }
+    }   
 }

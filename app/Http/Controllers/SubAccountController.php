@@ -37,6 +37,10 @@ class SubAccountController extends Controller
         $sub_account=SubAccount::orderBy('sub_account_name','asc')->get();
         return compact('sub_account');
     }
+    public function getSubAccountByAccountHead($id){
+        $sub_account=SubAccount::where('account_head_id',$id)->get();
+        return response()->json($sub_account);
+    }
     public function store(Request  $request){
         SubAccount::create([
             'sub_account_name'=>$request->sub_account_name,

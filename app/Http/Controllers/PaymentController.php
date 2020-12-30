@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\AccountTransition;
+use App\Http\Traits\AccountReport\Ledger;
 use App\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 class PaymentController extends Controller
 {
+    use Ledger;
     public function getAll(Request $request){
         $payment=Payment::orderBy('id','asc');
         if($request->cash_payment_no!=null){
@@ -63,28 +65,30 @@ class PaymentController extends Controller
                 'created_by' => Auth::user()->id,
                 'updated_by' => Auth::user()->id,
             ]);
-            AccountTransition::create([
-                'sub_account_id' => $payment->debit->id,
-                'transition_date' => $payment->date,
-                'payment_id' => $payment->id,
-                'vochur_no'=>$cash_payment_no,
-                'is_cashbook' => 0,
-                'debit' => $payment->amount,
-                'description' => $payment->remark,
-                'created_by' => Auth::user()->id,
-                'updated_by' => Auth::user()->id,
-            ]);
-            AccountTransition::create([
-                'sub_account_id' => $payment->credit->id,
-                'transition_date' => $payment->date,
-                'payment_id' => $payment->id,
-                'vochur_no'=>$cash_payment_no,
-                'is_cashbook' => 0,
-                'credit' => $payment->amount,
-                'description' => $payment->remark,
-                'created_by' => Auth::user()->id,
-                'updated_by' => Auth::user()->id,
-            ]);
+            $this->storePaymentInLedger($payment);
+            
+            // AccountTransition::create([
+            //     'sub_account_id' => $payment->debit->id,
+            //     'transition_date' => $payment->date,
+            //     'payment_id' => $payment->id,
+            //     'vochur_no'=>$cash_payment_no,
+            //     'is_cashbook' => 0,
+            //     'debit' => $payment->amount,
+            //     'description' => $payment->remark,
+            //     'created_by' => Auth::user()->id,
+            //     'updated_by' => Auth::user()->id,
+            // ]);
+            // AccountTransition::create([
+            //     'sub_account_id' => $payment->credit->id,
+            //     'transition_date' => $payment->date,
+            //     'payment_id' => $payment->id,
+            //     'vochur_no'=>$cash_payment_no,
+            //     'is_cashbook' => 0,
+            //     'credit' => $payment->amount,
+            //     'description' => $payment->remark,
+            //     'created_by' => Auth::user()->id,
+            //     'updated_by' => Auth::user()->id,
+            // ]);
 
         }
 

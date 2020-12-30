@@ -107,6 +107,7 @@ import CreditCollectionReport from "./views/Report/CreditCollectionReport";
 import InventoryAdjustment from "./views/Inventory/InventoryAdjustment";
 import InventoryAdjustmentForm from "./views/Inventory/InventoryAdjustmentForm";
 import InventoryValuation from "./views/Report/InventoryValuationReport";
+import ProfitAndLoss from "./views/Report/ProfitAndLossReport";
 import Ledger from "./views/Ledger/Ledger";
 
 const routes = [
@@ -536,6 +537,11 @@ const routes = [
    name:'ledger',
   path:'/ledger',
   component:Ledger,
+ },
+ {
+   name:'profit_and_loss',
+   path:'/report/profit_and_loss',
+   component:ProfitAndLoss,
  }
 ];
 

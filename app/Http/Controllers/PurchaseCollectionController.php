@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\AccountTransition;
+use App\Http\Traits\AccountReport\Ledger;
 use App\Http\Traits\Report\GetReport;
 use App\PurchaseCollection;
 use App\PurchaseInvoice;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Session;
 class PurchaseCollectionController extends Controller
 {
     use GetReport;
+    use Ledger;
     public function getPurchaseCollection(Request  $request){
         $login_year = Session::get('loginYear');
         $data = PurchaseCollection::with('branch');
@@ -72,7 +74,7 @@ class PurchaseCollectionController extends Controller
 //        dd($data);
         return response(compact('data'), 200);    }
         public function store(Request  $request){
-//        dd($request->all());
+    //    dd($request->all());
             //auto generate collection no;
             $max_id = PurchaseCollection::max('id');
             if($max_id) {
@@ -105,13 +107,16 @@ class PurchaseCollectionController extends Controller
                     'sub_account_id' => $sub_account_id,
                     'transition_date' => $request->collection_date,
                     'purchase_id' => $p_collection->id,
+                    'supplier_id'=>$p_collection->supplier_id,
                     'is_cashbook' => 1,
                     'description'=>$description,
                     'vochur_no'=>$p_collection->collection_no,
                     'credit' => $total_paid_amount,
+                    'status'=>'credit_payment',
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
                 ]);
+                $this->storeCreditPaymentInLedger($p_collection,$request);
             }
             for($i=0; $i<count($request->invoices); $i++) {
                 if($request->discounts[$i]==null){
@@ -189,11 +194,15 @@ class PurchaseCollectionController extends Controller
             $description=$collection->collection_no.", Date ".$collection->collection_date." to " .$collection->supplier->name;
             if($collection){
                 if($collection->total_paid_amount!=0){
-                    AccountTransition::where('purchase_id',$c_id)->update([
+                    AccountTransition::where([
+                        ['purchase_id',$c_id],
+                        ['is_cashbook',0],
+                        ['status','credit_payment']])->update([
                         'sub_account_id' => $sub_account_id,
                         'transition_date' => $request->collection_date, 
                         'purchase_id' => $collection->id,
                         'vochur_no'=>$collection->collection_no,
+                        'supplier_id'=>$collection->supplier,
                         'is_cashbook' => 1,
                         'description'=>$description,
                         'credit' => $collection->total_paid_amount,
@@ -203,6 +212,8 @@ class PurchaseCollectionController extends Controller
                 }elseif($collection->total_paid_amount==0){
                     AccountTransition::where('purchase_id',$c_id)->delete();
                 }
+                $this->updateCreditPaymentInLedger($collection,$request);
+
             }
 
             //update collection amount for removed sales
@@ -279,9 +290,10 @@ class PurchaseCollectionController extends Controller
         }
         $collection->purchases()->detach();
         $collection->delete();
-        AccountTransition::where('purchase_id',$id)
-            ->where('sub_account_id',config('global.credit_payment'))
-            ->delete();
+        AccountTransition::where([
+            ['purchase_id',$id],
+            ['status','credit_payment']
+        ])->delete();
 
         return response(['message' => 'delete successful']);
     }
