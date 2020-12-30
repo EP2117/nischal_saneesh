@@ -766,7 +766,6 @@
                   return x;
                 }
             },
-
             generatePDF(sale_id)
             {
                 var baseurl = window.location.origin;

@@ -97,14 +97,11 @@
                                 <!--<a class="d-sm-inline-block btn btn-sm btn-primary shadow-sm bg-blue text-white"  v-if="((user_role == 'admin' || user_role == 'system') && !isDisabled) || (!isEdit)"  data-toggle="modal" data-target="#mix_form">
                                     <i class="fas fa-plus"></i> Add Mixed Product
                                 </a>-->
-
                                 <a class='d-sm-inline-block btn btn-sm btn-primary shadow-sm bg-blue text-white' title='Add Product' @click="addProduct()" v-if="((user_role == 'admin' || user_role == 'system') && !isDisabled) || (!isEdit)" style="verticle-align:middle"><i class='fas fa-plus'></i></a>
-
                                 <!--<a class='blue-icon' title='Add Product' @click="addProduct()" v-if="((user_role == 'admin' || user_role == 'system') && !isDisabled) || (!isEdit)" style="verticle-align:middle"><i class='fas fa-plus-square' style='font-size: 30px;'></i></a>-->
                                 <div style="display:none;">
                                     <select class="form-control txt_product"
-                                            id="txt_product" style="min-width:150px;"
-                                    >
+                                            id="txt_product" style="min-width:150px;">
                                         <option value="">Select One</option>
                                         <option v-for="product in products" :data-uom="product.uom_name"
                                                 :data-price="product.product_price"
@@ -261,7 +258,7 @@
                                 <input type="submit" class="btn btn-primary btn-sm" value="Save Entry"  :disabled = "isDisabled">
                             </div>
 
-                            <div class="col-md-12" v-if="(user_role == 'system' || user_role == 'admin') && isEdit && isDisabled">
+                            <div class="col-md-12" v-if="(user_role == 'system' || user_role == 'admin') && isEdit && !isDisabled">
                                 <input type="submit" class="btn btn-primary btn-sm" value="Update">
                             </div>
 
@@ -452,11 +449,15 @@ export default {
         // this.form.office_sale_man_id = document.querySelector("meta[name='user-id-likelink']").getAttribute('content');
 
         this.user_role = document.querySelector("meta[name='user-role']").getAttribute('content');
-        if(this.user_role == "office_order_user") {
+         if(this.user_role != "admin" && this.user_role != "system") {
+            var url =  window.location.origin;
+            window.location.replace(url);
         }
-        if(this.user_role == "admin" && !this.isEdit) {
-            this.isDisabled = true;
-        }
+        // if(this.user_role == "office_order_user") {
+        // }
+        // if(this.user_role == "admin" && !this.isEdit) {
+        //     this.isDisabled = true;
+        // }
         if(this.$route.params.id) {
             this.isEdit = true;
             this.purchase_id = this.$route.params.id;
@@ -1252,6 +1253,7 @@ export default {
                     //prevent to Edit (save button permission)
                     if(app.user_role == "admin" || app.user_role == "system") {
                         app.isDisabled = false;
+                        console.log(app.isDisabled);
                         // if(response.data.purchase.collections.length == 0 && response.data.purchase.deliveries.length == 0 && response.data.purchase.delivery_approve == 0) {
                         //     app.isDisabled = false;
                         // } else {
@@ -1291,7 +1293,7 @@ export default {
                     app.form.pay_amount = response.data.purchase.pay_amount;
                     app.form.discount = response.data.purchase.discount;
                     app.form.balance_amount = response.data.purchase.balance_amount;
-                     if(app.form.collection_amount!=0  && app.form.payment_type=='credit'){
+                     if(response.data.purchase.collection_amount!=0  && app.form.payment_type=='credit'){
                         app.isDisabled=true;
                     }
                     $.each(app.ex_products, function( key, value ) {
@@ -2089,7 +2091,6 @@ export default {
                     .then(function(data) {
                         // console.log(data.data);
                         if(data.status == "success") {
-
                             //reset form data
                             event.target.reset();
                             $(".txt_product").select2();
@@ -2109,7 +2110,8 @@ export default {
                                 // }
                             });
                         } else {
-                            $.notify("Error", {
+                            $('#loading').hide();
+                            $.notify("Something Wrong", {
                                 autoHideDelay: 3000,
                                 gap: 1,
                                 className: "error"

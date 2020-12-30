@@ -210,6 +210,7 @@ trait Ledger
     // ******************************Start Purchase  in  Ledger ***********************************
     public function storePurchaseInLedger($p)
     {
+      
         $p_account = AccountTransition::create([
             'sub_account_id' => $this->purchase_account,
             'transition_date' => $p->invoice_date,
@@ -276,7 +277,7 @@ trait Ledger
             ['purchase_id', $cp->id],
             ['status', 'payment'],
         ])->delete();
-        $this->storetCreditPaymentInLedger($cp, $request);
+        $this->storeCreditPaymentInLedger($cp, $request);
     }
     public function storePaymentInLedger($payment){
         $p=AccountTransition::create([

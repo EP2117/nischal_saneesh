@@ -52,7 +52,7 @@
                             <div class="col-lg-6">
                                 <input class="form-control" type="text"
                                     id="product_code" name="product_code"
-                                    v-model="form.product_code"  >
+                                    v-model="form.product_code"  v-on:blur="checkProductCode">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -363,6 +363,20 @@
             filterCategories(brand_id) {
               axios.get("/categories_bybrand/"+brand_id).then(({ data }) => (this.categories = data.data));
               $("#category_id").select2();
+            },
+             checkProductCode() {
+                if($('#product_code').val() != '' && $('#product_code_type_id').val() != 'automatic') {
+                    var pcode = $('#product_code').val();
+                    if(/^[Pp][/\d]{5}?$/i.test(pcode)) {
+                        swal({
+                                title: "Warning!",
+                                text: 'Product code is invalid!',
+                                icon: "warning",
+                                button: true
+                            });
+                        $('#product_code').val('');
+                    }
+                }                
             },
             checkUOM(data,uom_id,product_id) {
                 let app = this;

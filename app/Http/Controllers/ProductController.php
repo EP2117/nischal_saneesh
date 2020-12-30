@@ -149,7 +149,6 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-
     	try {
 	        $this->validate($request, [
 	            'product_code' => 'max:255|unique:products',
@@ -160,8 +159,6 @@ class ProductController extends Controller
 //            $latest = Product::orderBy('id','desc')->first();
 ////            dd($latest);
 //            $random_code = "P".str_pad((int)$latest->id + 1,8,"0",STR_PAD_LEFT);
-//
-//
 //            $product_code=$request->product_code_type=='manual' ? $request->product_code: $random_code ;
             $product = new Product;
 	        $product->product_name      = $request->product_name;

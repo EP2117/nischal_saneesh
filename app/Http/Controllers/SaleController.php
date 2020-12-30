@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use DB;
+// use DB;
 use PDF;
 use Session;
 use App\Sale;
@@ -22,6 +22,8 @@ use App\Http\Traits\Report\GetReport;
 use App\Exports\DailySaleProductExport;
 use App\Http\Traits\AccountReport\Ledger;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
+
 
 class SaleController extends Controller
 {
@@ -280,175 +282,186 @@ class SaleController extends Controller
                 'reference_no' => 'max:255|unique:sales',
             ]);
         }**/
-        $sale = new Sale;
-        //auto generate invoice no;
-        $max_id = Sale::where('sale_type', $request->sale_type)->max('id');
-        if($max_id) {
-            $max_id = $max_id + 1;
-        }else {
-            $max_id = 1;
-        }
-        $invoice_no = "SI".str_pad($max_id,5,"0",STR_PAD_LEFT);
-        $sale->invoice_no = $invoice_no;
-        $sale->branch_id = Auth::user()->branch_id;
-        //$sale->reference_no = $request->reference_no;
-        $sale->invoice_date = $request->invoice_date;
-        //$sale->warehouse_id = Auth::user()->warehouse_id;
-        $sale->customer_id = $request->customer_id;
-        //$sale->delivery_approve = 0;
-        $sale->office_sale_man_id = $request->office_sale_man_id;
-        if($request->sale_order == true) {
-            $sale->order_id = $request->order_id;
-        }
-        $sale->pay_amount = $request->pay_amount;
-        $sale->sale_type  = $request->sale_type;
-        $sale->total_amount = $request->sub_total;
-        $sale->cash_discount = $request->cash_discount;
-        $sale->net_total = $request->net_total;
-        $sale->tax = $request->tax;
-        $sale->tax_amount = $request->tax_amount;
-        $sale->balance_amount = $request->balance_amount;
-        // if($request->cash_discount!=null || $request->cash_discount!= 0){
-        //     $discount_allowed_sub_account_id=config('global.discount_allowed');     /*sub account_id for Discount allowed*/
-        // }else{
-        //     $discount_allowed_sub_account_id=null;     /*sub account_id for Discount allowed*/
-        // }
-        if($request->payment_type == 'credit') {
-            $sub_account_id=config('global.sale_advance');                 /*sub account_id for sale advance*/
-            // $discount_allowed_sub_account_id=config('global.discount_allowed');     /*sub account_id for Discount allowed*/
-            if($request->pay_amount!=0){
-                $amount=$request->pay_amount;
-            }
-            $sale->payment_type = 'credit';
-            $sale->due_date = $request->due_date;
-            $sale->credit_day = $request->credit_day;
-        } else {
-            $sub_account_id=config('global.sale');     /*sub account_id for sale Account*/
-            $sale_common_account_id=config('global.cash_sale');     /*sub account_id for cash sale */
-            $amount=$request->pay_amount;
-            $sale->payment_type = 'cash';
-        }
-        $sale->created_by = Auth::user()->id;
-        $sale->updated_by = Auth::user()->id;
-        $sale->save();
+        DB::beginTransaction();
 
-        $description=$sale->invoice_no.", Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
-        /* Cash Book  for sale*/
-        if($sale) {
-            // cashbook
-            if ($request->payment_type == 'cash' || ($request->payment_type == 'credit' && $request->pay_amount != 0)) {
-                AccountTransition::create([
-                    'sub_account_id' => $sub_account_id,
-                    'transition_date' => $sale->invoice_date,
-                    'sale_id' => $sale->id,
-                    'vochur_no'=>$invoice_no,
-                    'description'=>$description,
-                    'is_cashbook' => 1,
-                    'debit' => $amount,
-                    'created_by' => Auth::user()->id,
-                    'updated_by' => Auth::user()->id,
-                ]);
+        try {
+            $sale = new Sale;
+            //auto generate invoice no;
+            $max_id = Sale::where('sale_type', $request->sale_type)->max('id');
+            if($max_id) {
+                $max_id = $max_id + 1;
+            }else {
+                $max_id = 1;
             }
-            // end cashbook 
-
-            // for ledger 
-           $this->storeSaleInLedger($sale);
-            // end ledger
-        }
-        $sale_id = $sale->id;
-        for($i=0; $i<count($request->product); $i++) {
-            //get product pre-defined UOM
-            $product_result = Product::select('uom_id')->find($request->product[$i]);
-            $main_uom_id = $product_result->uom_id;
-            //add product into pivot table
-            /**$pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);**/
+            $invoice_no = "SI".str_pad($max_id,5,"0",STR_PAD_LEFT);
+            $sale->invoice_no = $invoice_no;
+            $sale->branch_id = Auth::user()->branch_id;
+            //$sale->reference_no = $request->reference_no;
+            $sale->invoice_date = $request->invoice_date;
+            //$sale->warehouse_id = Auth::user()->warehouse_id;
+            $sale->customer_id = $request->customer_id;
+            //$sale->delivery_approve = 0;
+            $sale->office_sale_man_id = $request->office_sale_man_id;
             if($request->sale_order == true) {
-                $pivot = $sale->products()->attach($request->product[$i],['order_product_pivot_id' => $request->order_product_id[$i],'uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]); 
+                $sale->order_id = $request->order_id;
+            }
+            $sale->pay_amount = $request->pay_amount;
+            $sale->sale_type  = $request->sale_type;
+            $sale->total_amount = $request->sub_total;
+            $sale->cash_discount = $request->cash_discount;
+            $sale->net_total = $request->net_total;
+            $sale->tax = $request->tax;
+            $sale->tax_amount = $request->tax_amount;
+            $sale->balance_amount = $request->balance_amount;
+            // if($request->cash_discount!=null || $request->cash_discount!= 0){
+            //     $discount_allowed_sub_account_id=config('global.discount_allowed');     /*sub account_id for Discount allowed*/
+            // }else{
+            //     $discount_allowed_sub_account_id=null;     /*sub account_id for Discount allowed*/
+            // }
+            if($request->payment_type == 'credit') {
+                $sub_account_id=config('global.sale_advance');                 /*sub account_id for sale advance*/
+                // $discount_allowed_sub_account_id=config('global.discount_allowed');     /*sub account_id for Discount allowed*/
+                if($request->pay_amount!=0){
+                    $amount=$request->pay_amount;
+                }
+                $sale->payment_type = 'credit';
+                $sale->due_date = $request->due_date;
+                $sale->credit_day = $request->credit_day;
             } else {
-                $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
+                $sub_account_id=config('global.sale');     /*sub account_id for sale Account*/
+                $sale_common_account_id=config('global.cash_sale');     /*sub account_id for cash sale */
+                $amount=$request->pay_amount;
+                $sale->payment_type = 'cash';
             }
+            $sale->created_by = Auth::user()->id;
+            $sale->updated_by = Auth::user()->id;
+            $sale->save();
 
-            //get last pivot insert id
-            $last_row=DB::table('product_sale')->orderBy('id', 'DESC')->first();
+            $description=$sale->invoice_no.", Date ".$sale->invoice_date." by " .$sale->customer->cus_name;
+            /* Cash Book  for sale*/
+            if($sale) {
+                // cashbook
+                if ($request->payment_type == 'cash' || ($request->payment_type == 'credit' && $request->pay_amount != 0)) {
+                    AccountTransition::create([
+                        'sub_account_id' => $sub_account_id,
+                        'transition_date' => $sale->invoice_date,
+                        'sale_id' => $sale->id,
+                        'vochur_no'=>$invoice_no,
+                        'description'=>$description,
+                        'is_cashbook' => 1,
+                        'debit' => $amount,
+                        'created_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id,
+                    ]);
+                }
+                // end cashbook 
 
-            $pivot_id = $last_row->id;
-
-            if($request->sale_order == true) {
-                //update quantiy in product_order table
-                $accepted_qty = 0; 
-                $po_result = DB::table('product_order')
-                                ->select('accepted_quantity')
-                                ->where('id',$request->order_product_id[$i])
-                                ->first(); 
-                if($po_result->accepted_quantity == NULL) {
-                    $accepted_qty = $request->qty[$i];
+                // for ledger 
+               $this->storeSaleInLedger($sale);
+                // end ledger
+            }
+            $sale_id = $sale->id;
+            for($i=0; $i<count($request->product); $i++) {
+                //get product pre-defined UOM
+                $product_result = Product::select('uom_id')->find($request->product[$i]);
+                $main_uom_id = $product_result->uom_id;
+                //add product into pivot table
+                /**$pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);**/
+                if($request->sale_order == true) {
+                    $pivot = $sale->products()->attach($request->product[$i],['order_product_pivot_id' => $request->order_product_id[$i],'uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]); 
                 } else {
-                    $accepted_qty = $po_result->accepted_quantity + $request->qty[$i]; 
-                } 
+                    $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
+                }
+
+                //get last pivot insert id
+                $last_row=DB::table('product_sale')->orderBy('id', 'DESC')->first();
+
+                $pivot_id = $last_row->id;
+
+                if($request->sale_order == true) {
+                    //update quantiy in product_order table
+                    $accepted_qty = 0; 
+                    $po_result = DB::table('product_order')
+                                    ->select('accepted_quantity')
+                                    ->where('id',$request->order_product_id[$i])
+                                    ->first(); 
+                    if($po_result->accepted_quantity == NULL) {
+                        $accepted_qty = $request->qty[$i];
+                    } else {
+                        $accepted_qty = $po_result->accepted_quantity + $request->qty[$i]; 
+                    } 
         
 
-                DB::table('product_order')
-                        ->where('id', $request->order_product_id[$i])
-                        ->update(array('accepted_quantity' => $accepted_qty));
+                    DB::table('product_order')
+                            ->where('id', $request->order_product_id[$i])
+                            ->update(array('accepted_quantity' => $accepted_qty));
 
-                //Check order status is done or not
-                 $chk_order = DB::table("product_order")
+                    //Check order status is done or not
+                     $chk_order = DB::table("product_order")
 
-                            ->select(DB::raw("SUM(CASE  WHEN product_quantity IS NOT NULL THEN product_quantity  ELSE 0 END)  as product_qty, SUM(CASE  WHEN accepted_quantity IS NOT NULL THEN accepted_quantity  ELSE 0 END)  as accepted_qty"))
-                            ->where('order_id','=',$request->order_id)
-                            ->groupBy('order_id')
-                            ->first();
-                //update order status
-                $order = Order::find($request->order_id);
-                if($chk_order->product_qty == $chk_order->accepted_qty) {
-                    $status = "Done";
-                    //change status in order table;
-                    $order->order_status = $status;
-                    $order->save();
-                }
+                                ->select(DB::raw("SUM(CASE  WHEN product_quantity IS NOT NULL THEN product_quantity  ELSE 0 END)  as product_qty, SUM(CASE  WHEN accepted_quantity IS NOT NULL THEN accepted_quantity  ELSE 0 END)  as accepted_qty"))
+                                ->where('order_id','=',$request->order_id)
+                                ->groupBy('order_id')
+                                ->first();
+                    //update order status
+                    $order = Order::find($request->order_id);
+                    if($chk_order->product_qty == $chk_order->accepted_qty) {
+                        $status = "Done";
+                        //change status in order table;
+                        $order->order_status = $status;
+                        $order->save();
+                    }
                 
-            }
+                }
 
-            //calculate quantity for product pre-defined UOM
-            $uom_relation = DB::table('product_selling_uom')
-                            ->select('relation')
-                            ->where('product_id',$request->product[$i])
-                            ->where('uom_id',$request->uom[$i])
-                            ->first();
-            if($uom_relation) {
-                $relation_val = $uom_relation->relation;
-            } else {
-                //for pre-defined product uom
-                $relation_val = 1;
+                //calculate quantity for product pre-defined UOM
+                $uom_relation = DB::table('product_selling_uom')
+                                ->select('relation')
+                                ->where('product_id',$request->product[$i])
+                                ->where('uom_id',$request->uom[$i])
+                                ->first();
+                if($uom_relation) {
+                    $relation_val = $uom_relation->relation;
+                } else {
+                    //for pre-defined product uom
+                    $relation_val = 1;
+                }
+                // $pp=DB::table('product_purchase')->where('product_id',$request->product[$i])->get();
+            // $q=$m=0;
+            $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
+            $store_cost_price=Product::find($request->product[$i]);
+             $store_cost_price->cost_price=$cost_price;
+             $store_cost_price->save();
+                //add products in transition table=> transition_type = out (for sold out)
+                $obj = new ProductTransition;
+                $obj->product_id            = $request->product[$i];
+                $obj->transition_type       = "out";
+                $obj->transition_sale_id   = $sale_id;
+                $obj->transition_product_pivot_id   = $pivot_id;
+                $obj->branch_id  = Auth::user()->branch_id;
+                $obj->warehouse_id          = Auth::user()->warehouse_id;
+                $obj->transition_date       = $request->invoice_date;
+                $obj->cost_price            =$cost_price *$request->qty[$i] * $relation_val;
+                $obj->transition_product_uom_id        = $request->uom[$i];
+                $obj->transition_product_quantity      = $request->qty[$i];
+                $obj->product_uom_id        = $main_uom_id;
+                $obj->product_quantity      = $request->qty[$i] * $relation_val;
+                $obj->created_by = Auth::user()->id;
+                $obj->updated_by = Auth::user()->id;
+                $obj->save();
             }
-            // $pp=DB::table('product_purchase')->where('product_id',$request->product[$i])->get();
-        // $q=$m=0;
-        $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
-        $store_cost_price=Product::find($request->product[$i]);
-         $store_cost_price->cost_price=$cost_price;
-         $store_cost_price->save();
-            //add products in transition table=> transition_type = out (for sold out)
-            $obj = new ProductTransition;
-            $obj->product_id            = $request->product[$i];
-            $obj->transition_type       = "out";
-            $obj->transition_sale_id   = $sale_id;
-            $obj->transition_product_pivot_id   = $pivot_id;
-            $obj->branch_id  = Auth::user()->branch_id;
-            $obj->warehouse_id          = Auth::user()->warehouse_id;
-            $obj->transition_date       = $request->invoice_date;
-            $obj->cost_price            =$cost_price *$request->qty[$i] * $relation_val;
-            $obj->transition_product_uom_id        = $request->uom[$i];
-            $obj->transition_product_quantity      = $request->qty[$i];
-            $obj->product_uom_id        = $main_uom_id;
-            $obj->product_quantity      = $request->qty[$i] * $relation_val;
-            $obj->created_by = Auth::user()->id;
-            $obj->updated_by = Auth::user()->id;
-            $obj->save();
+            $status = "success";
+            $sale_id = $sale->id;
+            DB::commit();
+            return compact('status','sale_id');
+        } catch (\Throwable $e) {
+            DB::rollback();
+            $status = "fail";
+            return compact('status');
+            throw $e;
+            
         }
-
-        $status = "success";
-        $sale_id = $sale->id;
-        return compact('status','sale_id');
+      
     }
 
     /**
@@ -465,180 +478,191 @@ class SaleController extends Controller
                 'reference_no' => 'max:255|unique:sales,reference_no,'.$id,
             ]);
         }**/
-        $sale = Sale::find($id);
-        $old_sub_account_id=$sale->payment_type=='credit' ? config('global.sale_advance') : config('global.sale');
-        if($sale->payment_type=='cash'){
-           $old_cash_sale_account_id= config('global.cash_sale');
-           $old_discount_allowed_account_id= config('global.discount_allowed');
-        }
-        $sale->invoice_no = $request->invoice_no;
-        $sale->customer_id = $request->customer_id;
-        $sale->branch_id = Auth::user()->branch_id;
-        //$sale->reference_no = $request->reference_no;
-        $sale->invoice_date = $request->invoice_date;
-        //$sale->warehouse_id = Auth::user()->warehouse_id;
-        $sale->customer_id = $request->customer_id;
-        //$sale->delivery_approve = 0;
-        $sale->office_sale_man_id = $request->office_sale_man_id;
+        DB::beginTransaction();
+
+        try {
+            $sale = Sale::find($id);
+            $old_sub_account_id=$sale->payment_type=='credit' ? config('global.sale_advance') : config('global.sale');
+            if($sale->payment_type=='cash'){
+               $old_cash_sale_account_id= config('global.cash_sale');
+               $old_discount_allowed_account_id= config('global.discount_allowed');
+            }
+            $sale->invoice_no = $request->invoice_no;
+            $sale->customer_id = $request->customer_id;
+            $sale->branch_id = Auth::user()->branch_id;
+            //$sale->reference_no = $request->reference_no;
+            $sale->invoice_date = $request->invoice_date;
+            //$sale->warehouse_id = Auth::user()->warehouse_id;
+            $sale->customer_id = $request->customer_id;
+            //$sale->delivery_approve = 0;
+            $sale->office_sale_man_id = $request->office_sale_man_id;
         
-        if($request->sale_order == true) {
-            $sale->order_id = $request->order_id;
-        }
-
-        $sale->pay_amount = $request->pay_amount;
-        $sale->sale_type  = $request->sale_type;
-
-        $sale->total_amount = $request->sub_total;
-        $sale->cash_discount = $request->cash_discount;
-        $sale->net_total = $request->net_total;
-        $sale->tax = $request->tax;
-        $sale->tax_amount = $request->tax_amount;
-        $sale->balance_amount = $request->balance_amount;
-
-        if($request->payment_type == 'credit') {
-            $sub_account_id=config('global.sale_advance');     /*sub account_id for sale advance*/
-            if($request->pay_amount!=0){
-                $amount=$request->pay_amount;
+            if($request->sale_order == true) {
+                $sale->order_id = $request->order_id;
             }
-            $sale->payment_type = 'credit';
-            $sale->due_date = $request->due_date;
-            $sale->credit_day = $request->credit_day;
-        } else {
-            $sub_account_id=config('global.sale');     /*sub account_id for sale*/
-            $cash_sale_account_id=config('global.cash_sale');     /*sub account_id for cash sale */
-            $amount=$request->pay_amount;
-            $sale->payment_type = 'cash';
-        }
 
-        $sale->updated_at = time();
-        $sale->updated_by = Auth::user()->id;
-        $sale->save();
-        $cus=Customer::find($request->customer_id);
-        $description=$sale->invoice_no.", Date ".$sale->invoice_date." by " .$cus->cus_name;
-        if($sale){
-            if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
-                $update_cashbook=AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_sub_account_id)->where('is_cashbook',1)->delete();
-                // dd($update_cashbook);
-                // AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_cash_sale_account_id)->delete();
-                // AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_discount_allowed_account_id)->delete();
-                   AccountTransition::create([
-                        'sub_account_id' => $sub_account_id,
-                        'transition_date' => $sale->invoice_date,
-                        'sale_id' => $sale->id,
-                        'is_cashbook' => 1,
-                        'debit' => $amount,
-                        'description'=>$description,
-                        'vochur_no'=>$request->invoice_no,
-                        'created_by' => Auth::user()->id,
-                        'updated_by' => Auth::user()->id,
-                    ]);
-                    $this->updateSaleInLedger($sale);
+            $sale->pay_amount = $request->pay_amount;
+            $sale->sale_type  = $request->sale_type;
 
-            }elseif($request->payment_type=='credit' && $request->pay_amount==0){
-                AccountTransition::where('sale_id',$id)
-                ->where('sub_account_id',$old_sub_account_id)
-                ->delete();
-            }
-        }
-        $ex_pivot_arr = $request->ex_product_pivot;
+            $sale->total_amount = $request->sub_total;
+            $sale->cash_discount = $request->cash_discount;
+            $sale->net_total = $request->net_total;
+            $sale->tax = $request->tax;
+            $sale->tax_amount = $request->tax_amount;
+            $sale->balance_amount = $request->balance_amount;
 
-        //remove id in pivot that are removed in sale Form
-        $results =array_diff($ex_pivot_arr,$request->product_pivot); //get id that are not in request pivot array
-        foreach($results as $key => $val) {
-            //delete in pivot
-            DB::table('product_sale')
-                ->where('id', $val)
-                ->delete();
-            //delete in transition
-            DB::table('product_transitions')
-                ->where('transition_product_pivot_id', $val)
-                ->where('transition_sale_id', $id)
-                ->delete();
-        }
-        //update in product pivot table
-        for($i=0; $i<count($request->product); $i++) {
-
-            //check product already exist or not
-            if($request->product_pivot[$i] != '0' && in_array($request->product_pivot[$i], $ex_pivot_arr)) {
-                //update existing product in pivot and transition tables
-                DB::table('product_sale')
-                    ->where('id', $request->product_pivot[$i])
-                    ->update(array('uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]));
-
-                //get product pre-defined UOM
-                $product_result = Product::select('uom_id')->find($request->product[$i]);
-                $main_uom_id = $product_result->uom_id;
-
-                //calculate quantity for product pre-defined UOM
-                $uom_relation = DB::table('product_selling_uom')
-                                ->select('relation')
-                                ->where('product_id',$request->product[$i])
-                                ->where('uom_id',$request->uom[$i])
-                                ->first();
-                if($uom_relation) {
-                    $relation_val = $uom_relation->relation;
-                } else {
-                    //for pre-defined product uom
-                    $relation_val = 1;
+            if($request->payment_type == 'credit') {
+                $sub_account_id=config('global.sale_advance');     /*sub account_id for sale advance*/
+                if($request->pay_amount!=0){
+                    $amount=$request->pay_amount;
                 }
-                $product_qty = $request->qty[$i] * $relation_val;
-
-                DB::table('product_transitions')
-                    ->where('transition_product_pivot_id', $request->product_pivot[$i])
-                    ->where('transition_sale_id', $id)
-                    ->update(array('product_uom_id' => $main_uom_id, 'product_quantity' => $product_qty, 'transition_product_uom_id' => $request->uom[$i], 'transition_product_quantity' => $request->qty[$i]));
+                $sale->payment_type = 'credit';
+                $sale->due_date = $request->due_date;
+                $sale->credit_day = $request->credit_day;
             } else {
-
-                //add product into pivot table if not exist
-
-                //get product pre-defined UOM
-                $product_result = Product::select('uom_id')->find($request->product[$i]);
-                $main_uom_id = $product_result->uom_id;
-
-                //add product into pivot table
-                /*$pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);*/
-
-                $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
-
-                //get last pivot insert id
-                $last_row=DB::table('product_sale')->orderBy('id', 'DESC')->first();
-
-                $pivot_id = $last_row->id;
-
-                //calculate quantity for product pre-defined UOM
-                $uom_relation = DB::table('product_selling_uom')
-                                ->select('relation')
-                                ->where('product_id',$request->product[$i])
-                                ->where('uom_id',$request->uom[$i])
-                                ->first();
-                if($uom_relation) {
-                    $relation_val = $uom_relation->relation;
-                } else {
-                    //for pre-defined product uom
-                    $relation_val = 1;
-                }
-        $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
-                //add products in transition table=> transfer_type = out (for sold out)
-                $obj = new ProductTransition;
-                $obj->product_id            = $request->product[$i];
-                $obj->transition_type       = "out";
-                $obj->transition_sale_id   = $id;
-                $obj->transition_product_pivot_id   = $pivot_id;
-                $obj->branch_id  = Auth::user()->branch_id;
-                $obj->warehouse_id          = Auth::user()->warehouse_id; // for Main Warehouse Entry
-                $obj->transition_date       = $request->invoice_date;
-                $obj->transition_product_uom_id        = $request->uom[$i];
-                $obj->transition_product_quantity      = $request->qty[$i];
-                $obj->product_uom_id        = $main_uom_id;
-                $obj->product_quantity      = $request->qty[$i] * $relation_val;
-                $obj->created_by = Auth::user()->id;
-                $obj->updated_by = Auth::user()->id;
-                $obj->save();
+                $sub_account_id=config('global.sale');     /*sub account_id for sale*/
+                $cash_sale_account_id=config('global.cash_sale');     /*sub account_id for cash sale */
+                $amount=$request->pay_amount;
+                $sale->payment_type = 'cash';
             }
-        }
 
-        $status = "success";
-        return compact('status');
+            $sale->updated_at = time();
+            $sale->updated_by = Auth::user()->id;
+            $sale->save();
+            $cus=Customer::find($request->customer_id);
+            $description=$sale->invoice_no.", Date ".$sale->invoice_date." by " .$cus->cus_name;
+            if($sale){
+                if($request->payment_type =='cash' || ($request->payment_type=='credit' && $request->pay_amount!=0)) {
+                    $update_cashbook=AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_sub_account_id)->where('is_cashbook',1)->delete();
+                    // dd($update_cashbook);
+                    // AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_cash_sale_account_id)->delete();
+                    // AccountTransition::where('sale_id',$id)->where('sub_account_id',$old_discount_allowed_account_id)->delete();
+                       AccountTransition::create([
+                            'sub_account_id' => $sub_account_id,
+                            'transition_date' => $sale->invoice_date,
+                            'sale_id' => $sale->id,
+                            'is_cashbook' => 1,
+                            'debit' => $amount,
+                            'description'=>$description,
+                            'vochur_no'=>$request->invoice_no,
+                            'created_by' => Auth::user()->id,
+                            'updated_by' => Auth::user()->id,
+                        ]);
+                        $this->updateSaleInLedger($sale);
+
+                }elseif($request->payment_type=='credit' && $request->pay_amount==0){
+                    AccountTransition::where('sale_id',$id)
+                    ->where('sub_account_id',$old_sub_account_id)
+                    ->delete();
+                }
+            }
+            $ex_pivot_arr = $request->ex_product_pivot;
+
+            //remove id in pivot that are removed in sale Form
+            $results =array_diff($ex_pivot_arr,$request->product_pivot); //get id that are not in request pivot array
+            foreach($results as $key => $val) {
+                //delete in pivot
+                DB::table('product_sale')
+                    ->where('id', $val)
+                    ->delete();
+                //delete in transition
+                DB::table('product_transitions')
+                    ->where('transition_product_pivot_id', $val)
+                    ->where('transition_sale_id', $id)
+                    ->delete();
+            }
+            //update in product pivot table
+            for($i=0; $i<count($request->product); $i++) {
+
+                //check product already exist or not
+                if($request->product_pivot[$i] != '0' && in_array($request->product_pivot[$i], $ex_pivot_arr)) {
+                    //update existing product in pivot and transition tables
+                    DB::table('product_sale')
+                        ->where('id', $request->product_pivot[$i])
+                        ->update(array('uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]));
+
+                    //get product pre-defined UOM
+                    $product_result = Product::select('uom_id')->find($request->product[$i]);
+                    $main_uom_id = $product_result->uom_id;
+
+                    //calculate quantity for product pre-defined UOM
+                    $uom_relation = DB::table('product_selling_uom')
+                                    ->select('relation')
+                                    ->where('product_id',$request->product[$i])
+                                    ->where('uom_id',$request->uom[$i])
+                                    ->first();
+                    if($uom_relation) {
+                        $relation_val = $uom_relation->relation;
+                    } else {
+                        //for pre-defined product uom
+                        $relation_val = 1;
+                    }
+                    $product_qty = $request->qty[$i] * $relation_val;
+
+                    DB::table('product_transitions')
+                        ->where('transition_product_pivot_id', $request->product_pivot[$i])
+                        ->where('transition_sale_id', $id)
+                        ->update(array('product_uom_id' => $main_uom_id, 'product_quantity' => $product_qty, 'transition_product_uom_id' => $request->uom[$i], 'transition_product_quantity' => $request->qty[$i]));
+                } else {
+
+                    //add product into pivot table if not exist
+
+                    //get product pre-defined UOM
+                    $product_result = Product::select('uom_id')->find($request->product[$i]);
+                    $main_uom_id = $product_result->uom_id;
+
+                    //add product into pivot table
+                    /*$pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);*/
+
+                    $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
+
+                    //get last pivot insert id
+                    $last_row=DB::table('product_sale')->orderBy('id', 'DESC')->first();
+
+                    $pivot_id = $last_row->id;
+
+                    //calculate quantity for product pre-defined UOM
+                    $uom_relation = DB::table('product_selling_uom')
+                                    ->select('relation')
+                                    ->where('product_id',$request->product[$i])
+                                    ->where('uom_id',$request->uom[$i])
+                                    ->first();
+                    if($uom_relation) {
+                        $relation_val = $uom_relation->relation;
+                    } else {
+                        //for pre-defined product uom
+                        $relation_val = 1;
+                    }
+            $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
+                    //add products in transition table=> transfer_type = out (for sold out)
+                    $obj = new ProductTransition;
+                    $obj->product_id            = $request->product[$i];
+                    $obj->transition_type       = "out";
+                    $obj->transition_sale_id   = $id;
+                    $obj->transition_product_pivot_id   = $pivot_id;
+                    $obj->branch_id  = Auth::user()->branch_id;
+                    $obj->warehouse_id          = Auth::user()->warehouse_id; // for Main Warehouse Entry
+                    $obj->transition_date       = $request->invoice_date;
+                    $obj->transition_product_uom_id        = $request->uom[$i];
+                    $obj->transition_product_quantity      = $request->qty[$i];
+                    $obj->product_uom_id        = $main_uom_id;
+                    $obj->product_quantity      = $request->qty[$i] * $relation_val;
+                    $obj->created_by = Auth::user()->id;
+                    $obj->updated_by = Auth::user()->id;
+                    $obj->save();
+                }
+            }
+
+            $status = "success";
+            DB::commit();
+            return compact('status');
+        } catch (\Throwable $e) {
+            DB::rollback();
+            $status = "fail";
+            return compact('status');
+            throw $e;
+        }
+       
 
     }
 
