@@ -197,7 +197,7 @@ class PurchaseInvoiceController extends Controller
             ]);
         }
         $p = PurchaseInvoice::find($id);
-        $old_sub_account_id=$p->payment_type=='credit' ? config('global.purchase_advance') :config('global.purchase');
+        $old_sub_account_id=$p->payment_type=='credit' ? config('global.purchase_advance') :config('global.cash_purchase');
         $p->invoice_no = $request->invoice_no;
         $p->reference_no = $request->reference_no;
         $p->invoice_date = $request->invoice_date;

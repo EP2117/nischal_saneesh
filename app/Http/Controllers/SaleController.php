@@ -276,14 +276,12 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         /**if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
             $validatedData = $request->validate([
                 'reference_no' => 'max:255|unique:sales',
             ]);
         }**/
         DB::beginTransaction();
-
         try {
             $sale = new Sale;
             //auto generate invoice no;
@@ -520,8 +518,8 @@ class SaleController extends Controller
                 $sale->due_date = $request->due_date;
                 $sale->credit_day = $request->credit_day;
             } else {
-                $sub_account_id=config('global.cash_sale');     /*sub account_id for sale*/
-                $cash_sale_account_id=config('global.cash_sale');     /*sub account_id for cash sale */
+                $sub_account_id=config('global.cash_sale');     /*sub account_id for cash sale*/
+                // $cash_sale_account_id=config('global.cash_sale');     /*sub account_id for cash sale */
                 $amount=$request->pay_amount;
                 $sale->payment_type = 'cash';
             }
@@ -543,6 +541,7 @@ class SaleController extends Controller
                             'sale_id' => $sale->id,
                             'is_cashbook' => 1,
                             'debit' => $amount,
+                            'status'=>'sale',
                             'description'=>$description,
                             'vochur_no'=>$request->invoice_no,
                             'created_by' => Auth::user()->id,
@@ -1502,7 +1501,6 @@ class SaleController extends Controller
         DB::table('product_transitions')
                 ->where('transition_sale_id', $id)
                 ->delete();
-
         $sale->delete();
         if($sale->payment_type=='cash'){
             $sub_account_id=config('global.cash_sale');
@@ -1510,7 +1508,7 @@ class SaleController extends Controller
             $sub_account_id=config('global.sale_advance');
         }
         AccountTransition::where('sale_id',$id)
-            ->where('sub_account_id',$sub_account_id)
+            ->where('status','sale')
             ->delete();
         return response(['message' => 'delete successful']);
     }

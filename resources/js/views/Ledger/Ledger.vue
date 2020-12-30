@@ -112,7 +112,7 @@
                                 <tr class="total_row">
                                     <!-- <template v-if="type=='other'"> -->
                                         <td colspan="4" class="text-right mm-txt"><strong>Opening Balance</strong></td>
-                                        <td class="text-center" colspan="1" v-if="at.opening_balance > 0 ">
+                                        <td class="text-center" colspan="1" v-if="at.opening_balance >= 0 ">
                                             {{at.opening_balance}}
                                         </td>
                                         <td class="text-center" colspan="1" v-if="at.opening_balance < 0 ">
@@ -241,7 +241,7 @@
                                 </tr>
                                 <tr class="total_row" v-if="!at.hide">
                                          <td colspan="4" class="text-right mm-text"><strong>Closing Balance</strong></td>
-                                        <td class="text-center " colspan="1" v-if="at.closing_balance>0">
+                                        <td class="text-center " colspan="1" v-if="at.closing_balance>=0">
                                             {{at.closing_balance}}
                                         </td>
                                         <td class="text-center " colspan="1" v-else-if="at.closing_balance<0">
