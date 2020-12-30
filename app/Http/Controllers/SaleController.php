@@ -423,9 +423,9 @@ class SaleController extends Controller
             // $pp=DB::table('product_purchase')->where('product_id',$request->product[$i])->get();
         // $q=$m=0;
         $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
-        $store_cost_price=Product::find($request->product[$i]);
-         $store_cost_price->cost_price=$cost_price;
-         $store_cost_price->save();
+        // $store_cost_price=Product::find($request->product[$i]);
+        //  $store_cost_price->cost_price=$cost_price;
+        //  $store_cost_price->save();
             //add products in transition table=> transition_type = out (for sold out)
             $obj = new ProductTransition;
             $obj->product_id            = $request->product[$i];
