@@ -118,6 +118,7 @@ class CollectionController extends Controller
                     'sale_id' => $collection->id,
                     'is_cashbook' => 1,
                     'description'=>$description,
+                    'status'=>'credit_collection',
                     'customer_id'=>$collection->customer_id,
                     'vochur_no'=>$collection_no,
                     'debit' => $collection->total_paid_amount,
@@ -193,15 +194,18 @@ class CollectionController extends Controller
             $description=$collection->collection_no.",Date ".$collection->collection_date." to " .$collection->customer->cus_name;
             if($collection){
                 if($collection->total_paid_amount!=0){
-                        AccountTransition::where([
-                        ['sale_id',$id],['is_cashbook',1]])->update([
+                    AccountTransition::where([
+                        ['sale_id',$id],
+                        ['is_cashbook',1],
+                        ['status','credit_collection'],
+                    ])->delete();
+                        AccountTransition::create([
                         'sub_account_id' => $sub_account_id,
                         'transition_date' => $request->collection_date,
                         'sale_id' => $collection->id,
                         'vochur_no'=>$request->collection_no,
                         'description'=>$description,
                         'is_cashbook' => 1,
-                        'status'=>'credit_collection',
                         'customer_id'=>$collection->customer_id,
                         'debit' => $collection->total_paid_amount,
                         'created_by' => Auth::user()->id,

@@ -61,6 +61,7 @@ class ReceiptController extends Controller
                 'is_cashbook'=>1,
                 'vochur_no'=>$cash_receipt_no,
                 'debit'=>$receipt->amount,
+                'status'=>'receipt',
                 'description'=>$receipt->remark,
                 'created_by'=>Auth::user()->id,
                 'updated_by'=>Auth::user()->id,
@@ -160,8 +161,9 @@ class ReceiptController extends Controller
     }
     public function destroy($id){
         Recepit::whereId($id)->delete();
-        AccountTransition::where('receipt_id',$id)
-        ->where('is_cashbook',1)
+        AccountTransition::
+        where('receipt_id',$id)
+        ->where('status','receipt')
         ->delete();
 
     }

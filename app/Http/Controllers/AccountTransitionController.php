@@ -113,13 +113,15 @@ class AccountTransitionController extends Controller
                     $profitAndLoss[$ah->name]=new stdClass();
                     foreach($pl as $p){
                         // $product_sale=DB::table('product_sale')->where('sale_id',$p->sale_id)->get();
-                        $product_sale=DB::table('product_transitions')->where('transition_sale_id',$p->sale_id)->get();
+                        $product_sale=DB::table('product_transitions')
+                        ->where('transition_sale_id',4)->get();
                         foreach($product_sale as $ps){
                             // $product=Product::find($ps->product_id);
                             // $amount+=(int)$product->cost_price* (int)$ps->product_quantity;
                             $amount+=(int)$ps->cost_price;
                         }
                     }
+                    // dd($amount);
                     $cost_of_revenue=new stdClass();
                     $cost_of_revenue->name='Cost Of Good Sold';
                     $cost_of_revenue->amount=$amount;

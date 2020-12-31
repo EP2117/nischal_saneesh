@@ -138,6 +138,7 @@ export default {
 
     },
     mounted() {
+
         let app=this;
         $("#debit_id").select2();
         $("#debit_id").on("select2:select", function(e) {
@@ -175,8 +176,6 @@ export default {
                 //     }
                 // }
             }).on("dp.change", function(e) {
-                // alert('a');
-                // console.log(e);
                 var formatedValue = e.date.format("YYYY-MM-DD");
                 app.form.date = formatedValue;
             });

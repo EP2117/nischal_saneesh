@@ -25,7 +25,7 @@
                     <div class="form-group col-md-4 col-lg-3">
                         <label for="to_date">To Date</label>
                         <input type="text" class="form-control datetimepicker" id="to_date" name="to_date"
-                               v-model="search.to_date">
+                               v-model="search.to_date" autocomplete="off">
                     </div>
                     <div class="form-group col-md-4 col-lg-3">
                         <label >Monthly</label>
@@ -112,7 +112,7 @@
                                <td colspan="1" class="text-right mm-text"><strong>Loss Profit </strong>  </td>
                                <td colspan="1" class="text-center ">{{(-1) *gross_profit}}</td>
                           </tr> -->
-                        <template v-if="income!=null">
+                        <template v-if="income!=''">
                              <h3 style="margin-left:100px">Income</h3>
                             <template v-for='(inc,k) in income'>
                                 <h5  style="margin-left:250px">{{inc.account_head_name}}</h5>
@@ -136,7 +136,7 @@
                                    <td colspan="1" class="text-center ">{{total_income.toLocaleString()}}</td>
                               </tr>
                         </template>
-                        <template v-if="expense!=null">
+                        <template v-if="expense!=''">
                             <h3 style="margin-left:100px">Expense</h3>
                             <template v-for='(exp,k) in expense'>
                                 <template v-if="exp.expense.length > 0">

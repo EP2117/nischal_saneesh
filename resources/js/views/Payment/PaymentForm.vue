@@ -174,7 +174,6 @@ export default {
             //     }
             // }
         }).on("dp.change", function(e) {
-            // alert('a');
             // console.log(e);
             var formatedValue = e.date.format("YYYY-MM-DD");
             app.form.date = formatedValue;
@@ -184,12 +183,10 @@ export default {
         initDebit(){
             axios.get('/sub_account/get_sub_account/'+"credit").then(({data})=>(this.debit=data.sub_account));
             $("#debit_id").select2();
-
         },
         initCredit(){
             axios.get('/sub_account/get_sub_account/'+"debit").then(({data})=>(this.credit=data.sub_account));
             $("#credit_id").select2();
-
         },
         getPayment(id){
             let app=this;
