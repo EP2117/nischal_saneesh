@@ -60,13 +60,13 @@ class PaymentController extends Controller
                 'vochur_no'=>$cash_payment_no,
                 'payment_id' => $payment->id,
                 'is_cashbook' => 1,
+                'status'=>'payment',
                 'credit' => $payment->amount,
                 'description' => $payment->remark,
                 'created_by' => Auth::user()->id,
                 'updated_by' => Auth::user()->id,
             ]);
             $this->storePaymentInLedger($payment);
-            
             // AccountTransition::create([
             //     'sub_account_id' => $payment->debit->id,
             //     'transition_date' => $payment->date,
@@ -131,6 +131,7 @@ class PaymentController extends Controller
                 'created_by' => Auth::user()->id,
                 'updated_by' => Auth::user()->id,
             ]);
+            $this->updatePaymentInLedger($payment);
 //              For leger
 //            AccountTransition::where('payment_id',$id)->update([
 //                'sub_account_id' => $payment->debit->id,
@@ -162,7 +163,7 @@ class PaymentController extends Controller
     public function destroy($id){
         Payment::whereId($id)->delete();
         AccountTransition::where('payment_id',$id)
-        ->where('is_cashbook',1)
+        ->where('status','payment')
         ->delete();
 
     }

@@ -275,8 +275,9 @@ trait Ledger
         AccountTransition::where([
             ['is_cashbook', 0],
             ['purchase_id', $cp->id],
-            ['status', 'payment'],
-        ])->delete();
+        ])->orWhere('status','credit_payment')
+        ->orWhere('status','discount_received')
+        ->delete();
         $this->storeCreditPaymentInLedger($cp, $request);
     }
     public function storePaymentInLedger($payment){
@@ -292,8 +293,6 @@ trait Ledger
             'created_by' => Auth::user()->id,
             'updated_by' => Auth::user()->id,
         ]);
-      
-
     }
     public function updatePaymentInLedger($payment){
         AccountTransition::where([
