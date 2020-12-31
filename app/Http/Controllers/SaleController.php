@@ -453,6 +453,7 @@ class SaleController extends Controller
             DB::commit();
             return compact('status','sale_id');
         } catch (\Throwable $e) {
+            dd($e->getMessage());
             DB::rollback();
             $status = "fail";
             return compact('status');

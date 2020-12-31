@@ -228,6 +228,7 @@
                 maxDate: app.user_year+"-12-31",
             })
             .on("dp.show", function(e) {
+                app.search.date = moment().format('YYYY-MM-DD');
                 var y = new Date().getFullYear();
                 if(app.user_year < y) { 
                   if(app.search.date == app.user_year+"-12-31" || app.search.from_date == '') {

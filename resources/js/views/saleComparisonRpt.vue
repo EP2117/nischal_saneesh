@@ -419,6 +419,7 @@
             })
             .on("dp.show", function(e) {
                 var y = new Date().getFullYear();
+                app.search.app_from_date = moment().format('YYYY-MM-DD');
                 if(app.user_year < y) { 
                   if(app.search.app_from_date == app.user_year+"-12-31" || app.search.app_from_date == '') {
                     app.search.app_from_date = app.user_year+"-12-31";
@@ -449,6 +450,7 @@
                 maxDate: app.user_year+"-12-31",
             })
             .on("dp.show", function(e) {
+               app.search.app_to_date = moment().format('YYYY-MM-DD');
                 var y = new Date().getFullYear();
                 if(app.user_year < y) { 
                   if(app.search.app_to_date == app.user_year+"-12-31" || app.search.app_to_date == '') {
@@ -480,6 +482,7 @@
                 maxDate: app.user_year+"-12-31",
             })
             .on("dp.show", function(e) {
+                app.search.inv_from_date = moment().format('YYYY-MM-DD');
                 var y = new Date().getFullYear();
                 if(app.user_year < y) { 
                   if(app.search.inv_from_date == app.user_year+"-12-31" || app.search.inv_from_date == '') {
@@ -511,6 +514,7 @@
                 maxDate: app.user_year+"-12-31",
             })
             .on("dp.show", function(e) {
+                app.search.inv_to_date = moment().format('YYYY-MM-DD');
                 var y = new Date().getFullYear();
                 if(app.user_year < y) { 
                   if(app.search.inv_to_date == app.user_year+"-12-31" || app.search.inv_to_date == '') {

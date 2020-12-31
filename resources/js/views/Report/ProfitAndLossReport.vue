@@ -262,6 +262,7 @@ export default {
             })
             .on("dp.show", function(e) {
                 var y = new Date().getFullYear();
+                app.search.from_date = moment().format('YYYY-MM-DD');
                 if(app.user_year < y) {
                     if(app.search.from_date == app.user_year+"-12-31" || app.search.from_date == '') {
                         app.search.from_date = app.user_year+"-12-31";
@@ -292,6 +293,7 @@ export default {
                 maxDate: app.user_year+"-12-31",
             })
             .on("dp.show", function(e) {
+                app.search.to_date = moment().format('YYYY-MM-DD');
                 var y = new Date().getFullYear();
                 if(app.user_year < y) {
                     if(app.search.to_date == app.user_year+"-12-31" || app.search.to_date == '') {
@@ -322,7 +324,7 @@ export default {
         //     axios.get('/sub_account/get_sub_account/'+"credit").then(({data})=>(this.credit=data.sub_account));
         // },
         getProfitAndLoss(page=1) {
-            // let app= this;
+            // let app= this;            
               if(this.search.from_date == "" && this.search.to_date == "" && this.search.month == "" && this.search.year == "" ) {
                 swal("Warning!", "Please must be filtered at least one!", "warning")
                 return false;

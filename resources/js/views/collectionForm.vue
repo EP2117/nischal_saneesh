@@ -158,7 +158,7 @@
 
                                         </template>
                                         <tr>
-                                            <td colspan='5' class="text-right"> Total Amount</td>
+                                            <td colspan='6' class="text-right"> Total Amount</td>
                                             <td>{{total_pay}}</td>
                                             <td></td>
                                             <td></td>
@@ -179,6 +179,7 @@
                                             <th scope="col" >No.</th>
                                             <th scope="col" >Invoice Date</th>
                                             <th scope="col" >Invoice No.</th>
+                                            <th scope="col" >Sale Man</th>
                                             <th scope="col" >Invoice Amount</th>
                                             <th scope="col" >Previous Paid Amount</th>
                                             <th scope="col" >Pay Amount</th>
@@ -192,7 +193,7 @@
                                         
                                     </tbody>
                                     <tr>
-                                            <td colspan='5' class="text-right"> Total Amount</td>
+                                            <td colspan='6' class="text-right"> Total Amount</td>
                                             <td>{{total_pay}}</td>
                                             <td></td>
                                             <td></td>
@@ -439,6 +440,7 @@
                     maxDate: app.user_year+"-12-31",
                 })
                 .on("dp.show", function(e) {
+                    app.form.collection_date = moment().format('YYYY-MM-DD');
                     var y = new Date().getFullYear();
                     if(app.user_year < y) { 
                       if(app.form.collection_date == app.user_year+"-12-31" ||  app.form.collection_date == '') {
@@ -516,15 +518,19 @@
                         var total_balance = 0;
 
                         $(".balance_amt:visible").each(function() {
+                            var discount = $('#discount_amt'+bal_sale_id).val() == '' ||  $('#discount_amt'+bal_sale_id).val() == null ? 0 : $('#discount_amt'+bal_sale_id).val();
+
                             var bal_sale_id = $(this).attr('data-id');
-                            total_balance += parseInt($('#inv_amt'+bal_sale_id).val()) - (parseInt($('#prev_amt'+bal_sale_id).val())  + parseInt($('#discount_amt'+bal_sale_id).val()));
+                            total_balance += parseInt($('#inv_amt'+bal_sale_id).val()) - (parseInt($('#prev_amt'+bal_sale_id).val()) + parseInt(discount));
                             //total_balance = parseInt(total_balance) + parseInt($(this).val());
                         });
+                        console.log('t_balance is ' + total_balance + 'payment' + payment);
 
                         if(payment >  total_balance) {
                             swal("Warning!", "Your payment is more than total balance."+ total_balance, "warning");
-                            $('#pay_amount').val('');
-                            $('#pay_amount').focus();
+                            this.form.pay_amount='';
+                            // $('#pay_amount').val('');
+                            // $('#pay_amount').focus();
                             return false;
                         } else {
 
@@ -532,25 +538,42 @@
                             var balance = 0;
                             //auto  payment
                             $(".balance_amt:visible").each(function() {
-                                sale_id = $(this).attr('data-id'); 
-                                //balance = $(this).val(); 
-                                balance = parseInt($('#inv_amt'+sale_id).val()) - parseInt($('#prev_amt'+sale_id).val());
+                                sale_id = $(this).attr('data-id');
+                                var dsc=$('#discount_amt'+sale_id).val();
+                                console.log('desc is' +dsc);
+                                if(dsc==''){
+                                    dsc=0;
+                                }
+                                balance = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val())+parseInt(dsc));
+                                console.log('Inv ' +parseInt($('#inv_amt'+sale_id).val()) )
+                                console.log('Pre ' +parseInt($('#prev_amt'+sale_id).val()) )
+                                console.log('dsc ' + parseInt(dsc));
+                                console.log('balance' + balance);
+                                // alert(balance);
                                 if(payment == 0)  {
-                                    $('#pay_amt'+sale_id).val('0');
+                                    var dsc=$('#discount_amt'+sale_id).val()
+                                    if(dsc==''){
+                                        dsc=0;
+                                    }
+                                    $('#pay_amt'+sale_id).val('');
                                     payment = 0;
-                                    var invoice_bal = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val()) + parseInt(payment));
-                                        
+                                    var invoice_bal = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val()) + parseInt(payment)+parseInt(dsc));
+
                                         $(this).val(invoice_bal);
-                                } else {                    
+                                } else {
                                     if(parseInt(payment) <= parseInt(balance)) {
-                                        $('#pay_amt'+sale_id).val(payment);                                    
-                                        var invoice_bal = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val()) + parseInt(payment));
+                                        var dsc=$('#discount_amt'+sale_id).val();
+                                        if(dsc==''){
+                                            dsc=0;
+                                        }
+                                        $('#pay_amt'+sale_id).val(payment);
+                                        var invoice_bal = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val()) + parseInt(payment)+parseInt(dsc));
                                         payment = 0;
                                         $(this).val(invoice_bal);
                                     } else {
                                         payment = parseInt(payment) - parseInt(balance);
                                         $('#pay_amt'+sale_id).val(balance);
-                                        var invoice_bal = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val()) + parseInt(balance));
+                                        var invoice_bal = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val()) + parseInt(balance) + parseInt(dsc));
                                         $(this).val(invoice_bal);
                                     }
                                 }
@@ -576,16 +599,20 @@
                 } else {
                     var discount = 0;
                 }
-                var balance = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val()) + parseInt($('#pay_amt'+sale_id).val()));
+                var pay_amt = $('#pay_amt'+sale_id).val() == "" ? 0 : $('#pay_amt'+sale_id).val();
+                var balance = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val()) + parseInt(pay_amt));
                 if(discount != "") {
-                    if(discount > balance) {
+                    if (discount > balance) {
                         swal("Warning!", "Discount amount is greater than balance.", "warning");
-                        $("#discount_amt"+sale_id).val('');
-                        $("#discount_amt"+sale_id).focus();
+                        $("#discount_amt" + sale_id).val('');
+                        $("#discount_amt" + sale_id).focus();
                     } else {
-                        balance = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val()) + parseInt($('#pay_amt'+sale_id).val()) + parseInt(discount));
-                        $("#balance"+sale_id).val(balance);
+                        balance = parseInt($('#inv_amt' + sale_id).val()) - (parseInt($('#prev_amt' + sale_id).val()) + parseInt(pay_amt) + parseInt(discount));
+                        $("#balance" + sale_id).val(balance);
                     }
+                }else{
+                    balance = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val()) + parseInt(pay_amt) + parseInt(discount));
+                    $("#balance"+sale_id).val(balance);
                 }
             },
 
@@ -594,15 +621,17 @@
                 let app = this;
 
                 var discount = $("#discount_amt"+sale_id).val();
+                // alert(discount);
                 if(discount == "") {
                     discount = 0;
-                } 
+                }
                 var pay = $('#pay_amt'+sale_id).val();
                 if(pay == "") {
                     pay = 0;
                 }
                 var sale_bal = parseInt($('#inv_amt'+sale_id).val()) - (parseInt($('#prev_amt'+sale_id).val()) + parseInt(discount));
                 if(parseInt(pay) > parseInt(sale_bal)) {
+                    document.getElementById('pay_amt'+sale_id).value = '';
                     swal("Warning!", "Payment is greater than balance.", "warning");
                 } else {
                     var prev_pay = $('#prev_amt'+sale_id).val();
@@ -623,6 +652,7 @@
                 var total = 0;
                 $(".pay_amt:visible").each(function() {
                     if($(this).val() != "")
+                    //total = parseInt(totadiscount_amtl) + parseInt($(this).val());
                     total = parseInt(total) + parseInt($(this).val());
                 });
 

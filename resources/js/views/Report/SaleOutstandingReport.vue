@@ -269,6 +269,7 @@ export default {
                 maxDate: app.user_year+"-12-31",
             })
             .on("dp.show", function(e) {
+                app.search.from_date = moment().format('YYYY-MM-DD');
                 var y = new Date().getFullYear();
                 if(app.user_year < y) {
                     if(app.search.from_date == app.user_year+"-12-31" || app.search.from_date == '') {
@@ -300,6 +301,7 @@ export default {
                 maxDate: app.user_year+"-12-31",
             })
             .on("dp.show", function(e) {
+                app.search.to_date = moment().format('YYYY-MM-DD');
                 var y = new Date().getFullYear();
                 if(app.user_year < y) {
                     if(app.search.to_date == app.user_year+"-12-31" || app.search.to_date == '') {

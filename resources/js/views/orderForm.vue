@@ -1397,7 +1397,7 @@
                                 //location.reload();
                                 //app.$router.push("/order/edit/" + data.order_id);
                                 var baseurl = window.location.origin;
-                                window.open(baseurl+'/generate_order/'+data.order_id);
+                                window.open(app.site_path+'/generate_order/'+data.order_id);
                                 location.reload();
                             });
                         } else {
