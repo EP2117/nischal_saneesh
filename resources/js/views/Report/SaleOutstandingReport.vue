@@ -161,17 +161,17 @@
                         <tbody id="result" >
                             <template v-for="(po,k) in sale_outstandings">
                                 <template v-for="(c,key) in po.out_list">
-                                    <tr v-if="c.type='paid'">
-                                <td class="text-center"></td>
-                                <td class="text-center">{{c.invoice_no}}</td>
-                                <td class="text-center">{{c.invoice_date}}</td>
-                                <!--                            <td class="text-center">{{c.vochur_no}}</td>-->
-                                <td class="text-center">{{c.customer.cus_name}}</td>
-                                <td class="text-center" style="right: 4px ">{{c.customer.cus_code}}</td>
-                                <td class="text-center">{{c.total_amount}} </td>
-                                <td class="text-center">{{c.t_paid_amount}} </td>
-                                <td class="text-center">{{c.t_balance_amount}} </td>
-                                    </tr>
+                                <tr v-if="c.type=='paid'">
+                                    <td class="text-center"></td>
+                                    <td class="text-center">{{c.invoice_no}}</td>
+                                    <td class="text-center">{{c.invoice_date}}</td>
+                                    <!--                            <td class="text-center">{{c.vochur_no}}</td>-->
+                                    <td class="text-center">{{c.customer.cus_name}}</td>
+                                    <td class="text-center" style="right: 4px ">{{c.customer.cus_code}}</td>
+                                    <td class="text-center">{{c.total_amount}} </td>
+                                    <td class="text-center">{{c.t_paid_amount}} </td>
+                                    <td class="text-center">{{c.t_balance_amount}} </td>
+                                </tr>
                                 </template>
                                 <tr class="">
                                     <td colspan="5" class="text-right mm-txt"><b>Total</b></td>

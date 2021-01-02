@@ -74,19 +74,19 @@
                             <th class="text-center">Amount</th>
                         </tr>
                         </tfoot>
-                         <tbody >
+                         <tbody>
                         <template v-for="(pl,index) in profit_and_loss">
                             <template v-if='index== "Revenue"' >
-                                <h3 style="margin-left:100px">{{index}}</h3>
-                              <!-- <tr v-for="(r,i) in pl.revenue"> -->
-                              <tr v-for="(r,i) in pl" >  
+                             <h3 style="margin-left:100px">{{index}}</h3>
+                             <!--<tr v-for="(r,i) in pl.revenue"> -->
+                             <tr v-for="(r,i) in pl" >  
                                 <td class="text-center">
-                                    {{r.name}}
+                                  {{r.name}}
                                 </td>
-                                 <td class="text-center">
-                                    {{r.amount.toLocaleString()}}
+                                <td class="text-center">
+                                  {{r.amount.toLocaleString()}}
                                 </td>
-                              </tr>
+                             </tr>
                             </template>
                             <template v-if='index=="Cost of Revenue"'>
                                 <h3 style="margin-left:100px">{{index}}</h3>
@@ -101,8 +101,8 @@
                             </template>
                             <!-- <td class="text-center">{{((currentPage * perPage) - perPage) + (index+1)}}</td> -->
                         </template>
-                        <tr class="total_row table-secondary " v-if='profit_and_loss!=" " '  >
-                               <td colspan="1" class="text-right mm-text" v-if="gross_profit>0">
+                        <tr class="total_row table-secondary " v-if='profit_and_loss!="" '  >
+                               <td colspan="1" class="text-right mm-text" v-if="gross_profit>=0">
                                    <strong><h3>Gross Profit </h3></strong> 
                                     </td>
                                <td colspan="1" class="text-right mm-text" v-else-if="gross_profit<0"><strong><h3>Loss Profit </h3></strong>  </td>
@@ -157,7 +157,8 @@
                               </tr>
                         </template>
                             <tr class="total_row table-secondary" v-if="net_profit!=''">
-                                   <td colspan="1" class="text-right mm-text"><strong> <h3>Net Profit </h3></strong>  </td>
+                                   <td colspan="1" class="text-right mm-text" v-if="net_profit>=0"><strong> <h3>Net Profit </h3></strong>  </td>
+                                   <td colspan="1" class="text-right mm-text" v-if="net_profit<0"><strong> <h3> Net Loss </h3></strong>  </td>
                                    <td colspan="1" class="text-center ">{{net_profit.toLocaleString()}}</td>
                               </tr>
                         </tbody> 
@@ -228,20 +229,24 @@ export default {
         var app=this;
         // this.initDebit();
         // this.initCredit();
-    
         this.initMonth();
         this.initYear();
-         $('#month_id').select2();
-          $('#month_id').on('select2:select',function(e){
+        $('#month_id').select2();
+        $('#month_id').on('select2:select',function(e){
+            app.search.from_date='';
+            app.search.to_date='';
             var data=e.params.data;
             app.search.month=data.id;
-           
         });
           $('#year_id').select2();
           $('#year_id').on('select2:select',function(e){
+             app.search.from_date='';
+            app.search.to_date='';
             var data=e.params.data;
             app.search.year=data.id;
-           
+        });
+        $(document).on('change','#month_id',function(evt){
+            $('#year_id').prop('required',true);
         });
         $("#from_date")
             .datetimepicker({
@@ -270,6 +275,10 @@ export default {
                 }
             })
             .on("dp.change", function(e) {
+                app.search.month='';
+                $('#month_id').val('').trigger('change');
+                app.search.yeaer='';
+                $('#year_id').val('').trigger('change');
                 var formatedValue = e.date.format("YYYY-MM-DD");
                 //console.log(formatedValue);
                 app.search.from_date = formatedValue;
@@ -302,6 +311,11 @@ export default {
                 }
             })
             .on("dp.change", function(e) {
+                  app.search.month='';
+                $('#month_id').val('').trigger('change');
+                app.search.yeaer='';
+                $('#year_id').val('').trigger('change');
+                var formatedValue = e.date.format("YYYY-MM-DD");
                 var formatedValue = e.date.format("YYYY-MM-DD");
                 //console.log(formatedValue);
                 app.search.to_date = formatedValue;
@@ -314,7 +328,7 @@ export default {
             this.month=month;
         },
         initYear(){
-            var year=['2020'];
+            var year=['2020','2021'];
             this.year=year;
         },
         // initDebit(){

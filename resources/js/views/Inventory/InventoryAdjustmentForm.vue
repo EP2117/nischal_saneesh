@@ -133,10 +133,10 @@
                                                     <input type="text" class="form-control txt_uom" name="uom[]" data-id="" readonly />
                                                 </td>
                                                 <td>
-                                                    <input type="text"  :id="add_qty_1" class="form-control add_filter_qty num_txt" name="add_qty[]" style="min-width:60px;" />
+                                                    <input type="text"  id="add_qty_1" class="form-control add_filter_qty num_txt" name="add_qty[]" style="min-width:60px;" />
                                                 </td>
                                                 <td>
-                                                    <input type="text" :id="less_qty_1" class="form-control less_filter_qty num_txt "  style="min-width:60px;" name="less_qty[]"   />
+                                                    <input type="text" id="less_qty_1" class="form-control less_filter_qty num_txt "  style="min-width:60px;" name="less_qty[]"   />
                                                 </td>
                                                 <!-- <td>
                                                     <input type="text" class="form-control num_txt" name="qty[]" required />
@@ -228,18 +228,12 @@
 
             $("#loading").hide();
             let app = this;
-
             app.initProducts();
-
             $(".txt_product").select2();
-
             $(".txt_product").on("select2:select", function(e) {
-
                 var data = e.params.data;
-
                 var uom = e.target.options[e.target.options.selectedIndex].dataset.uom;
                 var uom_id = e.target.options[e.target.options.selectedIndex].dataset.uomid;
-
                 $(this).closest('td').next().find('.txt_uom').val(uom);
                 $(this).closest('td').next().find('.txt_uom').attr('data-id',uom_id);
 
