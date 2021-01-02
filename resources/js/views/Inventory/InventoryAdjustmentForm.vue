@@ -119,8 +119,7 @@
                                             <tr id="1">
                                                 <td style="width:40%">
                                                     <select class="form-control txt_product"
-                                                        name="product[]" style="min-width:150px;" required
-                                                    >
+                                                        name="product[]" style="min-width:150px;" required >
                                                         <option value="">Select One</option>
                                                         <option v-for="product in products" 
                                                         :data-uom="product.uom.uom_name" 
