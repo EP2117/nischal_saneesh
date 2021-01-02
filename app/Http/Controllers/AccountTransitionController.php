@@ -94,6 +94,9 @@ class AccountTransitionController extends Controller
                    $pl->when(!is_null($request->from_date),function($q)use($request){
                        return  $q->whereDate('transition_date','>=',$request->from_date);
                    });
+                   $pl->when(!is_null($request->from_date),function($q){
+                    return  $q->whereBetween('transition_date',[request('from_date'),request('to_date')]);
+                });
                    if($request->month){
                     // $pla->whereIn(DB::raw('MONTH(transition_date)'),[$request->month]);
                     $pl->whereMonth('transition_date','=',$request->month);
@@ -103,9 +106,6 @@ class AccountTransitionController extends Controller
                     $pl->whereYear('transition_date','=',$request->year);
                 }
                 
-                   $pl->when(!is_null($request->from_date),function($q){
-                       return  $q->whereBetween('transition_date',[request('from_date'),request('to_date')]);
-                   });
                    $pl=$pl->get();
                 //    dd($pl);
                    $amount=0;
@@ -114,14 +114,13 @@ class AccountTransitionController extends Controller
                     foreach($pl as $p){
                         // $product_sale=DB::table('product_sale')->where('sale_id',$p->sale_id)->get();
                         $product_sale=DB::table('product_transitions')
-                        ->where('transition_sale_id',4)->get();
+                        ->where('transition_sale_id',$p->sale_id)->get();
                         foreach($product_sale as $ps){
                             // $product=Product::find($ps->product_id);
                             // $amount+=(int)$product->cost_price* (int)$ps->product_quantity;
                             $amount+=(int)$ps->cost_price;
                         }
                     }
-                    // dd($amount);
                     $cost_of_revenue=new stdClass();
                     $cost_of_revenue->name='Cost Of Good Sold';
                     $cost_of_revenue->amount=$amount;
