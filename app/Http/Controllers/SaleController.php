@@ -524,7 +524,6 @@ class SaleController extends Controller
                 $amount=$request->pay_amount;
                 $sale->payment_type = 'cash';
             }
-
             $sale->updated_at = time();
             $sale->updated_by = Auth::user()->id;
             $sale->save();
