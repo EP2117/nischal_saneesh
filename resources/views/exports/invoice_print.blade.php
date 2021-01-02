@@ -197,7 +197,6 @@
           <td class="mm-txt">
               {{getUomName($product,$product->pivot->uom_id)}}
           </td>
-
           @if($product->pivot->is_foc == 0)
             <td style="text-align: right;">{{$product->pivot->price}}</td>
             <td style="text-align: right;">{{number_format($product->pivot->total_amount)}}</td>
@@ -205,15 +204,12 @@
             <td style="text-align: right">FOC</td>
             <td></td>
           @endif
-
           <!--@if($product->pivot->uom_id == $product->uom_id)
             <td></td>
           @else
             <td>1 x {{getUomRelation($product,$product->pivot->uom_id)}}</td>
           @endif-->
-
         </tr>
-       
       <?php
         }
       ?>
