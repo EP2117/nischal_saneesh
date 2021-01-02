@@ -572,7 +572,6 @@ class SaleController extends Controller
             }
             //update in product pivot table
             for($i=0; $i<count($request->product); $i++) {
-
                 //check product already exist or not
                 if($request->product_pivot[$i] != '0' && in_array($request->product_pivot[$i], $ex_pivot_arr)) {
                     //update existing product in pivot and transition tables
@@ -597,13 +596,13 @@ class SaleController extends Controller
                         $relation_val = 1;
                     }
                     $product_qty = $request->qty[$i] * $relation_val;
+                    $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
 
                     DB::table('product_transitions')
                         ->where('transition_product_pivot_id', $request->product_pivot[$i])
                         ->where('transition_sale_id', $id)
-                        ->update(array('product_uom_id' => $main_uom_id, 'product_quantity' => $product_qty, 'transition_product_uom_id' => $request->uom[$i], 'transition_product_quantity' => $request->qty[$i]));
+                        ->update(array('cost_price'=>$cost_price *$request->qty[$i],'product_uom_id' => $main_uom_id, 'product_quantity' => $product_qty, 'transition_product_uom_id' => $request->uom[$i], 'transition_product_quantity' => $request->qty[$i]));
                 } else {
-
                     //add product into pivot table if not exist
 
                     //get product pre-defined UOM
@@ -632,7 +631,7 @@ class SaleController extends Controller
                         //for pre-defined product uom
                         $relation_val = 1;
                     }
-            $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
+                  $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
                     //add products in transition table=> transfer_type = out (for sold out)
                     $obj = new ProductTransition;
                     $obj->product_id            = $request->product[$i];
@@ -643,6 +642,7 @@ class SaleController extends Controller
                     $obj->warehouse_id          = Auth::user()->warehouse_id; // for Main Warehouse Entry
                     $obj->transition_date       = $request->invoice_date;
                     $obj->transition_product_uom_id        = $request->uom[$i];
+                    $obj->cost_price            =$cost_price *$request->qty[$i];
                     $obj->transition_product_quantity      = $request->qty[$i];
                     $obj->product_uom_id        = $main_uom_id;
                     $obj->product_quantity      = $request->qty[$i] * $relation_val;

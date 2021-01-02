@@ -220,7 +220,11 @@
             <td style="text-align: right;">0</td>
             <td style="text-align: right;">0</td>
           @endif
-
+          <!--@if($product->pivot->uom_id == $product->uom_id)
+            <td></td>
+          @else
+            <td>1 x {{getUomRelation($product,$product->pivot->uom_id)}}</td>
+          @endif-->
         </tr>
       <?php
         }

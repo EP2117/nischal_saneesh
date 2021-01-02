@@ -452,6 +452,7 @@ trait GetReport{
             $where= "product_transitions.transition_date <= '".$today."'";
         }
         $products = DB::table("products")
+        ->where('products.is_active',1)
         ->select(DB::raw("products.id as product_id,pt.transition_date,ps.s_valuation_amount,pt.cost_price,products.purchase_price,ps.s_qty, pp.p_valuation_amount,pt.entry_qty,products.product_name,products.minimum_qty, products.brand_id,pt.warehouse_id, products.product_code,uom_id,uoms.uom_name,brands.brand_name,categories.category_name, pt.in_qty,pt.out_qty"))
         ->leftjoin(DB::raw("(SELECT product_id,product_quantity,transition_type,transition_purchase_id, warehouse_id, transition_date, branch_id,
                          SUM(CASE  WHEN transition_type = 'in'  AND transition_entry_id IS NOT NULL THEN product_quantity  ELSE 0 END) as entry_qty,

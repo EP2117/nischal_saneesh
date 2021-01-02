@@ -487,7 +487,6 @@ class ProductTransitionController extends Controller
         $total_valuation=0;
         foreach($data as $p){
             $bal=($p->entry_qty+(int)$p->in_qty)-(int)$p->out_qty;
-        
             $p->balance=$bal;
             // $p->s_valuation_amount=$p->s_valuation_amount==null ? 0 : (int)$p->s_valuation_amount;
             $p->p_valuation_amount=$p->p_valuation_amount==null ? 0 :(int)$p->p_valuation_amount;
