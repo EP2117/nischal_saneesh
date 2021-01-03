@@ -426,8 +426,8 @@ class SaleController extends Controller
                 }
                 // $pp=DB::table('product_purchase')->where('product_id',$request->product[$i])->get();
             // $q=$m=0;
-            $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
-            $store_cost_price=Product::find($request->product[$i]);
+             $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
+             $store_cost_price=Product::find($request->product[$i]);
              $store_cost_price->cost_price=$cost_price;
              $store_cost_price->save();
                 //add products in transition table=> transition_type = out (for sold out)
@@ -581,7 +581,6 @@ class SaleController extends Controller
                     //get product pre-defined UOM
                     $product_result = Product::select('uom_id')->find($request->product[$i]);
                     $main_uom_id = $product_result->uom_id;
-
                     //calculate quantity for product pre-defined UOM
                     $uom_relation = DB::table('product_selling_uom')
                                     ->select('relation')
@@ -595,8 +594,8 @@ class SaleController extends Controller
                         $relation_val = 1;
                     }
                     $product_qty = $request->qty[$i] * $relation_val;
-                    $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
-
+                    $p=Product::find($request->product[$i]);
+                    $cost_price=$p->cost_price;
                     DB::table('product_transitions')
                         ->where('transition_product_pivot_id', $request->product_pivot[$i])
                         ->where('transition_sale_id', $id)
@@ -630,7 +629,9 @@ class SaleController extends Controller
                         //for pre-defined product uom
                         $relation_val = 1;
                     }
-                  $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
+                    // $cost_price=$this->getCostPrice($request->product[$i])->product_cost_price;
+                    $store_cost_price=Product::find($request->product[$i]);
+                    $cost_price=$store_cost_price->cost_price;
                     //add products in transition table=> transfer_type = out (for sold out)
                     $obj = new ProductTransition;
                     $obj->product_id            = $request->product[$i];
@@ -640,9 +641,9 @@ class SaleController extends Controller
                     $obj->branch_id  = Auth::user()->branch_id;
                     $obj->warehouse_id          = Auth::user()->warehouse_id; // for Main Warehouse Entry
                     $obj->transition_date       = $request->invoice_date;
-                    $obj->transition_product_uom_id        = $request->uom[$i];
-                    $obj->cost_price            =$cost_price *$request->qty[$i];
-                    $obj->transition_product_quantity      = $request->qty[$i];
+                    $obj->transition_product_uom_id = $request->uom[$i];
+                    $obj->cost_price            = $cost_price * $request->qty[$i];
+                    $obj->transition_product_quantity  = $request->qty[$i];
                     $obj->product_uom_id        = $main_uom_id;
                     $obj->product_quantity      = $request->qty[$i] * $relation_val;
                     $obj->created_by = Auth::user()->id;
