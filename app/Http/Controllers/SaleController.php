@@ -602,11 +602,10 @@ class SaleController extends Controller
                         ->update(array('cost_price'=>$cost_price *$request->qty[$i],'product_uom_id' => $main_uom_id, 'product_quantity' => $product_qty, 'transition_product_uom_id' => $request->uom[$i], 'transition_product_quantity' => $request->qty[$i]));
                 } else {
                     //add product into pivot table if not exist
-
+                    
                     //get product pre-defined UOM
                     $product_result = Product::select('uom_id')->find($request->product[$i]);
                     $main_uom_id = $product_result->uom_id;
-
                     //add product into pivot table
                     /*$pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);*/
 
