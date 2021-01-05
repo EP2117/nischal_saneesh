@@ -476,7 +476,6 @@ trait GetReport{
                       ) as ps"),function($join){
                           $join->on("ps.product_id","=","products.id");
                       })
-             
 	    		->leftjoin('uoms', 'uoms.id', '=', 'products.uom_id')
 	    		->leftjoin('brands', 'brands.id', '=', 'products.brand_id')
                 ->leftjoin('categories', 'categories.id', '=', 'products.category_id');

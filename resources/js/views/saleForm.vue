@@ -1467,15 +1467,15 @@
                 .get("/sale/" + id)
                 .then(function(response) {  
                     //prevent to Edit (save button permission)
-                    if(app.user_role == "admin" || app.user_role == "system") {
-                        if(response.data.sale.collections.length == 0 && response.data.sale.deliveries.length == 0 && response.data.sale.delivery_approve == 0) {
-                            app.isDisabled = false;
-                        } else {
-                            app.isDisabled = true;
-                        }                        
-                    } else {
-                        app.isDisabled = true;
-                    }
+                    // if(app.user_role == "admin" || app.user_role == "system") {
+                    //     if(response.data.sale.collections.length == 0 && response.data.sale.deliveries.length == 0 && response.data.sale.delivery_approve == 0) {
+                    //         app.isDisabled = false;
+                    //     } else {
+                    //         app.isDisabled = true;
+                    //     }                        
+                    // } else {
+                    //     app.isDisabled = true;
+                    // }
                     app.form.invoice_date = moment(response.data.sale.invoice_date).format('YYYY-MM-DD');
                     app.ex_products = response.data.sale.products;
                     console.log(response.data.sale.products);
