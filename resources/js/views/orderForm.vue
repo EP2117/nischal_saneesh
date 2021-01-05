@@ -316,7 +316,7 @@
 
             if(this.user_role == "van_user" || this.user_role == "office_user") {
                 var url =  window.location.origin;
-                window.location.replace(url);
+                window.location.replace(this.site_path);
             }   
 
             if(this.$route.params.id) {

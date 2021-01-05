@@ -314,10 +314,10 @@
             //this.site_path = this.site_path.substring(this.site_path.lastIndexOf('/')+1);
             this.storage_path = document.querySelector("meta[name='storage-path']").getAttribute('content');
             
-            if(this.user_role == "office_user" || this.user_role == "van_user") {
+            if(this.user_role == "van_user") {
                 var url =  window.location.origin;
-                window.location.replace(url);
-            }   
+                window.location.replace(this.site_path);
+            }
             this.getOrders();   
 
             console.log(localStorage.getItem('storedData200')); 
