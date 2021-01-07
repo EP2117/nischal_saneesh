@@ -6,7 +6,7 @@
     @font-face {
     font-family: 'ZawgyiOne2008';
       src: url({{ storage_path('fonts/ZawgyiOne2008.ttf') }}) format("truetype");
-  }
+  } 
   .body {
     font-family: 'ZawgyiOne2008' !important;
   }
@@ -35,7 +35,7 @@
    /* margin-top:20px; */
   } 
   table#t01 tr.tr_heigh td{
-    height: 30px;
+    height: 20px;
   }
   td {
     border: 1px solid black;
@@ -78,7 +78,6 @@
     width: 200px;
   }
   .serial_no {
-    width:5%;
   }
   </style>
 </head>
@@ -120,17 +119,19 @@
     </div>
   </div>-->
   <!--<div>-->
-    <table id="t01" cellpadding="0" cellspacing="0" style="border:none;width:100%">
+  <div style="text-align: center;width:100%;height: auto;display:block"><img src="{{public_path('storage/image/print_header.jpeg')}}" style="display:block" /></div>
+    <table id="t01" cellpadding="0" cellspacing="0" style="border:none;">
       <thead>
         <tr style="border:none;">
-          <td colspan="9" style="border:none;height:20px;">
+          <!--<td colspan="9" style="border:none;height:20px;">
               &nbsp;
+          </td>-->
+         <td colspan="9" style="border:none;">
+              
           </td>
         </tr>
         <tr style="border:none;">
-          <td colspan="9" style="border:none;height:30px; background-color: #4472c4;color:#fffff; text-align: center;font-weight: bold">
-              SALES INVOICE
-          </td>
+          <td colspan="9" style="border:none;height:30px; background-color: #70706f;color:#fffff; text-align: center;font-weight: bold">SALES INVOICE</td>
         </tr>
         <tr>
           <td colspan="9" style="border:none;padding-top:30px;">
@@ -173,7 +174,7 @@
           </td>
         </tr>
         <tr class="tr_heigh">
-          <td class='mm-txt' style="text-align: center;width:10px">No.</td>
+          <td class='mm-txt' style="text-align: center;max-width:10px;margin:0;padding:0">No.</td>
           <td class='mm-txt' style="text-align: center;width:200px;">Product Name</td>
           <td class='mm-txt' style="text-align: center;width:70px;">QTY</td>
           <td class='mm-txt' style="text-align: center;">UOM</td>
@@ -186,13 +187,13 @@
       </thead>
       <?php
         $count = count($sale->products);
-        $extra_count = $count < 7 ? 7-$count : 0;
+        $extra_count = $count < 15 ? 15-$count : 0;
         $k = 0;
         foreach($sale->products as $product) {
           $k++;
       ?>
         <tr class="tr_heigh">
-          <td style="text-align: center;">{{$k}}</td>
+          <td style="text-align: center;width:5px;margin:0;padding:0">{{$k}}</td>
           <td class="mm-txt">{{$product->product_name}}</td>
 
           @if($product->pivot->uom_id == $product->uom_id)

@@ -118,11 +118,11 @@
                                             <a class="badge badge-primary text-white"  @click="changeStatus(ah.id,'inactive')" v-if="ah.is_active == 1">Inactive</a>
                                             <a class="badge badge-primary text-white" @click="changeStatus(ah.id,'active')" v-else>Active</a>
                                         </a>
-                                        <a class="dropdown-item">
+                                        <!--<a class="dropdown-item">
                                             <a title="Delete" class="text-danger" @click="destroyAccountHead(ah.id)" v-if="user_role == 'admin' || user_role == 'system'">
                                                 <i class="fas fa-trash"></i>
                                             </a>&nbsp;
-                                        </a>
+                                        </a>-->
 
                                     </div>
                                 </div>
