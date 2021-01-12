@@ -276,6 +276,7 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         /**if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
             $validatedData = $request->validate([
                 'reference_no' => 'max:255|unique:sales',
@@ -366,9 +367,9 @@ class SaleController extends Controller
                 //add product into pivot table
                 /**$pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);**/
                 if($request->sale_order == true) {
-                    $pivot = $sale->products()->attach($request->product[$i],['order_product_pivot_id' => $request->order_product_id[$i],'uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]); 
+                    $pivot = $sale->products()->attach($request->product[$i],['order_product_pivot_id' => $request->order_product_id[$i],'wt' => $request->wt[$i],'uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]); 
                 } else {
-                    $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
+                    $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'wt' => $request->wt[$i],'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
                 }
 
                 //get last pivot insert id
@@ -472,6 +473,7 @@ class SaleController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         /**if(!empty($request->reference_no) && $request->duplicate_ref_no == false) {
             $validatedData = $request->validate([
                 'reference_no' => 'max:255|unique:sales,reference_no,'.$id,
@@ -577,7 +579,7 @@ class SaleController extends Controller
                     //update existing product in pivot and transition tables
                     DB::table('product_sale')
                         ->where('id', $request->product_pivot[$i])
-                        ->update(array('uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]));
+                        ->update(array('uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i],'wt' => $request->wt[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]));
 
                     //get product pre-defined UOM
                     $product_result = Product::select('uom_id')->find($request->product[$i]);
@@ -610,7 +612,7 @@ class SaleController extends Controller
                     //add product into pivot table
                     /*$pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);*/
 
-                    $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
+                    $pivot = $sale->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'wt' => $request->wt[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
 
                     //get last pivot insert id
                     $last_row=DB::table('product_sale')->orderBy('id', 'DESC')->first();
@@ -644,6 +646,7 @@ class SaleController extends Controller
                     $obj->transition_product_uom_id = $request->uom[$i];
                     $obj->cost_price            = $cost_price * $request->qty[$i];
                     $obj->transition_product_quantity  = $request->qty[$i];
+                    $obj->wt  = $request->wt[$i];
                     $obj->product_uom_id        = $main_uom_id;
                     $obj->product_quantity      = $request->qty[$i] * $relation_val;
                     $obj->created_by = Auth::user()->id;
@@ -656,6 +659,7 @@ class SaleController extends Controller
             DB::commit();
             return compact('status');
         } catch (\Throwable $e) {
+            dd($e->getMessage());
             DB::rollback();
             $status = "fail";
             return compact('status');
