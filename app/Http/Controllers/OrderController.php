@@ -124,6 +124,8 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        DB::beginTransaction();
+        try {
         $order = new Order;
 
         //auto generate invoice no;
@@ -156,19 +158,21 @@ class OrderController extends Controller
         $order->created_by = Auth::user()->id;
         $order->updated_by = Auth::user()->id;        
         $order->save();
-
-        
         for($i=0; $i<count($request->product); $i++) {
-
             //add product into pivot table
-            $pivot = $order->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);  
-
-                    
+            $pivot = $order->products()->attach($request->product[$i],['uom_id' => $request->uom[$i],'wt' => $request->wt[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);  
         }
-
         $status = "success";
         $order_id = $order->id;
+        DB::commit();
         return compact('status','order_id');
+    } catch (\Throwable $e) {
+        DB::rollback();
+        dd($e->getMessage());
+        $status = "fail";
+        return compact('status');
+        throw $e;
+    }
     }
 
     /**
@@ -180,25 +184,24 @@ class OrderController extends Controller
      */
     public function update(Request $request, $id)
     {
-
+       DB::beginTransaction();
+       try {
         $order = Order::find($id);
         $order->order_no = $request->order_no;
         $order->order_date = $request->order_date;
         //$order->warehouse_id = Auth::user()->warehouse_id;
         $order->customer_id = $request->customer_id;
-
         $order->total_amount = $request->sub_total;
         $order->cash_discount = $request->cash_discount;
         $order->net_total = $request->net_total;
         $order->tax = $request->tax;
         $order->tax_amount = $request->tax_amount;
         $order->balance_amount = $request->balance_amount;
-
         $order->updated_at = time();
         $order->updated_by = Auth::user()->id;  
         $order->remark = $request->remark;      
         $order->save();
-        
+    
         $ex_pivot_arr = $request->ex_product_pivot;
 
         //remove id in pivot that are removed in Transfer Form
@@ -218,23 +221,31 @@ class OrderController extends Controller
                 //update existing product in pivot and transition tables
                 DB::table('product_order')
                     ->where('id', $request->product_pivot[$i])
-                    ->update(array('uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]));
+                    ->update(array('uom_id' => $request->uom[$i], 'wt' => $request->wt[$i],'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]));
 
-                
+            
             } else {
 
                 //add product into pivot table if not exist
                 /**$pivot = $order->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);**/ 
 
                 //add product into pivot table
-                $pivot = $order->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
+                $pivot = $order->products()->attach($request->product[$i],['uom_id' => $request->uom[$i],'wt' => $request->wt[$i], 'product_quantity' => $request->qty[$i], 'rate' => $request->rate[$i], 'actual_rate' => $request->actual_rate[$i], 'discount' => $request->discount[$i], 'other_discount' => $request->other_discount[$i], 'total_amount' => $request->total_amount[$i], 'is_foc' => $request->is_foc[$i]]);
 
-                
+            
             }
-        }
-
+         }
         $status = "success";        
+        DB::commit();
         return compact('status');
+        // return compact('status','order_id');
+      } catch (\Throwable $e) {
+        DB::rollback();
+        dd($e->getMessage());
+        $status = "fail";
+        return compact('status');
+        throw $e;
+      }
 
     }
 

@@ -103,6 +103,7 @@
                                     <thead class="thead-grey">
                                         <tr>
                                             <th scope="col" >Product Name</th>
+                                            <th scope="col" >WT</th>
                                             <th scope="col" >Quantity</th>
                                             <th scope="col" >UOM</th>
                                             <th scope="col" >Rate</th>
@@ -129,7 +130,10 @@
                                                     :data-uomid="product.uom_id" :value="product.product_id" 
                                                     data-pivotid = "0">{{product.product_name}}</option>
                                                 </select>
-                                            </td>                                                
+                                            </td>    
+                                            <td>
+                                                <input type="text" class="form-control wt_text" style="width:100px;" name="wt[]"  id="wt_1"  />
+                                            </td>                                            
                                             <td>
                                                 <input type="text" class="form-control num_txt txt_qty" style="width:100px;" name="qty[]"  id="qty_1" @blur="calTotalAmount($event.target)" required />
                                             </td>
@@ -169,35 +173,35 @@
                                         </tr>
                                         </template>
                                         <tr class="total_row">
-                                            <td colspan="7" class="text-right">Total Amount</td>
+                                            <td colspan="8" class="text-right">Total Amount</td>
                                             <td></td>
                                             <td colspan="2" class="text-right">
                                                 <input type="text" v-model="form.sub_total" class="form-control num_txt" readonly style="width:150px;" required />
                                             </td>
                                         </tr>
                                         <tr class="total_row">
-                                            <td colspan="7" class="text-right">Cash Discount</td>
+                                            <td colspan="8" class="text-right">Cash Discount</td>
                                             <td></td>
                                             <td colspan="2">
                                                 <input type="text" v-model="form.cash_discount" class="form-control num_txt" style="width:150px;" @blur="changeCashDiscount()" />
                                             </td>
                                         </tr> 
                                         <tr class="total_row">
-                                            <td colspan="7" class="text-right">Net Total</td>
+                                            <td colspan="8" class="text-right">Net Total</td>
                                             <td></td>
                                             <td colspan="2">
                                                 <input type="text" v-model="form.net_total" class="form-control num_txt" readonly style="width:150px;" required />
                                             </td>
                                         </tr> 
                                         <tr class="total_row">
-                                            <td colspan="7" class="text-right">Tax</td>
+                                            <td colspan="8" class="text-right">Tax</td>
                                             <td><input type="text" v-model="form.tax" class="form-control num_txt" style="width:70px;" placeholder='%' @blur="changeTax()"/></td>
                                             <td colspan="2">
                                                 <input type="text" v-model="form.tax_amount" class="form-control num_txt" readonly style="width:150px;" />
                                             </td>
                                         </tr>
                                         <tr class="total_row">
-                                            <td colspan="4" class="text-right">Previous Balance :</td>
+                                            <td colspan="5" class="text-right">Previous Balance :</td>
                                             <td>{{form.previous_balance}}</td>
                                             <td colspan="2" class="text-right">Balance Amount</td>
                                             <td></td>
@@ -249,6 +253,7 @@
                 product: [],
                 uom: [],
                 qty: [],
+                wt: [],
                 unit_price: [],
                 rate: [],
                 actual_rate: [],
@@ -584,7 +589,17 @@
                     $(t1).html(html);                    
                     cell1.appendChild(t1);
 
-                var cell2=row.insertCell(1);
+                 var cell02=row.insertCell(1);
+                 var t02=document.createElement("input");
+                    t02.name = "wt[]";
+                    t02.id = "wt_"+row_id;
+                    t02.style = "width:100px;";
+                    t02.className ="form-control wt_text";
+                    $(t02).attr("required", true);
+                    t02.addEventListener('blur', function(){ app.checkQty(t02); });
+                    cell02.appendChild(t02);
+
+                var cell2=row.insertCell(2);
                 var t2=document.createElement("input");
                     t2.name = "qty[]";
                     t2.id = "qty_"+row_id;
@@ -594,7 +609,7 @@
                     t2.addEventListener('blur', function(){ app.calTotalAmount(t2); });
                     cell2.appendChild(t2);
                    
-                var cell3=row.insertCell(2);
+                var cell3=row.insertCell(3);
 
                 var t3=document.createElement("select");
                     t3.name = "uom[]";
@@ -615,7 +630,7 @@
                  cell3.appendChild(t3);
 
 
-                var cell4=row.insertCell(3);
+                var cell4=row.insertCell(4);
                 var rate=document.createElement("input");
                     rate.name = "rate[]";
                     rate.id = "rate_"+row_id;
@@ -625,7 +640,7 @@
                     rate.addEventListener('blur', function(){ app.calTotalAmount(rate); });
                     cell4.appendChild(rate);
 
-                var cell_discount=row.insertCell(4);
+                var cell_discount=row.insertCell(5);
                 var discount=document.createElement("input");
                     discount.name = "discount[]";
                     discount.id = "discount_"+row_id;
@@ -634,7 +649,7 @@
                     discount.addEventListener('blur', function(){ app.calTotalAmount(discount); });
                     cell_discount.appendChild(discount);
 
-                var cell_actual=row.insertCell(5);
+                var cell_actual=row.insertCell(6);
                 var actual_rate=document.createElement("input");
                     actual_rate.name = "actual_rate[]";
                     actual_rate.id = "actual_rate_"+row_id;
@@ -657,7 +672,7 @@
                     app.form.customer_id = data.id;
                 });
 
-                var cell5=row.insertCell(6);
+                var cell5=row.insertCell(7);
                     cell5.className = "text-center";
                 var t5=document.createElement("input");
                     t5.type = "checkbox";
@@ -666,7 +681,7 @@
                     t5.addEventListener('change', function(){ app.checkFoc(t5); });
                     cell5.appendChild(t5);
 
-                var cell_other_disc=row.insertCell(7);
+                var cell_other_disc=row.insertCell(8);
                 var other_discount=document.createElement("input");
                     other_discount.name = "other_discount[]";
                     other_discount.id = "other_discount_"+row_id;
@@ -675,7 +690,7 @@
                     other_discount.addEventListener('blur', function(){ app.calTotalAmount(other_discount); });
                     cell_other_disc.appendChild(other_discount);
 
-                var cell7=row.insertCell(8);
+                var cell7=row.insertCell(9);
                 var t7=document.createElement("input");
                     t7.name = "total_amount[]";
                     t7.id = "total_amount_"+row_id;
@@ -686,7 +701,7 @@
                    // t2.addEventListener('blur', function(){ app.checkQty(t2); });
                     cell7.appendChild(t7);
 
-                var cell8=row.insertCell(9);
+                var cell8=row.insertCell(10);
                 cell8.className = "text-center";
                 var row_action = "<a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>";
                 $(cell8).append(row_action);
@@ -805,10 +820,18 @@
                                $(option).attr('data-pivotid',product.pivot.id);
                                option.text = product.product_name;
                                t1.append(option);
-
                                 cell1.appendChild(t1);
 
-                            var cell2=row.insertCell(1);
+                              var cell02=row.insertCell(1);
+                            var t02=document.createElement("input");
+                                t02.name = "wt[]";
+                                t02.id = "wt"+row_id;
+                                t02.value = product.pivot.wt;
+                                t02.style = "width:100px;";
+                                t02.className ="form-control wt_text";
+                                $(t02).attr("required", true);
+
+                            var cell2=row.insertCell(2);
                             var t2=document.createElement("input");
                                 t2.name = "qty[]";
                                 t2.id = "qty_"+row_id;
@@ -824,7 +847,7 @@
                                 t2.addEventListener('blur', function(){ app.calTotalAmount(t2); });
                                 cell2.appendChild(t2);                            
                                
-                            var cell3=row.insertCell(2);
+                            var cell3=row.insertCell(3);
 
                             var t3=document.createElement("select");
                                 t3.name = "uom[]";
@@ -883,7 +906,7 @@
                              cell3.appendChild(t3);
 
 
-                            var cell4=row.insertCell(3);
+                            var cell4=row.insertCell(4);
                             var rate=document.createElement("input");
                                 rate.name = "rate[]";
                                 rate.id = "rate_"+row_id;
@@ -897,7 +920,7 @@
                                 rate.addEventListener('blur', function(){ app.calTotalAmount(rate); });
                                 cell4.appendChild(rate);
 
-                            var cell_discount=row.insertCell(4);
+                            var cell_discount=row.insertCell(5);
                             var discount=document.createElement("input");
                                 discount.name = "discount[]";
                                 discount.id = "discount_"+row_id;
@@ -910,7 +933,7 @@
                                 discount.addEventListener('blur', function(){ app.calTotalAmount(discount); });
                                 cell_discount.appendChild(discount);
 
-                            var cell_actual=row.insertCell(5);
+                            var cell_actual=row.insertCell(6);
                             var actual_rate=document.createElement("input");
                                 actual_rate.name = "actual_rate[]";
                                 actual_rate.id = "actual_rate_"+row_id;
@@ -938,7 +961,7 @@
                                 axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
                             });                            
 
-                            var cell5=row.insertCell(6);
+                            var cell5=row.insertCell(7);
                                 cell5.className = "text-center";
                             var t5=document.createElement("input");
                                 t5.type = "checkbox";
@@ -954,7 +977,7 @@
                                 t5.addEventListener('change', function(){ app.checkFoc(t5); });
                                 cell5.appendChild(t5);
 
-                            var cell_other_disc=row.insertCell(7);
+                            var cell_other_disc=row.insertCell(8);
                             var other_discount=document.createElement("input");
                                 other_discount.name = "other_discount[]";
                                 other_discount.id = "other_discount_"+row_id;
@@ -967,7 +990,7 @@
                                 other_discount.addEventListener('blur', function(){ app.calTotalAmount(other_discount); });
                                 cell_other_disc.appendChild(other_discount);
 
-                            var cell7=row.insertCell(8);
+                            var cell7=row.insertCell(9);
                             var t7=document.createElement("input");
                                 t7.name = "total_amount[]";
                                 t7.id = "total_amount_"+row_id;
@@ -982,7 +1005,7 @@
                                // t2.addEventListener('blur', function(){ app.checkQty(t2); });
                                 cell7.appendChild(t7);
 
-                            var cell8=row.insertCell(9);
+                            var cell8=row.insertCell(10);
                             cell8.className = "text-center";
                             if(app.user_role != 'admin' && (app.order_status == 'Draft' || app.order_status == ''))
                             {
@@ -1039,7 +1062,6 @@
                     app.form.tax_amount    = response.data.order.tax_amount;
                     app.form.balance_amount= response.data.order.balance_amount;
                     app.form.previous_balance = response.data.previous_balance
-
                 })
                 .catch(function(error) {
                   // handle error
@@ -1339,7 +1361,6 @@
             },
 
             onSubmit: function(event){
-
                 let app = this;
                 app.form.product = [];
                 app.form.uom = [];
@@ -1351,16 +1372,13 @@
                 app.form.actual_rate = [];
                 app.form.discount = [];
                 app.form.other_discount = [];
-
                 $("#loading").show();
-
                 if (!this.isEdit) {
-
                     for(var i=0; i<document.getElementsByName('product[]').length; i++) {
-
                         app.form.product.push(document.getElementsByName('product[]')[i].value);
                         app.form.uom.push(document.getElementsByName('uom[]')[i].value);
                         app.form.qty.push(document.getElementsByName('qty[]')[i].value);
+                        app.form.wt.push(document.getElementsByName('wt[]')[i].value);
                         app.form.total_amount.push(document.getElementsByName('total_amount[]')[i].value);
 
                         app.form.rate.push(document.getElementsByName('rate[]')[i].value);
@@ -1424,6 +1442,7 @@
                         app.form.product.push(document.getElementsByName('product[]')[i].value);
                         app.form.uom.push(document.getElementsByName('uom[]')[i].value);
                         app.form.qty.push(document.getElementsByName('qty[]')[i].value);
+                        app.form.wt.push(document.getElementsByName('wt[]')[i].value);
                         app.form.total_amount.push(document.getElementsByName('total_amount[]')[i].value);
 
                         app.form.rate.push(document.getElementsByName('rate[]')[i].value);

@@ -654,13 +654,12 @@ class SaleController extends Controller
                     $obj->save();
                 }
             }
-
             $status = "success";
             DB::commit();
             return compact('status');
         } catch (\Throwable $e) {
-            dd($e->getMessage());
             DB::rollback();
+            dd($e->getMessage());
             $status = "fail";
             return compact('status');
             throw $e;
@@ -1380,6 +1379,7 @@ class SaleController extends Controller
                 //$html .= '<td class="mm-txt">'.$sale->office_sale_man.'</td>';
                 $html .= '<td>'.$sale->product_code.'</td>';
                 $html .= '<td>'.$sale->product_name.'</td>';
+                $html .= '<td>'.$sale->wt.'</td>';
                 $html .= '<td>'.$sale->product_quantity.'</td>';
                 $html .= '<td>'.$sale->uom_name.'</td>';
                 if($sale->is_foc == 0) {

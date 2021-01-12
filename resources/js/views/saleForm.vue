@@ -220,42 +220,42 @@
                                         </template>
                                         
                                         <tr class="total_row">
-                                            <td colspan="7" class="text-right">Total Amount</td>
+                                            <td colspan="8" class="text-right">Total Amount</td>
                                             <td>&nbsp;</td>
                                             <td colspan="2" class="text-right">
                                                 <input type="text" v-model="form.sub_total" class="form-control num_txt" readonly style="width:150px;" required />
                                             </td>
                                         </tr>
                                         <tr class="total_row">
-                                            <td colspan="7" class="text-right">Cash Discount</td>
+                                            <td colspan="8" class="text-right">Cash Discount</td>
                                             <td></td>
                                             <td colspan="2">
                                                 <input type="text" v-model="form.cash_discount" class="form-control num_txt" style="width:150px;" @blur="changeCashDiscount()" />
                                             </td>
                                         </tr> 
                                         <tr class="total_row">
-                                            <td colspan="7" class="text-right">Net Total</td>
+                                            <td colspan="8" class="text-right">Net Total</td>
                                             <td></td>
                                             <td colspan="2">
                                                 <input type="text" v-model="form.net_total" class="form-control num_txt" readonly style="width:150px;" required />
                                             </td>
                                         </tr> 
                                         <tr class="total_row">
-                                            <td colspan="7" class="text-right">Tax</td>
+                                            <td colspan="8" class="text-right">Tax</td>
                                             <td><input type="text" v-model="form.tax" class="form-control num_txt" style="width:70px;" placeholder='%' @blur="changeTax()"/></td>
                                             <td colspan="2">
                                                 <input type="text" v-model="form.tax_amount" class="form-control num_txt" readonly style="width:150px;" />
                                             </td>
                                         </tr>
                                         <tr class="total_row">
-                                            <td colspan="7" class="text-right">Paid Amount</td>
+                                            <td colspan="8" class="text-right">Paid Amount</td>
                                             <td></td>
                                             <td colspan="2">
                                                 <input type="text" id="pay_amount" v-model="form.pay_amount" class="form-control num_txt" readonly="readonly" style="width:150px;" @blur="changePaidAmount()" required />
                                             </td>
                                         </tr>
                                         <tr class="total_row">
-                                            <td colspan="4" class="text-right">Previous Balance :</td>
+                                            <td colspan="5" class="text-right">Previous Balance :</td>
                                             <td>{{form.previous_balance}}</td>
                                             <td colspan="2" class="text-right">Balance Amount</td>
                                             <td></td>
@@ -288,6 +288,7 @@
                                     <thead class="thead-grey">
                                         <tr>
                                             <th scope="col" >Product Name</th>
+                                            <th scope="col" >SO WT</th>
                                             <th scope="col" >SO QTY</th>
                                             <th scope="col" >Accept QTY</th>
                                             <th scope="col" >UOM</th>
@@ -461,9 +462,7 @@
 
             this.sale_type = this.$route.params.sale_type;
             this.user_warehouse = document.querySelector("meta[name='user-wh']").getAttribute('content');
-
             this.user_branch = document.querySelector("meta[name='user-branch']").getAttribute('content');
-
             //this.form.office_sale_man = document.querySelector("meta[name='user-name-likelink']").getAttribute('content');
             //this.form.office_sale_man_id = document.querySelector("meta[name='user-id-likelink']").getAttribute('content');
 
@@ -484,7 +483,6 @@
                 .then(function() {
                     app.getSale(app.sale_id);
                 });
-                
             } else {
                 //this.getMaxId();
                 this.initProducts();
@@ -563,6 +561,7 @@
 
                 var data = e.params.data;
                 if(data.id != '') {
+                    // alert('a');
                     app.getOrder(data.id);
                 } else {
                     $('#order_product_table tbody tr').slice(0, -6).remove();  
@@ -793,6 +792,7 @@
               $("#sale_man").select2();
             },
             getOrder(id) {
+                // alert(id);
                 $("#loading").show();
                 $('#order_product_table tbody tr').slice(0, -6).remove();
               let app = this;
@@ -800,6 +800,8 @@
                 .get("/order/" + id)
                 .then(function(response) {   
                     app.ex_products = response.data.order.products;
+                    console.log(app.ex_products);
+
 
                     //add  products dynamically
                     var subTotal = 0;
@@ -837,7 +839,29 @@
                                option.text = product.product_name;
                                t1.append(option);
                                 cell1.appendChild(t1);
-                            var cell2=row.insertCell(1);
+
+                            var cell02=row.insertCell(1);
+                            var t02=document.createElement("input");
+                                t02.name = "wt[]";
+                                t02.id = "wt_"+row_id;
+                                // if(product.pivot.accepted_quantity == null) {
+                                //     var accept_qty = 0;
+                                // } else {
+                                //     var accept_qty = product.pivot.accepted_quantity;
+                                // }
+                                // var qty = parseInt(product.pivot.product_quantity) - parseInt(accept_qty);
+                                t02.value = product.pivot.wt;
+                                t02.style = "width:100px;";
+                                t02.className ="form-control wt_txt";
+                                $(t02).attr("required", true);
+                                // if(app.order_status != 'Draft' && app.order_status != '') {
+                                //     $(t2).attr('readonly', true);
+                                // }
+                               // t2.addEventListener('blur', function(){ app.checkQty(t2); });
+                                cell02.appendChild(t02);
+
+
+                            var cell2=row.insertCell(2);
                             var t2=document.createElement("input");
                                 t2.name = "qty[]";
                                 t2.id = "qty_"+row_id;
@@ -859,7 +883,7 @@
                                // t2.addEventListener('blur', function(){ app.checkQty(t2); });
                                 cell2.appendChild(t2);
 
-                            var cell_accept_qty=row.insertCell(2);
+                            var cell_accept_qty=row.insertCell(3);
                             var accept_qty=document.createElement("input");
                                 accept_qty.name = "accept_qty[]";
                                 accept_qty.id = "accept_qty_"+row_id;
@@ -871,7 +895,7 @@
                                 accept_qty.addEventListener('blur', function(){ app.checkQty(accept_qty); });
                                 cell_accept_qty.appendChild(accept_qty);                            
                                
-                            var cell3=row.insertCell(3);
+                            var cell3=row.insertCell(4);
 
                             var t3=document.createElement("select");
                                 t3.name = "uom[]";
@@ -930,7 +954,7 @@
                              cell3.appendChild(t3);
 
 
-                            var cell4=row.insertCell(4);
+                            var cell4=row.insertCell(5);
                             var rate=document.createElement("input");
                                 rate.name = "rate[]";
                                 rate.id = "rate_"+row_id;
@@ -944,7 +968,7 @@
                                 rate.addEventListener('blur', function(){ app.calTotalAmount(rate); });
                                 cell4.appendChild(rate);
 
-                            var cell_discount=row.insertCell(5);
+                            var cell_discount=row.insertCell(6);
                             var discount=document.createElement("input");
                                 discount.name = "discount[]";
                                 discount.id = "discount_"+row_id;
@@ -957,7 +981,7 @@
                                 discount.addEventListener('blur', function(){ app.calTotalAmount(discount); });
                                 cell_discount.appendChild(discount);
 
-                            var cell_actual=row.insertCell(6);
+                            var cell_actual=row.insertCell(7);
                             var actual_rate=document.createElement("input");
                                 actual_rate.name = "actual_rate[]";
                                 actual_rate.id = "actual_rate_"+row_id;
@@ -984,7 +1008,7 @@
                                 axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
                             });                            
 
-                            var cell5=row.insertCell(7);
+                            var cell5=row.insertCell(8);
                                 cell5.className = "text-center";
                             var t5=document.createElement("input");
                                 t5.type = "checkbox";
@@ -1000,7 +1024,7 @@
                                 t5.addEventListener('change', function(){ app.checkFoc(t5); });
                                 cell5.appendChild(t5);
 
-                            var cell_other_disc=row.insertCell(8);
+                            var cell_other_disc=row.insertCell(9);
                             var other_discount=document.createElement("input");
                                 other_discount.name = "other_discount[]";
                                 other_discount.id = "other_discount_"+row_id;
@@ -1013,7 +1037,7 @@
                                 other_discount.addEventListener('blur', function(){ app.calTotalAmount(other_discount); });
                                 cell_other_disc.appendChild(other_discount);
 
-                            var cell7=row.insertCell(9);
+                            var cell7=row.insertCell(10);
                             var t7=document.createElement("input");
                                 t7.name = "total_amount[]";
                                 t7.id = "total_amount_"+row_id;
@@ -1028,7 +1052,7 @@
                                // t2.addEventListener('blur', function(){ app.checkQty(t2); });
                                 cell7.appendChild(t7);
 
-                            var cell8=row.insertCell(10);
+                            var cell8=row.insertCell(11);
                             cell8.className = "text-center";
                             /**if(app.user_role != 'admin' && (app.order_status == 'Draft' || app.order_status == ''))
                             {**/

@@ -178,6 +178,7 @@
                                 <!--<th class="text-center">Office Sale Man</th>-->
                                 <th class="text-center">Product Code</th>
                                 <th class="text-center">Product Name</th>
+                                <th class="text-center">WT</th>
                                 <th class="text-center">QTY</th>
                                 <th class="text-center">Selling UOM</th>
                                 <th class="text-center">Unit Price</th>

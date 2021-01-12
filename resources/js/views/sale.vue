@@ -7,7 +7,6 @@
                 <li class="breadcrumb-item" v-if="sale_type == 1"><a :href="site_path+'/office'">Office Sale</a></li>
                 <li class="breadcrumb-item" v-else><a :href="site_path+'/van'">Van Sale</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Sale Invoice</li>
-
             </ol>
         </nav>
         <!-- Page Heading -->
