@@ -1394,14 +1394,12 @@ class SaleController extends Controller
                 else {
                     $html .= '<td>FOC</td>';
                 }
-
                 $html .='<td class="text-right">'.$sale->total_amount.'</td>';
                 $html .= '</tr>';
 
                 if($sale->is_foc == 0){
                     $total = $total + $sale->total_amount;
                 }
-
                 $i++;
 
         }

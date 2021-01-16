@@ -176,6 +176,7 @@
         <tr class="tr_heigh">
           <td class='mm-txt' style="text-align: center;max-width:10px;margin:0;padding:0">No.</td>
           <td class='mm-txt' style="text-align: center;width:200px;">Product Name</td>
+          {{-- <td class='mm-txt' style="text-align: center;width:70px;">WT</td> --}}
           <td class='mm-txt' style="text-align: center;width:70px;">QTY</td>
           <td class='mm-txt' style="text-align: center;">UOM</td>
           <td class='mm-txt' style="text-align: center;">Rate</td>
@@ -195,7 +196,9 @@
         <tr class="tr_heigh">
           <td style="text-align: center;width:5px;margin:0;padding:0">{{$k}}</td>
           <td class="mm-txt">{{$product->product_name}}</td>
-
+            {{-- <td style="text-align: right;">
+              {{$product->pivot->wt}}
+            </td>   --}}
           @if($product->pivot->uom_id == $product->uom_id)
           <td style="text-align: right;">
               {{$product->pivot->product_quantity}}

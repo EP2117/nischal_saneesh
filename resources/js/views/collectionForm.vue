@@ -74,7 +74,7 @@
                                 <select multiple class="form-control invoices"
                                     name="invoices[]" v-model="form.invoices" :required="isRequired" style="width:100%"
                                 >
-                                    <option v-for="sale in sale_invoices" :value="sale.id">{{sale.invoice_no}}_{{sale.total_amount-(sale.discount+sale.collection_amount+sale.pay_amount)}}_{{sale.invoice_date}}</option>
+                                    <option v-for="sale in sale_invoices" :value="sale.id">{{sale.invoice_no}}_{{(sale.total_amount-(sale.discount+sale.collection_amount+sale.pay_amount)).toLocaleString()}}_{{sale_invoice_date(sale.invoice_date)}}</option>
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
@@ -292,13 +292,10 @@
             }
         },
         mounted() {
-
             $("#loading").hide();
             let app = this;
-
             app.initCustomers();
             app.initBranches();
-
             $("#branch_id").on("select2:select", function(e) {
                 app.selected_invoices = [];
                 var data = e.params.data;
@@ -311,7 +308,6 @@
                     $(".invoices").select2();
                 }
             });
-
             $("#customer_id").select2();
             $("#customer_id").on("select2:select", function(e) {
                 app.selected_invoices = [];
@@ -324,7 +320,6 @@
                 axios.get("/customer_credit_sale/"+data.id+"?"+search).then(({ data }) => (app.sale_invoices = data.data));
                 $(".invoices").select2();
             });
-
             $(".invoices").select2();
             $(".invoices").on("select2:select", function(e) {
                 var data = e.params.data;
@@ -469,6 +464,9 @@
         },
 
         methods: {
+            sale_invoice_date(date){
+               return moment(date).format('DD/MM/YY');
+            },
             test(){
                 alert('k');
             },
