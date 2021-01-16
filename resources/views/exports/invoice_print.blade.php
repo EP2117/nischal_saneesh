@@ -126,15 +126,15 @@
           <!--<td colspan="9" style="border:none;height:20px;">
               &nbsp;
           </td>-->
-         <td colspan="9" style="border:none;">
+         <td colspan="10" style="border:none;">
               
           </td>
         </tr>
         <tr style="border:none;">
-          <td colspan="9" style="border:none;height:30px; background-color: #70706f;color:#fffff; text-align: center;font-weight: bold">SALES INVOICE</td>
+          <td colspan="10" style="border:none;height:30px; background-color: #70706f;color:#fffff; text-align: center;font-weight: bold">SALES INVOICE</td>
         </tr>
         <tr>
-          <td colspan="9" style="border:none;padding-top:30px;">
+          <td colspan="10" style="border:none;padding-top:30px;">
             <table cellpadding="0" cellspacing="0" style="border:none; width:100%;">
                 <tr>
                     <td class="mm-txt" style="border:none;">Customer:</td>
@@ -176,14 +176,14 @@
         <tr class="tr_heigh">
           <td class='mm-txt' style="text-align: center;max-width:10px;margin:0;padding:0">No.</td>
           <td class='mm-txt' style="text-align: center;width:200px;">Product Name</td>
-          {{-- <td class='mm-txt' style="text-align: center;width:70px;">WT</td> --}}
+          <td class='mm-txt' style="text-align: center;width:70px;">WT</td>
           <td class='mm-txt' style="text-align: center;width:70px;">QTY</td>
           <td class='mm-txt' style="text-align: center;">UOM</td>
           <td class='mm-txt' style="text-align: center;">Rate</td>
           <td class='mm-txt' style="text-align: center;width:50px">Discount</td>
           <td class='mm-txt' style="text-align: center;">Actual <br />Rate</td>
           <td class='mm-txt' style="text-align: center;width:50px;">Other <br />Discount</td>
-          <td class='mm-txt' style="text-align: center;">Amount</td>
+          <td class='mm-txt' style="text-align: center;border-right: solid 1px #000;">Amoun</td>
         </tr>
       </thead>
       <?php
@@ -196,9 +196,9 @@
         <tr class="tr_heigh">
           <td style="text-align: center;width:5px;margin:0;padding:0">{{$k}}</td>
           <td class="mm-txt">{{$product->product_name}}</td>
-            {{-- <td style="text-align: right;">
+            <td style="text-align: right;">
               {{$product->pivot->wt}}
-            </td>   --}}
+            </td> 
           @if($product->pivot->uom_id == $product->uom_id)
           <td style="text-align: right;">
               {{$product->pivot->product_quantity}}
@@ -246,13 +246,14 @@
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
       </tr>      
       <?php
         }
       ?>
 
       <tr class="tr_heigh">
-        <td colspan="6" rowspan="6" style="vertical-align: top;" class="mm-txt">
+        <td colspan="7" rowspan="6" style="vertical-align: top;" class="mm-txt">
           Sales Man: {{$sale->sale_man->sale_man}} <br />
           @if($sale->payment_type == 'credit')
           Due Date: {{$sale->due_date}} <br />
@@ -285,7 +286,7 @@
         <td style="text-align: right;">{{number_format($sale->balance_amount)}}</td>
       </tr>
       <tr>
-        <td colspan="9" style="height:100px;vertical-align: top" class="mm-txt">Bank Details:</td>
+        <td colspan="10" style="height:100px;vertical-align: top" class="mm-txt">Bank Details:</td>
       </tr>
       <!--<tfoot>
         <tr style="border:none;">
