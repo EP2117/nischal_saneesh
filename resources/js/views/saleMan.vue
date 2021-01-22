@@ -182,7 +182,8 @@
             this.site_path = document.querySelector("meta[name='site-path']").getAttribute('content');
             //this.site_path = this.site_path.substring(this.site_path.lastIndexOf('/')+1);
             this.storage_path = document.querySelector("meta[name='storage-path']").getAttribute('content');
-            if(this.user_role != "system") {
+            if(this.user_role != "system" && this.user_role != 'admin') {
+                // alert('a');
                 var url =  window.location.origin;
                 window.location.replace(url);
             }

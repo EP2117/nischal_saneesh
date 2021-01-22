@@ -132,7 +132,7 @@
 
                         <div class="row mt-0" v-if="form.sale_order == false || isEdit">
                             <div class="col-md-12 text-right mt-0">
-                                <a class='blue-icon' title='Add Product' @click="addProduct()" v-if="((user_role == 'system' || user_role == 'office_user') && form.sale_order == false && !isDisabled) || (( user_role == 'system' || user_role == 'office_user') && form.revise_order == true && !isDisabled) || (!isEdit)"><i class='fas fa-plus-square' style='font-size: 30px;'></i></a>
+                                <a class='blue-icon' title='Add Product' @click="addProduct()" v-if="((user_role == 'system' || user_role == 'office_user') && form.sale_order == false && !isDisabled) || (( user_role == 'system' || user_role == 'office_user' || user_role == 'office_user') && form.revise_order == true && !isDisabled) || (!isEdit)"><i class='fas fa-plus-square' style='font-size: 30px;'></i></a>
                                 <div style="display:none;">
                                     <select class="form-control txt_product"
                                         id="txt_product" style="min-width:150px;"
@@ -357,7 +357,7 @@
                                 <input type="submit" class="btn btn-primary btn-sm" value="Save Entry" id="save_btn" :disabled = "isDisabled">
                             </div>
 
-                            <div class="col-md-12" v-if="(user_role == 'system' || user_role == 'office_user') && isEdit && !isDisabled"> 
+                            <div class="col-md-12" v-if="(user_role == 'system' || user_role == 'office_user' || user_role=='admin') && isEdit && !isDisabled"> 
                                 <input type="submit" class="btn btn-primary btn-sm" value="Update" id="save_btn">
                             </div>
 
@@ -472,9 +472,9 @@
                 //window.location.replace(url);
             }
 
-            if(this.user_role == "admin" && !this.isEdit) {
-                this.isDisabled = true;
-            }
+            // if( !this.isEdit) {
+            //     this.isDisabled = true;
+            // }
             if(this.$route.params.id) {
                 this.isEdit = true;
                 this.sale_id = this.$route.params.id;
@@ -1339,7 +1339,6 @@
                     t02.id = "wt_"+row_id;
                     t02.style = "width:100px;";
                     t02.className ="form-control wt_text";
-                    $(t02).attr("required", true);
                     t02.addEventListener('blur', function(){ app.checkQty(t02); });
                     cell02.appendChild(t02);
                    

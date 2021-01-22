@@ -12,7 +12,7 @@
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h4 class="mb-0 text-gray-800">Sale Invoice</h4>
-            <router-link :to="'/sale/'+sale_type+'/new'" class="d-sm-inline-block btn btn-primary shadow-sm inventory" v-if="user_role == 'system' || user_role == 'office_user' || user_role == 'van_user'">
+            <router-link :to="'/sale/'+sale_type+'/new'" class="d-sm-inline-block btn btn-primary shadow-sm inventory" v-if="user_role == 'system' || user_role == 'admin' || user_role == 'office_user' || user_role == 'van_user'">
                 <i class="fas fa-plus"></i> Add New Invoice
             </router-link>
         </div>
