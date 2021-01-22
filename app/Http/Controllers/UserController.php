@@ -135,7 +135,6 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         $validatedData = $request->validate([
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|string|confirmed',

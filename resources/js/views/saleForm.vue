@@ -132,7 +132,7 @@
 
                         <div class="row mt-0" v-if="form.sale_order == false || isEdit">
                             <div class="col-md-12 text-right mt-0">
-                                <a class='blue-icon' title='Add Product' @click="addProduct()" v-if="((user_role == 'system' || user_role == 'office_user') && form.sale_order == false && !isDisabled) || (( user_role == 'system' || user_role == 'office_user' || user_role == 'office_user') && form.revise_order == true && !isDisabled) || (!isEdit)"><i class='fas fa-plus-square' style='font-size: 30px;'></i></a>
+                                <a class='blue-icon' title='Add Product' @click="addProduct()" v-if="((user_role == 'system'  || user_role == 'admin' || user_role == 'office_user') && form.sale_order == false && !isDisabled) || (( user_role == 'system' || user_role == 'office_user' || user_role == 'office_user') && form.revise_order == true && !isDisabled) || (!isEdit)"><i class='fas fa-plus-square' style='font-size: 30px;'></i></a>
                                 <div style="display:none;">
                                     <select class="form-control txt_product"
                                         id="txt_product" style="min-width:150px;"
@@ -1770,7 +1770,7 @@
 
                             var cell8=row.insertCell(10);
                             cell8.className = "text-center";
-                            if(app.user_role != 'admin' && response.data.sale.order_id == null)
+                            if( response.data.sale.order_id == null)
                             {
                                 var row_action = "<a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>";
                             }
