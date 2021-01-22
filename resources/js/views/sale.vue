@@ -253,15 +253,13 @@
                                                     <i class="fas fa-print"></i>
                                                 </a>        
                                             </a>
-
                                             <a class="dropdown-item">
                                                 <a title="Print" class="text-primary" @click="generatePDF(sale.id)" v-if="sale_type == 1 && user_role != 'Country Head' && user_role != 'Local Supervisor' && user_role != 'office_order_user'">
                                                     <i class="fas fa-print"></i>
                                                 </a>          
                                             </a>
-
                                             <a class="dropdown-item">
-                                                <a title="Delete" class="text-danger" @click="removeSale(sale.id)" v-if="(user_role == 'system' || user_role == 'office_user') && sale.collections.length == 0 && sale.delivery_approve == 0 && sale.deliveries.length == 0">
+                                                <a title="Delete" class="text-danger" @click="removeSale(sale.id)" v-if="(user_role == 'system' || user_role == 'office_user' || user_role=='admin') && sale.collections.length == 0 && sale.delivery_approve == 0 && sale.deliveries.length == 0">
                                                     <i class="fas fa-trash"></i>
                                                 </a>           
                                             </a>
