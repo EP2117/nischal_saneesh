@@ -1593,7 +1593,7 @@
                                 t02.value = product.pivot.wt;
                                 t02.style = "width:100px;";
                                 t02.className ="form-control wt_text";
-                                $(t02).attr("required", true);
+                                // $(t02).attr("required", true);
                                 // if(response.data.sale.order_id != null) {
                                 //     $(t02).attr('readonly', true);
                                 // }

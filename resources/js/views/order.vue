@@ -182,7 +182,7 @@
                                                 </a>
                                             </a>
                                             <a class="dropdown-item">    
-                                                <a title="Delete" class="text-danger" @click="removeOrder(order.id)" v-if="user_role == 'system' || user_id == order.sale_man_id ">
+                                                <a title="Delete" class="text-danger" @click="removeOrder(order.id)" v-if="user_role == 'system' || user_role == 'admin' || user_id == order.sale_man_id ">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </a>

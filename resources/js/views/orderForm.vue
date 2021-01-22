@@ -223,7 +223,6 @@
                                 v-model="form.remark"></textarea>
                             </div>                           
                         </div>
-
                         <div class="row">
                             <div class="col-md-12" v-if="order_status == 'Draft' || order_status == ''">
                                 <input type="submit" class="btn btn-primary btn-sm" value="Save Entry" :disabled="isDisabled">
@@ -764,7 +763,7 @@
                     }
 
                     //for edit permission (save btn)
-                    if(app.user_role == 'system' || app.user_id == response.data.order.sale_man_id) {
+                    if(app.user_role == 'system' || app.user_id == response.data.order.sale_man_id || app.user_role=='admin') {
                         app.isDisabled = false;
                     } else {
                         app.isDisabled = true;
@@ -824,11 +823,12 @@
                               var cell02=row.insertCell(1);
                             var t02=document.createElement("input");
                                 t02.name = "wt[]";
-                                t02.id = "wt"+row_id;
+                                t02.id = "wt"+row_id;   
                                 t02.value = product.pivot.wt;
                                 t02.style = "width:100px;";
                                 t02.className ="form-control wt_text";
-                                $(t02).attr("required", true);
+                                // $(t02).attr("required", true);
+                                cell02.appendChild(t02);  
 
                             var cell2=row.insertCell(2);
                             var t2=document.createElement("input");
