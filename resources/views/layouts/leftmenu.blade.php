@@ -230,6 +230,16 @@
         </router-link>
         @endif
         @endif
+        @if(Auth::user()->role->role_name=='admin')
+        <hr class="sidebar-divider">
+
+        <router-link  tag="li" to="/sale-man" class="nav-item">
+            <a class="nav-link" >
+                <i class="fas fa-users"></i>
+                <span>Sale Man</span>
+            </a>
+        </router-link>
+        @endif
 
 
 

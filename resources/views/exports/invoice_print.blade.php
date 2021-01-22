@@ -193,12 +193,12 @@
         foreach($sale->products as $product) {
           $k++;
       ?>
-        <tr class="tr_heigh">
+        <tr class="tr_heigh"> 
           <td style="text-align: center;width:5px;margin:0;padding:0">{{$k}}</td>
           <td class="mm-txt">{{$product->product_name}}</td>
-            {{-- <td style="text-align: right;">
-              {{$product->pivot->wt}}
-            </td>   --}}
+          {{-- <td style="text-align: right;">
+            {{$product->pivot->wt}}
+          </td>   --}}
           @if($product->pivot->uom_id == $product->uom_id)
           <td style="text-align: right;">
               {{$product->pivot->product_quantity}}

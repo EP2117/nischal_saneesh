@@ -595,7 +595,6 @@
                     t02.id = "wt_"+row_id;
                     t02.style = "width:100px;";
                     t02.className ="form-control wt_text";
-                    $(t02).attr("required", true);
                     t02.addEventListener('blur', function(){ app.checkQty(t02); });
                     cell02.appendChild(t02);
 
@@ -953,14 +952,11 @@
 
                             $("#customer_id").select2();
                             $("#customer_id").on("select2:select", function(e) {
-
                                 var data = e.params.data;
                                 app.form.customer_id = data.id;
-
                                 //get customer's previous balance
                                 axios.get("/customer_previous_balance/"+data.id).then(({ data }) => (app.form.previous_balance = data.previous_balance));
                             });                            
-
                             var cell5=row.insertCell(7);
                                 cell5.className = "text-center";
                             var t5=document.createElement("input");
@@ -1135,12 +1131,12 @@
                         console.log(min_qty+','+this.products[key].in_count+', '+this.products[key].direct_sale_qty+','+order_qty);
                         console.log(product_qty);
 
-                        if(product_qty > available_qty) {
+                        // if(product_qty > available_qty) {
                             
-                            swal("Warning!", "Not enough quantity! Availabel quantity is "+available_qty+" "+uom_name+".", "warning");
+                        //     swal("Warning!", "Not enough quantity! Availabel quantity is "+available_qty+" "+uom_name+".", "warning");
 
-                            $(obj).focus(); obj.value="";
-                        }
+                        //     $(obj).focus(); obj.value="";
+                        // }
                     }
                 } else {
                     //For UOM box select Event
