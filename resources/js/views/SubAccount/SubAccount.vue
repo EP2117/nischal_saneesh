@@ -101,12 +101,15 @@
                             </td>
                             <td class="text-center"></td>
                             <td class="text-center">
+
                                 <div class="dropdown">
                                     <a class="btn btn-sm btn-icon-only text-danger " href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="fas fa-ellipsis-v"></i>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                        <a class="dropdown-item">
+                                        <a class="dropdown-item" 
+                                            v-show="user_role=='system' && (sa.sub_account_name=='Cash in hand' || sa.sub_account_name=='Bank in hand' || sa.sub_account_name=='Cash Purchase' || sa.sub_account_name=='Cash Sale' || sa.sub_account_name=='Credit Collection' || sa.sub_account_name=='Credit Payment' || sa.sub_account_name=='Discount Allowed' || sa.sub_account_name=='Discount Received' || sa.sub_account_name=='Opening Cash Balance' || sa.sub_account_name=='Purchase Account' || sa.sub_account_name=='Purchase Advance' || sa.sub_account_name=='Sale Account' || sa.sub_account_name=='Sale Advance') "
+                                        >
                                             <router-link tag="span" :to="'/sub_account/edit/' + sa.id" >
                                                 <a href="#" title="Edit/View" class="">
                                                     <i class="fas fa-edit"></i>
@@ -201,12 +204,12 @@ export default {
             sub_account_count: 0,
             sub_account:[],
             rows:'',
+            user_role:'',
         }
     },
     created(){
         // console.log(this.perPage);
         this.user_role = document.querySelector("meta[name='user-role']").getAttribute('content');
-
         this.site_path = document.querySelector("meta[name='site-path']").getAttribute('content');
         //this.site_path = this.site_path.substring(this.site_path.lastIndexOf('/')+1);
         this.storage_path = document.querySelector("meta[name='storage-path']").getAttribute('content');
