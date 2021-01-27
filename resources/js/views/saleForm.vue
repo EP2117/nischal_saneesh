@@ -1339,7 +1339,6 @@
                     t02.id = "wt_"+row_id;
                     t02.style = "width:100px;";
                     t02.className ="form-control wt_text";
-                    t02.addEventListener('blur', function(){ app.checkQty(t02); });
                     cell02.appendChild(t02);
                    
                 // var cell3=row.insertCell(2);
@@ -1593,11 +1592,7 @@
                                 t02.value = product.pivot.wt;
                                 t02.style = "width:100px;";
                                 t02.className ="form-control wt_text";
-                                // $(t02).attr("required", true);
-                                // if(response.data.sale.order_id != null) {
-                                //     $(t02).attr('readonly', true);
-                                // }
-                                // t02.addEventListener('blur', function(){ app.calTotalAmount(t02); });
+                            
                                 cell02.appendChild(t02);  
 
                             var cell2=row.insertCell(2);
@@ -1707,9 +1702,6 @@
                                 $(actual_rate).attr("readonly", true);
                                 actual_rate.addEventListener('blur', function(){ app.calTotalAmount(actual_rate); });
                                 cell_actual.appendChild(actual_rate);
-
-                            
-
                             $(".txt_product").select2();
 
                             $(".txt_uom").select2();
@@ -1787,15 +1779,12 @@
                                var uom      = e.target.options[e.target.options.selectedIndex].dataset.uom;
                                var uom_id   = e.target.options[e.target.options.selectedIndex].dataset.uomid;
                                var price    = e.target.options[e.target.options.selectedIndex].dataset.price;
-
                                 //$(this).closest('td').next().next().find('.txt_uom').attr('data-uom',uom);
                                 $("#uom_"+row_id).attr('data-uom',uom);
-
                                 //auto add new product row
                                 /**if($(this).closest('tr').next().hasClass("total_row")) {
                                     app.addProduct();
                                 }**/
-
                                //add Warehouse UOM Selling Price
                                // $(this).closest('td').next().next().next().next().next().find('input').val(price);
                                $("#rate_"+row_id).val(price);

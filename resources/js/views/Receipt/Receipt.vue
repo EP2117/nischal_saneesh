@@ -108,10 +108,10 @@
                             <!--                            <td></td>-->
                             <td class="text-center">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                             <td class="text-center">{{r.cash_receipt_no}}</td>
-                            <td class="text-center">{{r.date}}</td>
+                            <td class="text-center">{{dateFormat(r.date)}}</td>
                             <td class="text-center">{{r.debit.sub_account_name}}</td>
                             <td class="text-center">{{r.credit.sub_account_name}}</td>
-                            <td class="text-center">{{r.amount}}</td>
+                            <td class="text-center">{{r.amount.toLocaleString()}}</td>
                             <td class="text-center">{{r.remark}}</td>
                             <td class="text-left">
                                 <div class="dropdown">
@@ -238,6 +238,7 @@ export default {
         }
         this.getReceipt();
     },
+    
     mounted() {
         var app=this;
         this.initDebit();
@@ -305,6 +306,9 @@ export default {
             });
     },
     methods:{
+           dateFormat(d) {
+            return moment(d).format('DD/MM/YYYY');
+        },
         initDebit(){
             axios.get('/sub_account/get_sub_account/'+"debit").then(({data})=>(this.debit=data.sub_account));
         },

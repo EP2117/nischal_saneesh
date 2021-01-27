@@ -65,11 +65,11 @@ trait GetReport{
             }
             $total_discount+=$payment->discount;
             $total_paid+=$payment->paid_amount;
-            $html .= '<tr><td class="text-center"></td><td class="text-center">'.$payment->collection_date.'</td><td class="text-center">'.$payment->collection_no.'</td>';
+            $html .= '<tr><td class="text-center"></td><td class="text-center">'.Carbon::parse($payment->collection_date)->format('d/m/Y').'</td><td class="text-center">'.$payment->collection_no.'</td>';
             $html .= '<td class="text-center">'.$payment->invoice_date.'</td><td>'.$payment->invoice_no.'</td>';
             $html .= '<td class="mm-txt">'.$payment->supplier_name.'</td>';
-            $html .= '<td class="text-center">'.$payment->paid_amount.'</td>';
-            $html .= '<td class="mm-txt">'.$payment->discount.'</td>';
+            $html .= '<td class="text-center">'.number_format($payment->paid_amount).'</td>';
+            $html .= '<td class="mm-txt">'.number_format($payment->discount).'</td>';
             $html .= '</tr>';
         }
 
@@ -429,12 +429,12 @@ trait GetReport{
                     }
                     $total_discount+=$c->discount;
                     $total_paid+=$c->paid_amount;
-                    $html .= '<tr><td class="text-center"></td><td class="text-center">'.$c->collection_date.'</td><td class="text-center">'.$c->collection_no.'</td>';
-                    $html .= '<td class="text-center">'.$c->invoice_date.'</td><td>'.$c->invoice_no.'</td>';
+                    $html .= '<tr><td class="text-center"></td><td class="text-center">'.Carbon::parse($c->collection_date)->format('d/m/Y').'</td><td class="text-center">'.$c->collection_no.'</td>';
+                    $html .= '<td class="text-center">'.Carbon::parse($c->invoice_date)->format('d/m/Y').'</td><td>'.$c->invoice_no.'</td>';
                     $html .= '<td class="mm-txt">'.$c->customer_name.'</td>';
                     $html .= '<td class="mm-txt">'.$c->sale_man.'</td>';
-                    $html .= '<td class="text-center">'.$c->paid_amount.'</td>';
-                    $html .= '<td class=" text-center mm-txt">'.$c->discount.'</td>';
+                    $html .= '<td class="text-center">'.number_format($c->paid_amount).'</td>';
+                    $html .= '<td class=" text-center mm-txt">'.number_format($c->discount).'</td>';
                     $html .= '<td class=" text-center mm-txt">'.$c->collect_type.'</td>';
                     $html .= '</tr>';
                 }

@@ -106,10 +106,10 @@
                             <!--                            <td></td>-->
                             <td class="text-center">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                             <td class="text-center">{{p.cash_payment_no}}</td>
-                            <td class="text-center">{{p.date}}</td>
+                            <td class="text-center">{{dateFormat(p.date)}}</td>
                             <td class="text-center">{{p.debit.sub_account_name}}</td>
                             <td class="text-center">{{p.credit.sub_account_name}}</td>
-                            <td class="text-center">{{p.amount}}</td>
+                            <td class="text-center">{{p.amount.toLocaleString()}}</td>
                             <td class="text-center">{{p.remark}}</td>
 
                             <!--                            <td class="text-center" v-if="sa.is_active == 1">-->
@@ -312,6 +312,9 @@ export default {
             });
     },
     methods:{
+           dateFormat(d) {
+            return moment(d).format('DD/MM/YYYY');
+        },
         initDebit(){
             axios.get('/sub_account/get_sub_account/'+"debit").then(({data})=>(this.debit=data.sub_account));
         },

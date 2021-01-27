@@ -83,12 +83,12 @@
                             <tr class="total_row"   v-if="at.opening_balance != 0 && !at.hide " >
                                 <td colspan="5" class="text-right mm-txt"><strong>Opening Balance</strong></td>
                                 <td class="text-center" colspan="1" v-if="at.opening_balance > 0 ">
-                                    {{at.opening_balance}}
+                                    {{at.opening_balance.toLocaleString()}}
                                 </td>
                                 <td class="text-center" colspan="1" v-if="at.opening_balance < 0 ">
                                 </td>
                                 <td class="text-center" colspan="1" v-if="at.opening_balance < 0 ">
-                                    {{at.opening_balance*(-1)}}
+                                    {{at.opening_balance*(-1).toLocaleString()}}
                                 </td>
                                 <td class="text-center" colspan="1" v-if="at.opening_balance >0 ">
                                 </td>
@@ -97,12 +97,15 @@
                                 <tr v-for="(c,key) in at.cashbook_list">
                                     <td class="text-right"></td>
                                     <td class="text-center">{{c.vochur_no}}</td>
-                                    <td class="text-center">{{c.transition_date}}</td>
+                                    <td class="text-center">{{dateFormat(c.transition_date)}}</td>
                                     <!--                            <td class="text-center">{{c.vochur_no}}</td>-->
                                     <td class="text-center">{{c.description}}</td>
                                     <td class="text-center" style="right: 4px ">{{c.sub_account.sub_account_name}}</td>
-                                    <td class="text-center">{{c.debit!=''? c.debit : ''}} </td>
-                                    <td class="text-center">{{c.credit!=''? c.credit : ''}} </td>
+                                    <td class="text-center" >
+                                      
+                                        {{(c.debit!=null? c.debit.toLocaleString() : '')}} 
+                                        </td>
+                                    <td class="text-center">{{(c.credit!=null? c.credit.toLocaleString() : '')}} </td>
 
                                 </tr>
                             </template>
@@ -110,31 +113,31 @@
                                 <tr>
                                     <td class="text-right"></td>
                                     <td class="text-center"></td>
-                                    <td >{{at.date}}</td>
+                                    <td >{{dateFormat(at.date)}}</td>
                                 </tr>
                             </template>
                             
                             <tr class="total_row"    v-if="at.cashbook_list.length>0 && !at.hide">
                                 <td colspan="5" class="text-right mm-txt"><strong>DailyTotal</strong></td>
                                 <td class="text-center" colspan="1">
-                                    {{at.total_debit}}
+                                    {{at.total_debit.toLocaleString()}}
                                 </td>
                                 <td class="text-center" colspan="1">
-                                    {{at.total_credit}}
+                                    {{at.total_credit.toLocaleString()}}
                                 </td>
 
                             </tr>
                             <tr class="total_row" v-if="!at.hide">
                                 <td colspan="5" class="text-right mm-text"><strong>Closing Balance</strong></td>
                                 <td class="text-center " colspan="1" v-if="at.closing_balance>0">
-                                    {{at.closing_balance}}
+                                    {{at.closing_balance.toLocaleString()}}
                                     <!--                                121222-->
                                 </td>
                                 <td class="text-center " colspan="1" v-else-if="at.closing_balance<0">
                                     <!--                                121222-->
                                 </td>
                                 <td class="text-center " colspan="1" v-if="at.closing_balance < 0">
-                                    {{at.closing_balance*(-1)}}
+                                    {{(at.closing_balance*(-1)).toLocaleString()}}
                                     <!--                                121222-->
                                 </td>
                                 <td class="text-center " colspan="1" v-else-if="at.closing_balance > 0">
@@ -301,6 +304,9 @@ export default {
             });
     },
     methods:{
+           dateFormat(d) {
+            return moment(d).format('DD/MM/YYYY');
+        },
         initSubAccount(){
             axios.get('/sub_account/get_all_sub_account').then(({data})=>(this.sub_account=data.sub_account));
         },

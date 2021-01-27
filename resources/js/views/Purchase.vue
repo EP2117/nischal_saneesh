@@ -171,7 +171,7 @@
                                 <td class="text-right">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                                 <td class="textalign">{{p.invoice_no}}</td>
                                 <td class="textalign">{{p.reference_no}}</td>
-                                <td class="textalign">{{p.invoice_date}}</td>
+                                <td class="textalign">{{dateFormat(p.invoice_date)}}</td>
                                 <td v-if="p.branch != null">{{p.branch.branch_name}}</td>
                                 <td v-else></td>
                                 <td class="mm-txt">{{p.supplier.name}}</td>
@@ -180,9 +180,9 @@
                                 <td class="mm-txt" v-if="p.office_purchase_man_id != null">{{p.office_purchase_man.name}}</td>
                                 <td v-else></td>
                                 <td>{{p.warehouse.warehouse_name}}</td>
-                                <td class="text-right">{{p.total_amount}}</td>
-                                <td class="text-right">{{p.pay_amount+p.collection_amount}}</td>
-                                <td class="text-right">{{p.balance_amount-p.collection_amount}}</td>
+                                <td class="text-right">{{p.total_amount.toLocaleString()}}</td>
+                                <td class="text-right">{{(p.pay_amount+p.collection_amount).toLocaleString()}}</td>
+                                <td class="text-right">{{(p.balance_amount-p.collection_amount).toLocaleString()}}</td>
                                 <td>{{localTime(p.created_at)}}</td>
                                 <td>{{localTime(p.updated_at)}}</td>
 <!--                                <template v-if="sale_type == 1">-->
@@ -559,7 +559,7 @@ export default {
             });
         },
         dateFormat(d) {
-            return moment(d).format('YYYY-MM-DD');
+            return moment(d).format('DD/MM/YYYY');
         },
 
         getUomName(product,uom_id) {

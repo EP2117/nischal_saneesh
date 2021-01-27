@@ -124,12 +124,12 @@
                             <tr v-for="order,index in orders.data">
                                 <td class="text-right">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                                 <td class="textalign">{{order.order_no}}</td>
-                                <td class="textalign">{{order.order_date}}</td>
+                                <td class="textalign">{{dateFormat(order.order_date)}}</td>
                                 <td v-if="order.branch != null" class="textalign">{{order.branch.branch_name}}</td>
                                 <td v-else></td>
                                 <td class="mm-txt">{{order.customer.cus_name}}</td>
                                 <td class="mm-txt">{{order.sale_man != null ? order.sale_man.sale_man : ''}}</td>
-                                <td class="text-right">{{order.net_total}}</td>
+                                <td class="text-right">{{order.net_total.toLocaleString()}}</td>
                                 <td class="mm-txt">{{order.remark}}</td>
                                 <td>{{localTime(order.created_at)}}</td>
                                 <td>{{localTime(order.updated_at)}}</td>
@@ -506,7 +506,7 @@
             },
 
             dateFormat(d) {
-                return moment(d).format('YYYY-MM-DD');
+                return moment(d).format('DD/MM/YYYY');
             },
 
             numberWithCommas(x) {

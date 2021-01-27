@@ -137,6 +137,7 @@
 <!--                                        <th scope="col">Brand</th>-->
 <!--                                        <th scope="col" >Category</th>-->
                                         <th scope="col" class="mm-txt">အမျိုးအမည်</th>
+                                        <th scope="col" class="mm-txt">WT</th>
                                         <th scope="col" class="mm-txt">အရေအတွက်</th>
                                         <th scope="col" >Purchase Unit</th>
 <!--                                        <th scope="col" >Stock Available</th>-->
@@ -181,6 +182,9 @@
                                                 </select>
                                             </td>
                                             <td>
+                                                <input type="text" class="form-control wt_text" style="width:100px;" name="wt[]"  id="wt_1"  />
+                                            </td>     
+                                            <td>
                                                 <input type="text" class="form-control decimal_no txt_qty" name="qty[]" style="width:150px;"   id="qty_1"  required />
                                             </td>
                                             <td>
@@ -213,19 +217,19 @@
                                         </tr>
                                     </template>
                                     <tr class="total_row"   >
-                                        <td colspan="4" class="text-right mm-txt">စုစုေပါင္း</td>
+                                        <td colspan="5" class="text-right mm-txt">စုစုေပါင္း</td>
                                         <td colspan="2">
                                             <input type="text" v-model="form.sub_total" class="form-control num_txt" readonly style="width:150px;" required />
                                         </td>
                                     </tr>
                                     <tr class="total_row">
-                                        <td colspan="4" class="text-right mm-txt">ေလ်ာ့ေင ြ</td>
+                                        <td colspan="5" class="text-right mm-txt">ေလ်ာ့ေင ြ</td>
                                         <td colspan="2">
                                             <input type="text" v-model="form.discount" class="form-control num_txt" style="width:150px;" @keyup="changeDiscount($event.target)" />
                                         </td>
                                     </tr>
                                     <tr class="total_row">
-                                        <td colspan="4" class="text-right mm-txt">လက္ခံရရိွေင ြ</td>
+                                        <td colspan="5" class="text-right mm-txt">လက္ခံရရိွေင ြ</td>
                                         <td colspan="2" v-if="form.payment_type == 'credit'">
                                             <input type="text" v-model="form.pay_amount" class="form-control num_txt" style="width:150px;" @keyup="calBalance($event.target)" />
                                         </td>
@@ -240,7 +244,7 @@
 <!--                                        </td>-->
 <!--                                    </tr>-->
                                     <tr class="total_row">
-                                        <td colspan="4" class="text-right mm-txt">လက္က်န္ေင ြစုစုေပါင္း</td>
+                                        <td colspan="5" class="text-right mm-txt">လက္က်န္ေင ြစုစုေပါင္း</td>
                                         <td colspan="2">
                                             <input type="text" v-model="form.balance_amount" class="form-control num_txt" readonly style="width:150px;" required />
                                         </td>
@@ -393,6 +397,7 @@ export default {
                 qty: [],
                 unit_price: [],
                 total_amount: [],
+                wt:[],
                 sub_total: 0,
                 pay_amount: 0,
                 balance_amount:0,
@@ -995,6 +1000,9 @@ export default {
             option.text = "Select One";
             t3.append(option);
 
+
+            
+
             /*$.each(this.products, function(index, value) {
                var option = document.createElement("option");
                option.value = value.product_id;
@@ -1010,7 +1018,15 @@ export default {
             $(t3).html(html);
             cell3.appendChild(t3);
 
-            var cell4=row.insertCell(1);
+             var cell02=row.insertCell(1);
+             var t02=document.createElement("input");
+                t02.name = "wt[]";
+                t02.id = "wt_"+row_id;
+                t02.style = "width:100px;";
+                t02.className ="form-control wt_text";
+                cell02.appendChild(t02);
+
+            var cell4=row.insertCell(2);
             var t4=document.createElement("input");
             t4.name = "qty[]";
             t4.id = "qty_"+row_id;
@@ -1020,7 +1036,7 @@ export default {
             // t4.addEventListener('blur', function(){ app.checkQty(t4); });
             cell4.appendChild(t4);
 
-            var cell5=row.insertCell(2);
+            var cell5=row.insertCell(3);
 
             var t5=document.createElement("select");
             t5.name = "uom[]";
@@ -1186,7 +1202,7 @@ export default {
                 $(t6).attr("required", true);
                 t6.addEventListener('blur', function(){ app.calTotalAmount(t6); });
                 cell6.appendChild(t6); */
-            var cell8=row.insertCell(3);
+            var cell8=row.insertCell(4);
             var t8=document.createElement("input");
             t8.name = "unit_price[]";
             t8.id = "unit_price_"+row_id;
@@ -1195,7 +1211,7 @@ export default {
             $(t8).attr("required", true);
             cell8.appendChild(t8);
 
-            var cell9=row.insertCell(4);
+            var cell9=row.insertCell(5);
             var t9=document.createElement("input");
             t9.name = "total_amount[]";
             t9.id = "total_amount_"+row_id;
@@ -1205,7 +1221,7 @@ export default {
             $(t9).attr("readonly", true);
             // t2.addEventListener('blur', function(){ app.checkQty(t2); });
             cell9.appendChild(t9);
-            var cell10=row.insertCell(5);
+            var cell10=row.insertCell(6);
             cell10.className = "text-center";
             var row_action = "<a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>    ";
             $(cell10).append(row_action);
@@ -1358,7 +1374,18 @@ export default {
                             option.text = product.product_name;
                             t3.append(option);
                             cell3.appendChild(t3);
-                            var cell4=row.insertCell(1);
+
+                            var cell02=row.insertCell(1);
+                            var t02=document.createElement("input");
+                                t02.name = "wt[]";
+                                t02.id = "wt"+row_id;
+                                t02.value = product.pivot.wt;
+                                t02.style = "width:100px;";
+                                t02.className ="form-control wt_text";
+                            
+                                cell02.appendChild(t02);  
+
+                            var cell4=row.insertCell(2);
                             var t4=document.createElement("input");
                             t4.name = "qty[]";
                             t4.id = "qty_"+row_id;
@@ -1368,7 +1395,7 @@ export default {
                             $(t4).attr("required", true);
                             // t4.addEventListener('blur', function(){ app.checkQty(t4); });
                             cell4.appendChild(t4);
-                            var cell5=row.insertCell(2);
+                            var cell5=row.insertCell(3);
                             var t5=document.createElement("select");
                             t5.name = "uom[]";
                             t5.id = "uom_"+row_id;
@@ -1620,7 +1647,7 @@ export default {
                             // $(t8).attr("required", true);
                             // cell8.appendChild(t8);
 
-                            var cell8=row.insertCell(3);
+                            var cell8=row.insertCell(4);
                             var t8=document.createElement("input");
                             t8.name = "unit_price[]";
                             t8.id = "unit_price_"+row_id;
@@ -1676,7 +1703,7 @@ export default {
 
 
 
-                            var cell9=row.insertCell(4);
+                            var cell9=row.insertCell(5);
                             var t9=document.createElement("input");
                             t9.name = "total_amount[]";
                             t9.id = "total_amount_"+row_id;
@@ -1691,7 +1718,7 @@ export default {
                             // t2.addEventListener('blur', function(){ app.checkQty(t2); });
                             cell9.appendChild(t9);
 
-                            var cell10=row.insertCell(5);
+                            var cell10=row.insertCell(6);
                             cell10.className = "text-center";
                             if((app.user_role == 'admin' || app.user_role == 'system') && !app.isDisabled)
                             {
@@ -2055,6 +2082,7 @@ export default {
                     app.form.product.push(document.getElementsByName('product[]')[i].value);
                     app.form.uom.push(document.getElementsByName('uom[]')[i].value);
                     app.form.qty.push(document.getElementsByName('qty[]')[i].value);
+                    app.form.wt.push(document.getElementsByName('wt[]')[i].value);
                     app.form.unit_price.push(document.getElementsByName('unit_price[]')[i].value);
                     // app.form.unit_price.push($('#unit_price_'+i).val());
 
@@ -2078,6 +2106,7 @@ export default {
                     }
 
                     var price_variant =  parseInt(document.getElementsByName('unit_price[]')[i].value) - parseInt(product_price);
+
 
                     app.form.price_variants.push(price_variant);
 
@@ -2161,8 +2190,7 @@ export default {
                         app.form.qty.push(document.getElementsByName('qty[]')[i].value);
                         app.form.unit_price.push(document.getElementsByName('unit_price[]')[i].value);
                         app.form.total_amount.push(document.getElementsByName('total_amount[]')[i].value);
-
-
+                        app.form.wt.push(document.getElementsByName('wt[]')[i].value);
                         app.form.product_pivot.push(document.getElementsByName('product[]')[i].options[document.getElementsByName('product[]')[i].options.selectedIndex].dataset.pivotid);
 
                         //for  price variant

@@ -165,7 +165,7 @@
                             <tr>
                                 <td class="text-right">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                                 <td class="textalign">{{sale.invoice_no}}</td>
-                                <td class="textalign">{{sale.invoice_date}}</td>
+                                <td class="textalign">{{dateFormat(sale.invoice_date)}}</td>
                                 <td v-if="sale.branch != null">{{sale.branch.branch_name}}</td>
                                 <td v-else></td>
                                 <td class="mm-txt">{{sale.customer.cus_name}}</td>
@@ -173,7 +173,7 @@
                                 <td v-else></td>
                                 <!--<td class="text-right">{{sale.total_amount}}</td>
                                 <td class="text-right">{{sale.pay_amount}}</td>-->
-                                <td class="text-right">{{sale.net_total}}</td>
+                                <td class="text-right">{{sale.net_total.toLocaleString()}}</td>
                                 <template v-if="sale_type == 1">
                                 <td class="text-center" v-if="(user_role == 'system' || user_role == 'admin') && sale.delivery_status == 'Draft'">
                                     <input
@@ -739,7 +739,7 @@
             },
 
             dateFormat(d) {
-                return moment(d).format('YYYY-MM-DD');
+                return moment(d).format('DD/MM/YYYY');
             },
 
             getUomName(product,uom_id) {

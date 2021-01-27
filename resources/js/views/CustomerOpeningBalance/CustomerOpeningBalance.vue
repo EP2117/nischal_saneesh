@@ -88,9 +88,9 @@
                             <!--                            <td></td>-->
                             <td class="text-center">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                             <td class="text-center">{{p.invoice_no}}</td>
-                            <td class="text-center">{{p.invoice_date}}</td>
+                            <td class="text-center">{{dateFormat(p.invoice_date)}}</td>
                             <td class="text-center">{{p.customer.cus_name}}</td>
-                            <td class="text-center">{{p.total_amount}}</td>
+                            <td class="text-center">{{p.total_amount.toLocaleString()}}</td>
                             <!--                            <td class="text-center" v-if="sa.is_active == 1">-->
                             <!--                                <span class="badge badge-success">Active</span>-->
                             <!--                            </td>-->
@@ -273,6 +273,10 @@ export default {
                 app.rows = data.total;
             });
         },
+          dateFormat(d) {
+            return moment(d).format('DD/MM/YYYY');
+        },
+ 
         removeCustomerOB(id) {
             let app = this;
             swal({

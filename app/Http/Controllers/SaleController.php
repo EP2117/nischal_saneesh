@@ -1038,7 +1038,7 @@ class SaleController extends Controller
 
 
     //Daily Sale Product Wise Report
-    public function getDailySaleProductReportssss(Request $request)
+    public function getDailySaleProductReportss(Request $request)
     {
         ini_set('memory_limit','512M');
 
@@ -1204,7 +1204,6 @@ class SaleController extends Controller
         if($request->invoice_no != "") {
             $sales->where('sales.invoice_no', $request->invoice_no);
         }
-
         if($request->from_date != '' && $request->to_date != '')
         {
             $sales->whereBetween('sales.invoice_date', array($request->from_date, $request->to_date));
@@ -1222,7 +1221,6 @@ class SaleController extends Controller
         if(isset($request->branch_id) && $request->branch_id != "") {
             $sales->where('sales.branch_id', $request->branch_id);
         }
-
         //for Country Head and Admin roles (can access multiple branch)
         if(Auth::user()->role->id == 6 || Auth::user()->role->id == 2) {
             $branches = Auth::user()->branches;
@@ -1372,7 +1370,7 @@ class SaleController extends Controller
         $i = 1;
         $html = '';
         foreach($data as $sale) {
-                $html .= '<tr><td class="text-right"></td><td>'.$sale->invoice_no.'</td><td>'.$sale->invoice_date.'</td>';
+                $html .= '<tr><td class="text-right"></td><td>'.$sale->invoice_no.'</td><td>'.Carbon::parse($sale->invoice_date)->format('d/m/Y').'</td>';
                 $html .= '<td class="mm-txt">'.$sale->branch_name.'</td>';
                 $html .= '<td class="mm-txt">'.$sale->cus_name.'</td>';
                 $html .= '<td class="mm-txt">'.$sale->sale_man.'</td>';
@@ -1389,12 +1387,12 @@ class SaleController extends Controller
                         $other_discount = 0;
                     }
                     $price = $sale->actual_rate - $other_discount;
-                    $html .= '<td class="text-right">'.$price.'</td>';
+                    $html .= '<td class="text-right">'.number_format($price).'</td>';
                 }
                 else {
                     $html .= '<td>FOC</td>';
                 }
-                $html .='<td class="text-right">'.$sale->total_amount.'</td>';
+                $html .='<td class="text-right">'.number_format($sale->total_amount).'</td>';
                 $html .= '</tr>';
 
                 if($sale->is_foc == 0){
@@ -1404,7 +1402,7 @@ class SaleController extends Controller
 
         }
 
-        $html .= '<tr><td colspan ="11" style="text-align: right;">Total</td><td class="text-right">'.number_format($total).'</td></tr>';
+        $html .= '<tr><td colspan ="12" style="text-align: right;">Total</td><td class="text-right">'.number_format($total).'</td></tr>';
 
         return response(compact('html'), 200);
     }

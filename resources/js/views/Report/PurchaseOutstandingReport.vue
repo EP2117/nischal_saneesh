@@ -164,20 +164,20 @@
                                     <tr v-if="c.type=='paid'">
                                         <td class="text-center"></td>
                                 <td class="text-center">{{c.invoice_no}}</td>
-                                <td class="text-center">{{c.invoice_date}}</td>
+                                <td class="text-center">{{dateFormat(c.invoice_date)}}</td>
                                 <!--                            <td class="text-center">{{c.vochur_no}}</td>-->
                                 <td class="text-center">{{c.supplier.name}}</td>
                                 <td class="text-center" style="right: 4px ">{{c.supplier.supplier_code}}</td>
-                                <td class="text-center">{{c.total_amount}} </td>
-                                <td class="text-center">{{c.t_paid_amount}} </td>
-                                <td class="text-center">{{c.t_balance_amount}} </td>
+                                <td class="text-center">{{c.total_amount.toLocaleString()}} </td>
+                                <td class="text-center">{{c.t_paid_amount.toLocaleString()}} </td>
+                                <td class="text-center">{{c.t_balance_amount.toLocaleString()}} </td>
                                     </tr>
                                 </template>
                                 <tr class="">
                                     <td colspan="5" class="text-right mm-txt"><b>Total</b></td>
-                                    <td class="text-center">{{po.total_inv_amt}}</td>
-                                    <td class="text-center">{{po.total_paid_amt}}</td>
-                                    <td class="text-center">{{po.total_bal_amt}}</td>
+                                    <td class="text-center">{{po.total_inv_amt.toLocaleString()}}</td>
+                                    <td class="text-center">{{po.total_paid_amt.toLocaleString()}}</td>
+                                    <td class="text-center">{{po.total_bal_amt.toLocaleString()}}</td>
                                 </tr>
                                     <!-- </template> -->
                                 
@@ -187,9 +187,9 @@
                             </tr>
                              <tr class="">
                                     <td colspan="5" class="text-right mm-txt"><strong>Total Net</strong></td>
-                                    <td class="text-center">{{net_inv_amt}}</td>
-                                    <td class="text-center">{{net_paid_amt}}</td>
-                                    <td class="text-center">{{net_bal_amt}}</td>
+                                    <td class="text-center">{{net_inv_amt.toLocaleString()}}</td>
+                                    <td class="text-center">{{net_paid_amt.toLocaleString()}}</td>
+                                    <td class="text-center">{{net_bal_amt.toLocaleString()}}</td>
                                 </tr>
                         </tbody>
                     </table>
@@ -483,7 +483,7 @@ export default {
         },
 
         dateFormat(d) {
-            return moment(d).format('YYYY-MM-DD');
+            return moment(d).format('DD/MM/YYY');
         },
 
         // getSellingUom(product,uom_id) {

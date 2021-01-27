@@ -186,7 +186,7 @@
                                 <!--<th class="text-center">Reference No.</th>-->
                                 <th class="text-center">Date</th>
                                 <th class="text-center">Branch</th>
-                                <th class="text-center">Customer</th>
+                                <th class="">Customer</th>
                                 <th class="text-center">Sale Man</th>
                                 <!--<th class="text-center">Office Sale Man</th>-->
                                 <th class="text-center">Total Amount</th>
@@ -198,15 +198,15 @@
                                     <td class="text-right"></td>
                                     <td class="textalign">{{sale.invoice_no}}</td>
                                     <!--<td class="textalign">{{sale.reference_no}}</td>-->
-                                    <td class="textalign">{{sale.invoice_date}}</td>
+                                    <td class="textalign">{{dateFormat(sale.invoice_date)}}</td>
                                     <td v-if="sale.branch != null" class="textalign">{{sale.branch.branch_name}}</td>
                                     <td v-else></td>
-                                    <td class="mm-txt">{{sale.customer.cus_name}}</td>
+                                    <td class="mm-txt ">{{sale.customer.cus_name}}</td>
                                     <!--<td class="mm-txt textalign" v-if="sale.order != null && sale.order.sale_man != null">{{sale.order.sale_man.name}}</td>
                                     <td v-else></td>-->
                                     <td class="mm-txt textalign" v-if="sale.office_sale_man_id != null">{{sale.sale_man.sale_man}}</td>
                                             <td v-else></td>
-                                    <td class="text-right">{{sale.net_total}}</td>
+                                    <td class="text-right">{{(sale.net_total).toLocaleString()}}</td>
                                 </tr>
                             </template>
                             <tr>
@@ -598,7 +598,7 @@
             },
 
             dateFormat(d) {
-                return moment(d).format('YYYY-MM-DD');
+                return moment(d).format('DD/MM/YYYY');
             },
 
             numberWithCommas(x) {

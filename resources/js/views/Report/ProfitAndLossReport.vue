@@ -133,7 +133,7 @@
                                                 {{i.sub_account_name}}
                                             </td>
                                              <td class="text-center">
-                                                {{i.amount.toLocaleString()}}
+                                                {{(parseInt(i.amount)).toLocaleString()}}
                                             </td>
                                           </tr>
                                             <tr class="total_row">
@@ -154,10 +154,10 @@
                                      <h5 style="margin-left:250px">{{exp.account_head_name}}</h5>
                                       <tr v-for="(e,index) in exp.expense" >  
                                         <td class="text-center">
-                                            {{e.sub_account_name}}
+                                            {{e.sub_account_name    }}
                                         </td>
                                          <td class="text-center">
-                                            {{e.amount.toLocaleString()}}
+                                            {{(parseInt(e.amount)).toLocaleString()}}
                                         </td>
                                       </tr>
                                 </template>

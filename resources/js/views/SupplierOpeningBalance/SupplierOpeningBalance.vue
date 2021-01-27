@@ -88,9 +88,9 @@
                             <!--                            <td></td>-->
                             <td class="text-center">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                             <td class="text-center">{{p.invoice_no}}</td>
-                            <td class="text-center">{{p.invoice_date}}</td>
+                            <td class="text-center">{{dateFormat(p.invoice_date)}}</td>
                             <td class="text-center">{{p.supplier.name}}</td>
-                            <td class="text-center">{{p.total_amount}}</td>
+                            <td class="text-center">{{p.total_amount.toLocaleString()}}</td>
                             <!--                            <td class="text-center" v-if="sa.is_active == 1">-->
                             <!--                                <span class="badge badge-success">Active</span>-->
                             <!--                            </td>-->
@@ -256,6 +256,10 @@ export default {
             axios.get("/supplier").then(({ data }) => (this.suppliers = data.data));
             $("#supplier_id").select2();
         },
+          dateFormat(d) {
+            return moment(d).format('DD/MM/YYYY');
+        },
+
         getSupplierOB(page=1){
             $("#loading").show();
             // alert(page);

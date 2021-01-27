@@ -110,7 +110,7 @@
                                     <!-- <td class="text-center">{{product.minimum_qty}}</td> -->
                                     <td class="text-center">{{product.balance}}</td>
                                     <!-- <td class="text-center">{{product.valuation_amount==null? 0 : product.p_valuation_amount}}</td> -->
-                                    <td class="text-center">{{product.t_valuation_amount}}</td>
+                                    <td class="text-center">{{product.t_valuation_amount.toLocaleString()}}</td>
                                     <!-- <td>
                                         {{(parseInt(product.product_opening) + parseInt(product.inQqty)+ parseInt(product.receiveQty) +parseInt(product.add_qty)  )-(parseInt(product.saleQty)  + parseInt(product.transferQty))}}
                                     </td> -->

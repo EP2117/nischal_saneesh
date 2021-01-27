@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\AccountTransition;
-use App\Http\Traits\AccountReport\Cashbook;
-use App\Http\Traits\AccountReport\Ledger;
-use App\Http\Traits\Report\GetReport;
-use App\Product;
-use App\ProductTransition;
-use App\PurchaseInvoice;
 use App\User;
+use App\Product;
 use App\Supplier;
+use Carbon\Carbon;
+use App\PurchaseInvoice;
+use App\AccountTransition;
+use App\ProductTransition;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Traits\Report\GetReport;
+use App\Http\Traits\AccountReport\Ledger;
+use App\Http\Traits\AccountReport\Cashbook;
 
 class PurchaseInvoiceController extends Controller
 {
@@ -122,7 +123,7 @@ class PurchaseInvoiceController extends Controller
             for($i=0; $i<count($request->product); $i++) {
                 $product_result = Product::select('uom_id')->find($request->product[$i]);
                 $main_uom_id = $product_result->uom_id;
-                $pivot = $p->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
+                $pivot = $p->products()->attach($request->product[$i],['uom_id' => $request->uom[$i],'wt' => $request->wt[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
                 //get last pivot insert id
                 $last_row=DB::table('product_purchase')->orderBy('id', 'DESC')->first();
                 $pivot_id = $last_row->id;
@@ -272,7 +273,7 @@ class PurchaseInvoiceController extends Controller
                 //update existing product in pivot and transition tables
                 DB::table('product_purchase')
                     ->where('id', $request->product_pivot[$i])
-                    ->update(array('uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]));
+                    ->update(array('uom_id' => $request->uom[$i],'wt' => $request->wt[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]));
 
                 //get product pre-defined UOM
                 $product_result = Product::select('uom_id')->find($request->product[$i]);
@@ -301,7 +302,7 @@ class PurchaseInvoiceController extends Controller
                 $product_result = Product::select('uom_id')->find($request->product[$i]);
                 $main_uom_id = $product_result->uom_id;
                 //add product into pivot table
-                $pivot = $p->products()->attach($request->product[$i],['uom_id' => $request->uom[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
+                $pivot = $p->products()->attach($request->product[$i],['uom_id' => $request->uom[$i],'wt' => $request->wt[$i], 'product_quantity' => $request->qty[$i], 'price' => $request->unit_price[$i], 'price_variant' => $request->price_variants[$i], 'total_amount' => $request->total_amount[$i]]);
 
                 //get last pivot insert id
                 $last_row=DB::table('product_purchase')->orderBy('id', 'DESC')->first();
@@ -567,7 +568,7 @@ class PurchaseInvoiceController extends Controller
         $i = 1;
         $html = '';
         foreach($data as $purchase) {
-            $html .= '<tr><td class="text-right"></td><td>'.$purchase->invoice_no.'</td><td>'.$purchase->invoice_date.'</td>';
+            $html .= '<tr><td class="text-right"></td><td>'.$purchase->invoice_no.'</td><td>'.Carbon::parse($purchase->invoice_date)->format('d/m/Y').'</td>';
             $html .= '<td class="mm-txt">'.$purchase->branch_name.'</td>';
             $html .= '<td class="mm-txt">'.$purchase->name.'</td>';
             $html .= '<td>'.$purchase->product_code.'</td>';
@@ -575,13 +576,13 @@ class PurchaseInvoiceController extends Controller
             $html .= '<td>'.$purchase->product_quantity.'</td>';
             $html .= '<td>'.$purchase->uom_name.'</td>';
             if($purchase->is_foc == 0) {
-                $html .= '<td class="text-right">'.$purchase->price.'</td>';
+                $html .= '<td class="text-right">'.number_format($purchase->price).'</td>';
             }
             else {
                 $html .= '<td>FOC</td>';
             }
 
-            $html .='<td class="text-right">'.$purchase->total_amount.'</td>';
+            $html .='<td class="text-right">'.number_format($purchase->total_amount).'</td>';
             $html .= '</tr>';
 
             if($purchase->is_foc == 0){

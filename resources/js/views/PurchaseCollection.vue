@@ -105,7 +105,7 @@
                         <tr v-for="(collection,index) in collections">
                             <td class="textalign">{{index+1}}</td>
                             <td class="textalign">{{collection.collection_no}}</td>
-                            <td class="textalign">{{collection.collection_date}}</td>
+                            <td class="textalign">{{dateFormat(collection.collection_date)}}</td>
                             <td v-if="collection.branch != null">{{collection.branch.branch_name}}</td>
                             <td v-else></td>
                             <td class="mm-txt">{{collection.supplier.name}}</td>
@@ -336,7 +336,7 @@ export default {
         },
 
         dateFormat(d) {
-            return moment(d).format('YYYY-MM-DD');
+            return moment(d).format('DD/MM/YYYY');
         },
 
         numberWithCommas(x) {

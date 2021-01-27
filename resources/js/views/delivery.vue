@@ -130,11 +130,11 @@
                                 <td class="text-right">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
                                 <td>{{sale.invoice_no}}</td>
                                 <td>{{sale.reference_no}}</td>
-                                <td>{{sale.invoice_date}}</td>
+                                <td>{{dateFormat(sale.invoice_date)}}</td>
                                 <td v-if="sale.branch != null">{{sale.branch.branch_name}}</td>
                                 <td v-else></td>
                                 <td class="mm-txt">{{sale.customer.cus_name}}</td>
-                                <td>{{sale.total_amount}}</td>
+                                <td>{{sale.total_amount.toLocaleString()}}</td>
                                 <td v-if="sale.delivery_status == 'Draft'" class="text-danger text-center">{{sale.delivery_status}}</td>
                                 <td v-else-if="sale.delivery_status == 'Pending'" class="text-warning text-center">{{sale.delivery_status}}</td>
                                 <td v-else class="text-success text-center">{{sale.delivery_status}}</td>
@@ -647,7 +647,7 @@
             },
 
             dateFormat(d) {
-                return moment(d).format('YYYY-MM-DD');
+                return moment(d).format('DD/MM/YYYY');
             },
 
             showSale(sale_id,status,approve)
