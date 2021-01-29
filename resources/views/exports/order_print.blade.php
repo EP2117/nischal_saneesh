@@ -3,12 +3,27 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <style type="text/css">
-    @font-face {
+    /* @font-face {
     font-family: 'ZawgyiOne2008';
       src: url({{ storage_path('fonts/ZawgyiOne2008.ttf') }}) format("truetype");
+  } */
+  /* @font-face {
+    font-family: 'Pyidaungsu25Regular';
+      src: url({{ storage_path('fonts/Pyidaungsu25Regular.ttf') }}) ;
+  } */
+  /* Pyidaungsu-2.5_Regular */
+  @font-face {
+  font-family:'Pyidaungsu';
+  src:local('Pyidaungsu'), url('https://www.mmwebfonts.com/fonts/Pyidaungsu-2.5_Regular.woff') format('woff'), url('https://www.mmwebfonts.com/fonts/Pyidaungsu-2.5_Regular.ttf') format('ttf');
+  }
+
+  @font-face {
+  font-family:'Pyidaungsu';
+  src:local('Pyidaungsu'), url('https://www.mmwebfonts.com/fonts/Pyidaungsu-2.5_Bold.woff') format('woff'), url('https://www.mmwebfonts.com/fonts/Pyidaungsu-2.5_Bold.ttf') format('ttf');
+  font-weight:bold;
   }
   .body {
-    font-family: 'ZawgyiOne2008' !important;
+    font-family: 'Pyidaungsu' !important;
   }
   .title {
     font-size: 35px;
@@ -19,7 +34,7 @@
     font-size: 25px;
   }
   .mm-txt{
-    font-family: 'ZawgyiOne2008' !important;  
+    font-family: 'Pyidaungsu' !important;  
     font-size:13px;
   }
   .box {
@@ -126,8 +141,9 @@
           <td colspan="6">
             <table style="border:none; width:100%">
                 <tr>
-                    <td class="mm-txt" style="border:none;">၀ယ္သူ</td>
-                    <td class="mm-txt" style="border:none;">{{$order->customer->cus_name}}</td>
+                    <td class="mm-txt" style="border:none;">၀ယ္သူ </td>
+                    <td class="mm-txt" style="border:none;">
+                        {{$order->customer->cus_name}} 	</td>
                     <td class="mm-txt" style="text-align:right;border:none;">ရက္စဲြ</td>
                     <td class="mm-txt" style="text-align:right;border:none;">{{\Carbon\Carbon::parse($order->order_date)->format('d-m-Y')}}</td>
                 </tr>

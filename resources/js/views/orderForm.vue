@@ -435,8 +435,6 @@
             /*$(document).on('click','.add-new',function(evt){
                 app.addProduct();
             });*/                
-
-
             $(document).on('click','.remove-row',function(evt) {
                 if(document.getElementsByName('product[]').length <= 1) {                    
                     swal("Warning!", "At least one product must be added!", "warning")
@@ -449,11 +447,8 @@
                         }
                    }
                    var cash_discount = app.form.cash_discount == '' || app.form.cash_discount == null ? 0 : app.form.cash_discount;
-
                    app.form.sub_total = Math.round(sub_total);
-
                    app.form.net_total = parseInt(app.form.sub_total) - parseInt(cash_discount);
-
                     var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
                     var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
                     app.form.tax_amount = tax_amount;
