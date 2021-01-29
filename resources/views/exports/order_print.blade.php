@@ -123,13 +123,13 @@
           </td>
         </tr>-->
         <tr>
-          <td colspan="5">
+          <td colspan="6">
             <table style="border:none; width:100%">
                 <tr>
                     <td class="mm-txt" style="border:none;">၀ယ္သူ</td>
                     <td class="mm-txt" style="border:none;">{{$order->customer->cus_name}}</td>
                     <td class="mm-txt" style="text-align:right;border:none;">ရက္စဲြ</td>
-                    <td class="mm-txt" style="text-align:right;border:none;">{{$order->order_date}}</td>
+                    <td class="mm-txt" style="text-align:right;border:none;">{{\Carbon\Carbon::parse($order->order_date)->format('d-m-Y')}}</td>
                 </tr>
                 <tr>
                     <td class="mm-txt" style="border:none;">လိပ္စာ</td>
@@ -157,11 +157,12 @@
           </td>
         </tr>
         <tr>
-          <td class='mm-txt' style="text-align: center; width:50px;">စဥ္</td>
-          <td class='mm-txt' style="text-align: center;width:300px;">အမ်ိဳးအမည္</td>
-          <td class='mm-txt' style="text-align: center; min-width:50px;">အေရအတြက္</td>
-          <td class='mm-txt' style="text-align: center; min-width:30px;">ေစ်းႏႈန္း</td>
-          <td class='mm-txt' style="text-align: center;">သင့္ေငြ</td>
+          <td class='mm-txt' style="text-align: center; width:50px;">No</td>
+          <td class='mm-txt' style="text-align: center;width:300px;">Product Name</td>
+          <td class='mm-txt' style="text-align: center;width:50px;">WT</td>
+          <td class='mm-txt' style="text-align: center; min-width:50px;">QTY</td>
+          <td class='mm-txt' style="text-align: center; min-width:30px;">Rate</td>
+          <td class='mm-txt' style="text-align: center;">Amount</td>
         </tr>
       </thead>
       <?php
@@ -174,7 +175,9 @@
         <tr>
           <td style="text-align: center;">{{$k}}</td>
           <td class="mm-txt">{{$product->product_name}}</td>
-
+          <td style="text-align:center;">
+            {{$product->pivot->wt}} 
+           </td>
           @if($product->pivot->uom_id == $product->uom_id)
           <td style="text-align: right;">
               {{$product->pivot->product_quantity}} {{getUomName($product,$product->pivot->uom_id)}}
@@ -184,15 +187,13 @@
               {{$product->pivot->product_quantity}} {{getUomName($product,$product->pivot->uom_id)}} x {{getUomRelation($product,$product->pivot->uom_id)}} {{getUomName($product,$product->uom_id)}}
           </td>
           @endif
-
           @if($product->pivot->is_foc == 0)
-            <td style="text-align: right;">{{$product->pivot->price}}</td>
+            <td style="text-align: right;">{{$product->pivot->rate}}</td>
             <td style="text-align: right;">{{number_format($product->pivot->total_amount)}}</td>
           @else
             <td style="text-align: right">FOC</td>
             <td></td>
           @endif
-
         </tr>
       <?php
         }
@@ -206,13 +207,14 @@
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
       </tr>      
       <?php
         }
       ?>
 
       <tr>
-        <td colspan="4" class="mm-txt" style="text-align: right;">စုစုေပါင္း</td>
+        <td colspan="5" class="mm-txt" style="text-align: right;">စုစုေပါင္း</td>
         <td style="text-align: right;">{{number_format($order->total_amount)}}</td>
       </tr>
       <!--<tr>

@@ -31,7 +31,7 @@
                             <div class="form-group col-md-4">
                                 <label for="order_date">Date</label>
                                 <input type="text" class="form-control datetimepicker" id="order_date" name="order_date"
-                                v-model="form.order_date" required readonly>
+                                v-model="form.order_date" required >
                             </div>
                         </div>
 
@@ -547,10 +547,12 @@
             },
 
             addProduct() {           
-
                 var max = 0;
-                $('#product_table tbody tr').each(function(){
-                    max = $(this).attr('id') > max ? $(this).attr('id') : max;
+                // $('#product_table tbody tr').each(function(){
+                //     max = $(this).attr('id') > max ? $(this).attr('id') : max;
+                // });
+                 $('#product_table tbody tr').each(function(){
+                    max = parseInt($(this).attr('id')) > max ? parseInt($(this).attr('id')) : max;
                 });
 
                 //var max = $('#product_table tbody tr').sort(function(a, b) { return +a.id < +b.id })[0].id;

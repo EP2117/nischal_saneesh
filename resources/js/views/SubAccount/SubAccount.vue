@@ -61,8 +61,6 @@
             <div class="card-body">
                 <div class="table-responsive" v-if="sub_account_count > 0">
                     <!-- sort by -->
-
-
                     <!-- end sort by -->
                     <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">  <!--kamlesh-->
                         <thead>
@@ -72,7 +70,6 @@
                             <th class="text-center">Head Account</th>
                             <th class="text-center">Account Type</th>
                             <th class="text-center">Status</th>
-
                             <th class="text-center">  </th> <!--Kamlesh -->
                         </tr>
                         </thead>
@@ -88,9 +85,9 @@
                         </tfoot>
                         <tbody>
                         <tr v-for="(sa,index) in sub_account">
-                            <!--                            <td></td>-->
+                            <!-- <td></td>-->
                             <td class="text-right">{{((currentPage * perPage) - perPage) + (index+1)}}</td>
-                            <td class="text-center">{{sa.sub_account_name}}</td>
+                            <td class="text-center">{{sa.sub_account_name}} </td>
                             <td class="text-center">{{sa.account_head.name}}</td>
                             <td class="text-center">{{sa.account_type.name}}</td>
                             <td class="text-center" v-if="sa.is_active == 1">
