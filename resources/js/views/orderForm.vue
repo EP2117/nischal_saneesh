@@ -31,7 +31,7 @@
                             <div class="form-group col-md-4">
                                 <label for="order_date">Date</label>
                                 <input type="text" class="form-control datetimepicker" id="order_date" name="order_date"
-                                v-model="form.order_date" required readonly>
+                                v-model="form.order_date" required >
                             </div>
                         </div>
 
@@ -435,8 +435,6 @@
             /*$(document).on('click','.add-new',function(evt){
                 app.addProduct();
             });*/                
-
-
             $(document).on('click','.remove-row',function(evt) {
                 if(document.getElementsByName('product[]').length <= 1) {                    
                     swal("Warning!", "At least one product must be added!", "warning")
@@ -449,11 +447,8 @@
                         }
                    }
                    var cash_discount = app.form.cash_discount == '' || app.form.cash_discount == null ? 0 : app.form.cash_discount;
-
                    app.form.sub_total = Math.round(sub_total);
-
                    app.form.net_total = parseInt(app.form.sub_total) - parseInt(cash_discount);
-
                     var tax = app.form.tax == '' || app.form.tax == null ? 0 : app.form.tax;
                     var tax_amount = parseInt(tax)/100 * parseInt(app.form.net_total);
                     app.form.tax_amount = tax_amount;
@@ -547,10 +542,12 @@
             },
 
             addProduct() {           
-
                 var max = 0;
-                $('#product_table tbody tr').each(function(){
-                    max = $(this).attr('id') > max ? $(this).attr('id') : max;
+                // $('#product_table tbody tr').each(function(){
+                //     max = $(this).attr('id') > max ? $(this).attr('id') : max;
+                // });
+                 $('#product_table tbody tr').each(function(){
+                    max = parseInt($(this).attr('id')) > max ? parseInt($(this).attr('id')) : max;
                 });
 
                 //var max = $('#product_table tbody tr').sort(function(a, b) { return +a.id < +b.id })[0].id;

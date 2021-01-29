@@ -149,9 +149,12 @@
                     <td class="mm-txt" style="text-align:right;border:none;">Invoice Date:</td>
                     <td class="mm-txt" style="text-align:right;border:none;">
                       <?php
-                        $date_arr = explode('-',$sale->invoice_date);
+                        // $date_arr = explode('-',$sale->invoice_date);
+                        $date=\Carbon\Carbon::parse($sale->invoice_date)->format('d-m-Y')
                       ?>
-                      {{$date_arr[2].'-'.$date_arr[1].'-'.$date_arr[0]}}
+                      {{$date}}
+                      {{-- {{$date_arr[0].'-'.$date_arr[1].'-'.$date_arr[2]}} --}}
+
                     </td>
                 </tr>
             </table>

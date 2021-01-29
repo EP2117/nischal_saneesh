@@ -80,4 +80,7 @@
   'zawgyione2008' => array(
     'normal' => $fontDir . '/zawgyione2008-normal_3f2838638886f5c4dc362297aaebbb83',
   ),
+  'pyidaungsu' => array(
+    'normal' => $fontDir . '/pyidaungsu-normal_3f2838638886f5c4dc362297aaebbb83',
+  ),
 ) ?>

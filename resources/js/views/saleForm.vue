@@ -1294,10 +1294,14 @@
             addProduct() {           
 
                 var max = 0;
-                $('#product_table tbody tr').each(function(){
-                    max = $(this).attr('id') > max ? $(this).attr('id') : max;
-                });
+                // $('#product_table tbody tr').each(function(){
+                //     max = $(this).attr('id') > max ? $(this).attr('id') : max;
+                // });
 
+                 $('#product_table tbody tr').each(function(){
+                    max = parseInt($(this).attr('id')) > max ? parseInt($(this).attr('id')) : max;
+                });
+                    
                 //var max = $('#product_table tbody tr').sort(function(a, b) { return +a.id < +b.id })[0].id;
                 var row_id = parseInt(max) +1;
 
