@@ -3,27 +3,12 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <style type="text/css">
-    /* @font-face {
+    @font-face {
     font-family: 'ZawgyiOne2008';
       src: url({{ storage_path('fonts/ZawgyiOne2008.ttf') }}) format("truetype");
-  } */
-  /* @font-face {
-    font-family: 'Pyidaungsu25Regular';
-      src: url({{ storage_path('fonts/Pyidaungsu25Regular.ttf') }}) ;
-  } */
-  /* Pyidaungsu-2.5_Regular */
-  @font-face {
-  font-family:'Pyidaungsu';
-  src:local('Pyidaungsu'), url('https://www.mmwebfonts.com/fonts/Pyidaungsu-2.5_Regular.woff') format('woff'), url('https://www.mmwebfonts.com/fonts/Pyidaungsu-2.5_Regular.ttf') format('ttf');
-  }
-
-  @font-face {
-  font-family:'Pyidaungsu';
-  src:local('Pyidaungsu'), url('https://www.mmwebfonts.com/fonts/Pyidaungsu-2.5_Bold.woff') format('woff'), url('https://www.mmwebfonts.com/fonts/Pyidaungsu-2.5_Bold.ttf') format('ttf');
-  font-weight:bold;
   }
   .body {
-    font-family: 'Pyidaungsu' !important;
+    font-family: 'ZawgyiOne2008' !important;
   }
   .title {
     font-size: 35px;
@@ -34,7 +19,7 @@
     font-size: 25px;
   }
   .mm-txt{
-    font-family: 'Pyidaungsu' !important;  
+    font-family: 'ZawgyiOne2008' !important;  
     font-size:13px;
   }
   .box {
