@@ -454,7 +454,7 @@ export default {
         // this.form.office_sale_man_id = document.querySelector("meta[name='user-id-likelink']").getAttribute('content');
 
         this.user_role = document.querySelector("meta[name='user-role']").getAttribute('content');
-         if(this.user_role != "admin" && this.user_role != "system") {
+         if(this.user_role != "admin" && this.user_role != "system" && this.user_role != "office_user") {
             var url =  window.location.origin;
             window.location.replace(url);
         }
