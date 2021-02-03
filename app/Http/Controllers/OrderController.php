@@ -321,9 +321,9 @@ class OrderController extends Controller
        // $pdf = PDF::loadView('invoice_print', $data);
        // if(Auth::user()->role->id == "1" || Auth::user()->role->id == "2") {
             $order = Order::with('products','warehouse','customer','products.uom','products.selling_uoms')->find($order_id);  
+            return view('exports.order_print', compact('order'));
             $pdf = PDF::loadView('exports.order_print', compact('order'));
             $output = $pdf->output();
-
             return new Response($output, 200, [
                'Content-Type' => 'application/pdf',
                'Content-Disposition' =>  'inline; filename="order.pdf"',
