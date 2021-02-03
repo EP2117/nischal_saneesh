@@ -377,7 +377,6 @@
             </a>
         </router-link>
         @endif
-
         @endif
             @if(Request::path() == 'van' || Request::path() == 'purchase_office')
                 @if(Request::path() == 'purchase_office')
