@@ -42,7 +42,7 @@
   table#t01 {
     width:100%;
     margin-top:20px;
-  } 
+  }
   table#t01 tr.tr_heigh td{
     height: 20px;
   }
@@ -136,14 +136,14 @@
           <td colspan="6">
             <table style="border:none; width:100%">
                 <tr>
-                    <td class="mm-txt" style="border:none;">၀ယ္သူ </td>
+                    <td class="mm-txt" style="border:none;">၀ယ်သူ</td>
                     <td class="mm-txt" style="border:none;">
                         {{$order->customer->cus_name}} 	</td>
-                    <td class="mm-txt" style="text-align:right;border:none;">ရက္စဲြ</td>
+                    <td class="mm-txt" style="text-align:right;border:none;">ရက်စွဲ</td>
                     <td class="mm-txt" style="text-align:right;border:none;">{{\Carbon\Carbon::parse($order->order_date)->format('d-m-Y')}}</td>
                 </tr>
                 <tr>
-                    <td class="mm-txt" style="border:none;">လိပ္စာ</td>
+                    <td class="mm-txt" style="border:none;">လိပ်စာ </td>
                     <td class="mm-txt" style="border:none;">{{$order->customer->cus_shipping_address}}</td>
                     <td style="text-align:right;border:none;" class="mm-txt">Order No.</td>
                     <td style="text-align:right; border:none;" class="mm-txt">{{$order->order_no}}</td>
@@ -211,7 +211,6 @@
         for($i=0; $i<$extra_count; $i++) {
           $k++;
       ?>
-
       <tr class="tr_heigh">
         <td style="text-align: right;"></td>
         <td></td>
@@ -223,7 +222,6 @@
       <?php
         }
       ?>
-
       <tr>
         <td colspan="5" class="mm-txt" style="text-align: right;">စုစုေပါင္း</td>
         <td style="text-align: right;">{{number_format($order->total_amount)}}</td>
