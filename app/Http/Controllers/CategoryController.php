@@ -42,13 +42,11 @@ class CategoryController extends Controller
         $data = Category::with('brand')->orderBy('category_name', 'ASC')->get();
         return response(compact('data'), 200);
     }
-
     public function getCategoriesByBrand($brand_id)
     {
         $data = Category::with('brand')->where('brand_id',$brand_id)->orderBy('category_name', 'ASC')->get();
         return response(compact('data'), 200);
     }
-
     public function import() 
     {
         $path1 = request()->file('file')->store('temp'); 
