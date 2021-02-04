@@ -211,7 +211,6 @@
         for($i=0; $i<$extra_count; $i++) {
           $k++;
       ?>
-
       <tr class="tr_heigh">
         <td style="text-align: right;"></td>
         <td></td>
@@ -223,7 +222,6 @@
       <?php
         }
       ?>
-
       <tr>
         <td colspan="5" class="mm-txt" style="text-align: right;">စုစုေပါင္း</td>
         <td style="text-align: right;">{{number_format($order->total_amount)}}</td>
