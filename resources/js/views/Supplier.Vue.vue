@@ -9,7 +9,7 @@
             </ol>
         </nav>
         <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4"  >
             <h4 class="mb-0 text-gray-800">Supplier</h4>
             <router-link to="/supplier/new" class="d-sm-inline-block btn btn-primary shadow-sm text-right">
                 <i class="fas fa-plus"></i> Add New Supplier
@@ -181,7 +181,7 @@
                                     <a class="btn btn-sm btn-icon-only text-danger " href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="fas fa-ellipsis-v"></i>
                                     </a>
-                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow" >
                                         <a class="dropdown-item">
                                             <router-link tag="span" :to="'/supplier/edit/' + sup.id" >
                                                 <a href="#" title="Edit/View" class="">
@@ -189,7 +189,7 @@
                                                 </a>&nbsp;
                                             </router-link>
                                         </a>
-                                        <a class="dropdown-item">
+                                        <a class="dropdown-item" v-if="user_role!='office_user'">
                                             <a class="badge badge-primary text-white"  @click="changeStatus(sup.id,'inactive')" v-if="sup.is_active == 1">Inactive</a>
                                             <a class="badge badge-primary text-white" @click="changeStatus(sup.id,'active')" v-else>Active</a>
                                         </a>
