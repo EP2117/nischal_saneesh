@@ -120,7 +120,7 @@
                                                 <td>
                                                     <input type="text" class="form-control num_txt" name="qty[]" required />
                                                 </td>
-                                                <td class="text-center" v-if="user_role == 'office_user' || user_role == 'system'">
+                                                <td class="text-center" v-if="user_role == 'office_user' || user_role == 'system' ">
                                                     <a class='remove-row red-icon' title='Remove'><i class='fas fa-times-circle' style='font-size: 25px;'></i></a>
                                                 </td>
                                             </tr>
@@ -130,8 +130,8 @@
                             </div>                         
 
                         </div>
-                        <div class="row">
-                            <div class="col-md-12" v-if="user_role == 'office_user' || user_role == 'system'">
+                        <div class="row" v-if="!isHide">
+                            <div class="col-md-12" v-if=" user_role == 'system' || user_role == 'admin' || user_role == 'office_user'" >
                                 <input type="submit" class="btn btn-primary btn-sm" value="Save Entry">
                             </div>
                         </div>
@@ -163,6 +163,7 @@
 
               }),
               isEdit: false,
+              isHide: false,
               products: [],
               entry_id: '',
               ex_products: [],  
@@ -360,6 +361,9 @@
 
             getEntry(id) {
               let app = this;
+              if(this.user_role=='office_user'){
+                  app.isHide=true;
+              }
               axios
                 .get("/mainwarehouse_entry/" + id)
                 .then(function(response) {

@@ -10,7 +10,7 @@
             </ol>
         </nav>
         <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4" v-if="user_role!='office_user'">
             <h4 class="mb-0 text-gray-800">Account Head</h4>
             <router-link to="/account_head/new" class="d-sm-inline-block btn btn-primary shadow-sm text-right">
                 <i class="fas fa-plus"></i> Add New Account Head
@@ -114,7 +114,7 @@
                                                 </a>&nbsp;
                                             </router-link>
                                         </a>
-                                        <a class="dropdown-item">
+                                        <a class="dropdown-item" v-if="user_role!='office_user'">
                                             <a class="badge badge-primary text-white"  @click="changeStatus(ah.id,'inactive')" v-if="ah.is_active == 1">Inactive</a>
                                             <a class="badge badge-primary text-white" @click="changeStatus(ah.id,'active')" v-else>Active</a>
                                         </a>

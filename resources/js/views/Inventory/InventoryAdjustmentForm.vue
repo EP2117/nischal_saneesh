@@ -151,12 +151,11 @@
                             </div>                         
 
                         </div>
-                        <div class="row">
-                            <div class="col-md-12" v-if="user_role == 'office_user' || user_role == 'system'">
+                        <div class="row" v-if="!isHide">
+                            <div class="col-md-12" v-if="user_role == 'office_user' || user_role == 'system' || user_role == 'admin'">
                                 <input type="submit" class="btn btn-primary btn-sm" value="Save Entry">
                             </div>
                         </div>
-
                     </form>                    
                 <!-- form end -->  
                 </div>
@@ -186,6 +185,7 @@
               }),
               isEdit: false,
               qty_format:false,
+              isHide:false,
               products: [],
               adjustment_id: '',
               ex_products: [],  
@@ -235,7 +235,6 @@
                 var uom_id = e.target.options[e.target.options.selectedIndex].dataset.uomid;
                 $(this).closest('td').next().find('.txt_uom').val(uom);
                 $(this).closest('td').next().find('.txt_uom').attr('data-id',uom_id);
-
                 //auto add new product row
                 // if($(this).closest('tr').next().length == 0) {
                 //     app.addProduct();
@@ -414,6 +413,9 @@
 
             getAdjustment(id) {
               let app = this;
+              if(this.user_role=='office_user'){
+                  app.isHide=true;
+              }
               axios.get('/inventory_adjustment/' + id +'/edit')
                 .then(function(response) {
                     app.form.adjustment_date = moment(response.data.adjustment.adjustment_date).format('YYYY-MM-DD');

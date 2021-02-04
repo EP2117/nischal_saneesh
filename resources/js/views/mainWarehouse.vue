@@ -10,7 +10,7 @@
             </ol>
         </nav>
         <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4" v-if="user_role!='office_user'">
             <h4 class="mb-0 text-gray-800">Main Warehouse</h4>
             <router-link to="/inventory/main-warehouse/new" class="d-sm-inline-block btn btn-primary shadow-sm inventory" v-if="user_role == 'office_user' || user_role == 'system'">
                 <i class="fas fa-plus"></i> Add New Entry
@@ -137,8 +137,8 @@
                                                     </a>&nbsp;
                                                 </router-link>
                                             </a>
-                                            <a class="dropdown-item">
-                                                <a href="#" title="Delete" class="text-danger" @click="removeEntry(entry.id)" v-if="user_role == 'office_user' || user_role == 'system'">
+                                            <a class="dropdown-item" v-if="user_role!='office_user'">
+                                                <a href="#" title="Delete" class="text-danger" @click="removeEntry(entry.id)" v-if="user_role == 'office_user' || user_role == 'system' || user_role == 'admin'">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </a>

@@ -87,7 +87,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group row text-right">
+                        <div class="form-group row text-right" v-if="!isHide">
                             <label class="col-lg-3 col-form-label form-control-label"></label>
                             <div class="col-lg-12">
                                 <input type="reset" class="btn btn-secondary btn-sm" value="Cancel" v-if="!isEdit">
@@ -123,6 +123,7 @@ export default {
             states: [],
             townships: [],
             isEdit: false,
+            isHide:false,
             supplier_id: '',
             user_role: '',
             site_path: '',
@@ -140,7 +141,7 @@ export default {
             var url =  window.location.origin;
             window.location.replace(url);
         }
-
+      
         if(this.$route.params.id) {
             // console.log('aaaa');
             this.isEdit = true;
@@ -212,6 +213,9 @@ export default {
 
         getSupplier(id) {
             let app = this;
+              if(this.user_role =='office_user'){
+                this.isHide=true;
+            }
             axios
                 .get("/supplier/edit/" + id)
                 .then(function(response) {

@@ -4,8 +4,8 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#!"><i class="feather icon-home"></i></a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/'">Home</a></li>
-                <li class="breadcrumb-item"><a :href="site_path+'/master'">Master</a></li>
-                <li class="breadcrumb-item"><router-link tag="span" to="/receipt" class="font-weight-normal"><a href="#">Category</a></router-link></li>
+                <li class="breadcrumb-item"><a :href="site_path+'/account'">Account</a></li>
+                <li class="breadcrumb-item"><router-link tag="span" to="/receipt" class="font-weight-normal"><a href="#">Receipt</a></router-link></li>
                 <li class="breadcrumb-item active" aria-current="page">Receipt Form</li>
 
             </ol>
@@ -74,7 +74,7 @@
                                           v-model="form.remark"  ></textarea>
                             </div>
                         </div>
-                        <div class="form-group row text-right">
+                        <div class="form-group row text-right" v-if="!isHide">
                             <label class="col-lg-3 col-form-label form-control-label"></label>
                             <div class="col-lg-6">
                                 <input type="reset" class="btn btn-secondary btn-sm" value="Cancel" v-if="!isEdit">
@@ -105,6 +105,7 @@ export default {
 
             }),
             isEdit:false,
+            isHide:false,
             sub_account:[],
             debit:[],
             credit:[],
@@ -191,6 +192,9 @@ export default {
         },
         getReceipt(id){
             let app=this;
+             if(this.user_role){
+                app.isHide=true;
+            }
             axios.get('/receipt/edit/'+id).then(function (response){
                 var r=response.data.receipt;
                 app.form.cash_receipt_no=r.cash_receipt_no;
@@ -205,6 +209,9 @@ export default {
         },
         onSubmit:function (event){
             var app = this;
+             if(this.user_role){
+                app.isHide=true;
+            }
             $("#loading").show();
             if (!this.isEdit) {
                 this.form.post('/receipt/store').then(function (data){

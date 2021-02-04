@@ -10,9 +10,12 @@
             </ol>
         </nav>
         <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h4 class="mb-0 text-gray-800">Internal Receive</h4>
-        </div>
+        <!-- <div class="d-sm-flex align-items-center justify-content-between mb-4"> -->
+             <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h4 class="mb-0 text-gray-800">Internal Receive</h4>
+               
+            </div>
+        <!-- </div> -->
         <!-- table start -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -67,7 +70,7 @@
                                         type="checkbox"
                                         :id="'transfer_'+transfer.id"
                                         :name="'transfer_'+transfer.id"
-                                        v-if="user_role !='admin'"
+                                        v-if="user_role !='office_user'"
                                         @change="acceptTransfer($event.target,transfer.id)"
                                     >
                                     <input

@@ -126,14 +126,12 @@
                                     </tbody>
                                 </table>
                             </div>                         
-
                         </div>
-                        <div class="row">
-                            <div class="col-md-12" v-if="user_role != 'admin'">
+                        <div class="row" v-if="!isHide">
+                            <div class="col-md-12" >
                                 <input type="submit" class="btn btn-primary btn-sm" value="Save Entry">
                             </div>
                         </div>
-
                     </form>                    
                 <!-- form end -->  
                 </div>
@@ -162,6 +160,7 @@
                 uom_id: "",
               }),
               isEdit: false,
+              isHide:false,
               products: [],
               transfer_id: '',
               ex_products: [],
@@ -491,6 +490,9 @@
 
             getTransfer(id) {
               let app = this;
+              if(this.user_role=='office_user'){
+                  app.isHide=true;
+              }
               $("#loading").show();
               axios
                 .get("/transfer/" + id)

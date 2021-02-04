@@ -207,6 +207,7 @@ const routes = [
       path: '/inventory/transfer/edit/:id',
       component: TransferForm
     },
+    
     {
       path: '/inventory/receive/:id',
       component: TransferDetail

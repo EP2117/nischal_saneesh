@@ -9,7 +9,7 @@
             </ol>
         </nav>
         <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4" v-if="user_role!='office_user'">
             <h4 class="mb-0 text-gray-800">Receipt</h4>
             <router-link to="/receipt/new" class="d-sm-inline-block btn btn-primary shadow-sm text-right">
                 <i class="fas fa-plus"></i> Add New Receipt
