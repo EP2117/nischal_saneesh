@@ -59,7 +59,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="form-group col-md-8 text-right">
+                            <div class="form-group col-md-8 text-right" v-if="user_role!='office_user'">
                                 <label class="">&nbsp;</label>                                
                                 <input type="submit" class="btn btn-primary btn-sm" value="Save">&nbsp;
                                 <input type="reset" class="btn btn-secondary btn-sm" value="Cancel" v-if="!isEdit">

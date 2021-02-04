@@ -4,8 +4,8 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#!"><i class="feather icon-home"></i></a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/'">Home</a></li>
-                <li class="breadcrumb-item"><a :href="site_path+'/master'">Master</a></li>
-                <li class="breadcrumb-item"><router-link tag="span" to="/payment" class="font-weight-normal"><a href="#">Category</a></router-link></li>
+                <li class="breadcrumb-item"><a :href="site_path+'/account'">Account</a></li>
+                <li class="breadcrumb-item"><router-link tag="span" to="/payment" class="font-weight-normal"><a href="#">Account</a></router-link></li>
                 <li class="breadcrumb-item active" aria-current="page">Payment Form</li>
 
             </ol>
@@ -74,7 +74,7 @@
                                           v-model="form.remark"  ></textarea>
                             </div>
                         </div>
-                        <div class="form-group row text-right">
+                        <div class="form-group row text-right" v-if="!isEdit">
                             <label class="col-lg-3 col-form-label form-control-label"></label>
                             <div class="col-lg-6">
                                 <input type="reset" class="btn btn-secondary btn-sm" value="Cancel" v-if="!isEdit">
@@ -105,6 +105,7 @@ export default {
 
             }),
             isEdit:false,
+            isHide:false,
             sub_account:[],
             debit:[],
             credit:[],
@@ -190,6 +191,9 @@ export default {
         },
         getPayment(id){
             let app=this;
+             if(this.user_role){
+                app.isHide=true;
+            }
             axios.get('/payment/edit/'+id).then(function (response){
                 var r=response.data.payment;
                 app.form.cash_payment_no=r.cash_payment_no;

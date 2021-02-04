@@ -12,7 +12,7 @@
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h4 class="mb-0 text-gray-800">Inventory Adjustment</h4>
-            <router-link to="/inventory/create_adjustment" class="d-sm-inline-block btn btn-primary shadow-sm inventory" v-if="user_role == 'office_user' || user_role == 'system'">
+            <router-link to="/inventory/create_adjustment" class="d-sm-inline-block btn btn-primary shadow-sm inventory" v-if=" user_role == 'system' || user_role == 'admin'">
                 <i class="fas fa-plus"></i> Add New 
             </router-link>
         </div>
@@ -116,15 +116,15 @@
                                             <i class="fas fa-ellipsis-v"></i>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                            <a class="dropdown-item">
+                                            <a class="dropdown-item" >
                                                 <router-link tag="span" :to="'/inventory_adjustment/' + a.id +'/edit'" >
                                                     <a href="#" title="Edit/View" class="">
                                                         <i class="fas fa-edit"></i>
                                                     </a>&nbsp;
                                                 </router-link>
                                             </a>
-                                            <a class="dropdown-item">
-                                                <a href="#" title="Delete" class="text-danger" @click="removeAdjustment(a.id)" v-if="user_role == 'office_user' || user_role == 'system'">
+                                            <a class="dropdown-item" v-if="user_role!='office_user'">
+                                                <a href="#" title="Delete" class="text-danger" @click="removeAdjustment(a.id)" v-if="user_role == 'office_user' || user_role == 'system' || user_role == 'admin'">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </a>

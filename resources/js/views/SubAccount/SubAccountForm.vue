@@ -43,7 +43,7 @@
                                     <option v-for="at in account_type" :value="at.id"  >{{at.name}}</option>
                                 </select>
                             </div>
-                            <div class="form-group  row text-right pt-3">
+                            <div class="form-group  row text-right pt-3" v-if="!isHide">
                                 <label class="col-lg-3 col-form-label form-control-label"></label>
                                 <div class="col-lg-12">
                                     <input type="reset" class="btn btn-secondary btn-sm" value="Cancel" v-if="!isEdit">
@@ -81,6 +81,7 @@ export default {
             account_head:[],
             account_type:[],
             isEdit:false,
+            isHide:false,
         }
     },
     created() {
@@ -117,6 +118,9 @@ export default {
         },
         getSubAccount(id){
             let app=this;
+            if(this.user_role){
+                app.isHide=true;
+            }
             axios.get('/sub_account/edit/'+id).then(function (response){
                 var sa=response.data.sub_account;
                 app.form.sub_account_name=sa.sub_account_name;

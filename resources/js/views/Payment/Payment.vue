@@ -9,13 +9,12 @@
             </ol>
         </nav>
         <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4" v-if="user_role!='office_user'">
             <h4 class="mb-0 text-gray-800">Payment</h4>
             <router-link to="/payment/new" class="d-sm-inline-block btn btn-primary shadow-sm text-right">
                 <i class="fas fa-plus"></i> Add New Payment
             </router-link>
         </div>
-
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Search By</h6>

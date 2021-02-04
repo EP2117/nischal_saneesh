@@ -9,7 +9,7 @@
             </ol>
         </nav>
         <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4" v-if="user_role!='office_user'">
             <h4 class="mb-0 text-gray-800">Sub Account</h4>
             <router-link to="/sub_account/new" class="d-sm-inline-block btn btn-primary shadow-sm text-right">
                 <i class="fas fa-plus"></i> Add New Sub Account
@@ -98,14 +98,16 @@
                             </td>
                             <td class="text-center"></td>
                             <td class="text-center">
-
+                                 <!-- v-show="(user_role=='system' && user_role=='admin')
+                                 && (sa.sub_account_name=='Cash in hand' || sa.sub_account_name=='Bank in hand' || sa.sub_account_name=='Cash Purchase' || sa.sub_account_name=='Cash Sale' || sa.sub_account_name=='Credit Collection' || sa.sub_account_name=='Credit Payment' || sa.sub_account_name=='Discount Allowed' || sa.sub_account_name=='Discount Received' || sa.sub_account_name=='Opening Cash Balance' || sa.sub_account_name=='Purchase Account' || sa.sub_account_name=='Purchase Advance' || sa.sub_account_name=='Sale Account' || sa.sub_account_name=='Sale Advance') " -->
                                 <div class="dropdown">
                                     <a class="btn btn-sm btn-icon-only text-danger " href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="fas fa-ellipsis-v"></i>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                         <a class="dropdown-item" 
-                                            v-show="user_role=='system' && (sa.sub_account_name=='Cash in hand' || sa.sub_account_name=='Bank in hand' || sa.sub_account_name=='Cash Purchase' || sa.sub_account_name=='Cash Sale' || sa.sub_account_name=='Credit Collection' || sa.sub_account_name=='Credit Payment' || sa.sub_account_name=='Discount Allowed' || sa.sub_account_name=='Discount Received' || sa.sub_account_name=='Opening Cash Balance' || sa.sub_account_name=='Purchase Account' || sa.sub_account_name=='Purchase Advance' || sa.sub_account_name=='Sale Account' || sa.sub_account_name=='Sale Advance') "
+                                            v-if="(user_role=='system' || user_role=='admin' || user_role=='office_user')
+                                             || (sa.sub_account_name=='Cash in hand' || sa.sub_account_name=='Bank in hand' || sa.sub_account_name=='Cash Purchase' || sa.sub_account_name=='Cash Sale' || sa.sub_account_name=='Credit Collection' || sa.sub_account_name=='Credit Payment' || sa.sub_account_name=='Discount Allowed' || sa.sub_account_name=='Discount Received' || sa.sub_account_name=='Opening Cash Balance' || sa.sub_account_name=='Purchase Account' || sa.sub_account_name=='Purchase Advance' || sa.sub_account_name=='Sale Account' || sa.sub_account_name=='Sale Advance') "
                                         >
                                             <router-link tag="span" :to="'/sub_account/edit/' + sa.id" >
                                                 <a href="#" title="Edit/View" class="">
@@ -113,7 +115,7 @@
                                                 </a>&nbsp;
                                             </router-link>
                                         </a>
-                                        <a class="dropdown-item">
+                                        <a class="dropdown-item" v-if="user_role!='office_user'">
                                             <a class="badge badge-primary text-white"  @click="changeStatus(sa.id,'inactive')" v-if="sa.is_active == 1">Inactive</a>
                                             <a class="badge badge-primary text-white" @click="changeStatus(sa.id,'active')" v-else>Active</a>
                                         </a>

@@ -43,7 +43,7 @@
                                     <option v-for="f_type in financial_type2" :value="f_type.id"  >{{f_type.name}}</option>
                                 </select>
                             </div>
-                            <div class="form-group  row text-right pt-3">
+                            <div class="form-group  row text-right pt-3" v-if="!isHide">
                                 <label class="col-lg-3 col-form-label form-control-label"></label>
                                 <div class="col-lg-12">
                                     <input type="reset" class="btn btn-secondary btn-sm" value="Cancel" v-if="!isEdit">
@@ -81,6 +81,7 @@ export default {
             financial_type2:[],
 
             isEdit:false,
+            isHide:false,
         }
     },
     created() {
@@ -118,6 +119,9 @@ export default {
         },
         getAccountHead(id){
             let app=this;
+             if(this.user_role){
+                app.isHide=true;
+            }
             axios.get('/account_head/edit/'+id).then(function (response){
                 var ah=response.data.account_head;
                 app.form.name=ah.name;

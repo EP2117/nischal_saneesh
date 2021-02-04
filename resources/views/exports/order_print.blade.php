@@ -2,13 +2,24 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <style type="text/css">
     @font-face {
     font-family: 'ZawgyiOne2008';
       src: url({{ storage_path('fonts/ZawgyiOne2008.ttf') }}) format("truetype");
   }
+  @font-face {
+    font-family: "Pyidaungsu";
+    src: local("Pyidaungsu"), url("https://www.mmwebfonts.com/fonts/Pyidaungsu-2.1_Regular.woff") format("woff"), url("https://www.mmwebfonts.com/fonts/Pyidaungsu-2.1_Regular.ttf") format("ttf");
+  }
+
+  @font-face {
+    font-family: "Pyidaungsu";
+    src: local("Pyidaungsu"), url("https://www.mmwebfonts.com/fonts/Pyidaungsu-2.1_Bold.woff") format("woff"), url("https://www.mmwebfonts.com/fonts/Pyidaungsu-2.1_Bold.ttf") format("ttf");
+    font-weight: bold;
+  }
   .body {
-    font-family: 'ZawgyiOne2008' !important;
+    font-family: 'Pyidaungsu' !important;
   }
   .title {
     font-size: 35px;
@@ -19,7 +30,7 @@
     font-size: 25px;
   }
   .mm-txt{
-    font-family: 'ZawgyiOne2008' !important;  
+    font-family: 'Pyidaungsu' !important;  
     font-size:13px;
   }
   .box {
@@ -28,7 +39,6 @@
     height: 25px;
     border: 1px #000 solid;
   }
-
   table#t01 {
     width:100%;
     margin-top:20px;
@@ -224,5 +234,13 @@
         <td colspan="2" style="text-align: right;"><br /><br />Receive By</td>
       </tr>-->
     </table>
+    <script >
+      $(document).ready(function(){
+       setTimeout(function(){
+        window.onload=window.print();
+       }, 300);
+     });
+         
+     </script>
 </body>
 </html>
