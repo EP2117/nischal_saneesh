@@ -1502,7 +1502,7 @@
                 .get("/sale/" + id)
                 .then(function(response) {
                     //prevent to Edit (save button permission)
-                    if(app.user_role == "admin" || app.user_role == "system") {
+                    if(app.user_role == "admin" || app.user_role == "system" || app.user_role == "office_user") {
                         if(response.data.sale.collections.length == 0 && response.data.sale.deliveries.length == 0 && response.data.sale.delivery_approve == 0) {
                             app.isDisabled = false;
                         } else {

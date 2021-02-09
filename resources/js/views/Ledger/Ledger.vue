@@ -115,6 +115,9 @@
                                         <td class="text-center" colspan="1" v-if="at.opening_balance >= 0 ">
                                             {{at.opening_balance.toLocaleString()}}
                                         </td>
+                                         <td class="text-center" colspan="1" v-if="at.opening_balance >= 0 ">
+                                            <!-- {{at.opening_balance.toLocaleString()}} -->
+                                        </td>
                                         <td class="text-center" colspan="1" v-if="at.opening_balance < 0 ">
                                         </td>
                                         <td class="text-center" colspan="1" v-if="at.opening_balance < 0 ">
@@ -243,6 +246,8 @@
                                          <td colspan="4" class="text-right mm-text"><strong>Closing Balance</strong></td>
                                         <td class="text-center " colspan="1" v-if="at.closing_balance>=0">
                                             {{at.closing_balance.toLocaleString()}}
+                                        </td>
+                                         <td class="text-center " colspan="1" v-if="at.closing_balance>=0">
                                         </td>
                                         <td class="text-center " colspan="1" v-else-if="at.closing_balance<0">
                                         </td>

@@ -75,17 +75,15 @@ class SubAccountController extends Controller
     }
     public function getSubAccount($type){
         if($type==="debit"){
-//            dd('debit');
             $sub_account=SubAccount::wherehas('account_type',function ($q){
                 $q->where('name','Cash & Bank');
             })->get();
-//            dd($sub_account);
         }
         if($type==="credit"){
-            $sub_account=SubAccount::wherehas('account_type',function ($q){
-                $q->where('name','!=','Cash & Bank');
-            })->get();
-//            dd($sub_account);
+            $sub_account=SubAccount::get();
+            // wherehas('account_type',function ($q){
+            //     $q->where('name','!=','Cash & Bank');
+            // })->
         }
 //        dd($sub_account);
         return compact('sub_account');
