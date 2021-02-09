@@ -176,12 +176,12 @@
                                                 </router-link>
                                             </a>
                                             <a class="dropdown-item">
-                                                <a title="Print" class="text-primary" @click="generatePDF(order.id)" v-if="user_role == 'admin' || user_role == 'system'">
+                                                <a title="Print" class="text-primary" @click="generatePDF(order.id)" v-if="user_role == 'admin' || user_role == 'system' || user_role == 'office_user'">
                                                     <i class="fas fa-print"></i>
                                                 </a>
                                             </a>
                                             <a class="dropdown-item">    
-                                                <a title="Delete" class="text-danger" @click="removeOrder(order.id)" v-if="user_role == 'system' || user_role == 'admin' || user_id == order.sale_man_id ">
+                                                <a title="Delete" class="text-danger" @click="removeOrder(order.id)" v-if="user_role == 'system' || user_role == 'admin' || user_role == 'office_user' || user_id == order.sale_man_id ">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </a>
