@@ -45,7 +45,7 @@
                                 <select id="debit_id" class="form-control form-control-alternative"
                                         name="debit" v-model="form.debit" style="width:100%" required>
                                     <option value="">Select One</option>
-                                    <option v-for="d in debit" :value="d.id"  >{{d.sub_account_name}}</option>
+                                    <option v-for="d in debit" :value="d.id"  v-if="d.id != form.credit">{{d.sub_account_name}}</option>
                                 </select>
                             </div>
                         </div>
@@ -54,7 +54,7 @@
                             <div class="col-lg-6">
                                 <select  class="form-control form-control-alternative" id="credit_id" required v-model="form.credit" style="width:100%">
                                     <option value="">Select One</option>
-                                    <option v-for="c in credit" :value="c.id"  >{{c.sub_account_name}}</option>
+                                    <option v-for="c in credit" :value="c.id"  v-if="c.id != form.debit">{{c.sub_account_name}}</option>
                                 </select>
                             </div>
                         </div>
