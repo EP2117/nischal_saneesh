@@ -11,7 +11,7 @@
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h4 class="mb-0 text-gray-800">Purchase Invoice</h4>
-            <router-link :to="'/purchase/'+purchase_type+'/create'" class="d-sm-inline-block btn btn-primary shadow-sm inventory" v-if="user_role == 'system' || user_role == 'office_user' || user_role == 'van_user' || user_role == 'admin'">
+            <router-link :to="'/purchase/'+purchase_type+'/create'" class="d-sm-inline-block btn btn-primary shadow-sm inventory" v-if="user_role == 'system'  || user_role == 'van_user' || user_role == 'admin'">
                 <i class="fas fa-plus"></i> Add New Invoice
             </router-link>
         </div>
