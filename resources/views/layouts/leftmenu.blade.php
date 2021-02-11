@@ -322,21 +322,15 @@
             </li>
             @else
             @endif
-
-       
-
         @if(Auth::user()->role->role_name != 'office_order_user' && Auth::user()->role->role_name != 'delivery' && Auth::user()->role->id != 6 && Auth::user()->role->id != 7)
          <hr class="sidebar-divider">
-
         <router-link  tag="li" to="/order" class="nav-item">
             <a class="nav-link" href="#">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Sale Order</span>
             </a>
         </router-link>
-
         <hr class="sidebar-divider">
-
         <!-- Van Sale == 2; Office Sale == 1; -->
         <router-link  tag="li" to="/sale/<?php echo $role = Request::path() == 'van' ? '2' : '1'; ?>/" class="nav-item">
             <a class="nav-link" href="#">
