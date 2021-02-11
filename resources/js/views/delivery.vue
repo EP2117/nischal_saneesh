@@ -6,7 +6,6 @@
                 <li class="breadcrumb-item"><a :href="site_path+'/'">Home</a></li>
                 <li class="breadcrumb-item"><a :href="site_path+'/office'">Office Sale</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Delivery</li>
-
             </ol>
         </nav>
         <!-- Page Heading -->
