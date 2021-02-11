@@ -12,7 +12,7 @@
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h4 class="mb-0 text-gray-800">Payment</h4>
-            <router-link :to="'/purchase_collection/new'" class="d-sm-inline-block btn btn-primary shadow-sm inventory">
+            <router-link :to="'/purchase_collection/new'" class="d-sm-inline-block btn btn-primary shadow-sm inventory" v-if="user_role!='office_user'">
                 <i class="fas fa-plus"></i> Add New Payment
             </router-link>
         </div>

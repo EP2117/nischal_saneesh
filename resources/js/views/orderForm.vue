@@ -760,7 +760,7 @@
                     }
 
                     //for edit permission (save btn)
-                    if(app.user_role == 'system' || app.user_id == response.data.order.sale_man_id || app.user_role=='admin') {
+                    if(app.user_role == 'system' || app.user_id == response.data.order.sale_man_id || app.user_role=='admin' || app.user_role=='office_user') {
                         app.isDisabled = false;
                     } else {
                         app.isDisabled = true;
