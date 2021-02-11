@@ -278,7 +278,7 @@
             this.user_year = document.querySelector("meta[name='user-year-likelink']").getAttribute('content');
 
             /*if(this.user_role == "office_order_user")*/
-            if(this.user_role != "admin" && this.user_role != "system")
+            if(this.user_role != "admin" && this.user_role != "system" && this.user_role != "office_user")
             {
                 var url =  window.location.origin;
                 window.location.replace(url);
@@ -666,7 +666,7 @@
                 .then(function(response) {
 
                     //for save button permission
-                    if(app.user_role == "admin" || app.user_role == "system") {
+                    if(app.user_role == "admin" || app.user_role == "system" || app.user_role == "office_user") {
                         app.isDisabled = false;
                     } else {
                         app.isDisabled = true;

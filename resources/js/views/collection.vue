@@ -141,13 +141,12 @@
                                                 </router-link>
                                             </a>
                                             <a class="dropdown-item">
-                                                <a title="Delete" class="text-danger" @click="removeCollection(collection.id)" v-if="user_role == 'admin' || user_role == 'system'">
+                                                <a title="Delete" class="text-danger" @click="removeCollection(collection.id)" v-if="user_role == 'admin' || user_role == 'system' || user_role == 'office_user'">
                                                     <i class="fas fa-trash"></i>
                                                 </a>&nbsp;
                                             </a>
                                         </div>
                                     </div>
-
                                 </td>
                                 <!-- Kamlesh End-->
                             </tr>
@@ -202,7 +201,6 @@
                 var url =  window.location.origin;
                 window.location.replace(url);
             }
-
             this.getCollections();    
         },
 
