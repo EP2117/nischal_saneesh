@@ -197,7 +197,7 @@
             this.storage_path = document.querySelector("meta[name='storage-path']").getAttribute('content');
             
             /*if(this.user_role == "office_order_user")*/
-            if(this.user_role != "admin" && this.user_role != "system")
+            if(this.user_role != "admin" && this.user_role != "system" && this.user_role != "office_user")
             {
                 var url =  window.location.origin;
                 window.location.replace(url);
