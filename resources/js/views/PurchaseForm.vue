@@ -136,13 +136,13 @@
                                     <tr>
 <!--                                        <th scope="col">Brand</th>-->
 <!--                                        <th scope="col" >Category</th>-->
-                                        <th scope="col" class="mm-txt">အမျိုးအမည်</th>
+                                        <th scope="col" class="mm-txt">Product Name</th>
                                         <th scope="col" class="mm-txt">WT</th>
-                                        <th scope="col" class="mm-txt">အရေအတွက်</th>
+                                        <th scope="col" class="mm-txt">Quantity</th>
                                         <th scope="col" >Purchase Unit</th>
 <!--                                        <th scope="col" >Stock Available</th>-->
-                                        <th scope="col" class="mm-txt">စျေးနှုန်း</th>
-                                        <th scope="col" class="mm-txt">သင့္ေင ြ</th>
+                                        <th scope="col" class="mm-txt">Rate</th>
+                                        <th scope="col" class="mm-txt">Amount </th>
                                         <th scope="col" class="text-center"></th>
                                     </tr>
                                     </thead>
