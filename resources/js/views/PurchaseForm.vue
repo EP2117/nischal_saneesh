@@ -138,7 +138,7 @@
 <!--                                        <th scope="col" >Category</th>-->
                                         <th scope="col" class="mm-txt">Product Name</th>
                                         <th scope="col" class="mm-txt">WT</th>
-                                        <th scope="col" class="mm-txt">Quantity</th>
+                                        <th scope="col" class="mm-txt">QTY</th>
                                         <th scope="col" >Purchase Unit</th>
 <!--                                        <th scope="col" >Stock Available</th>-->
                                         <th scope="col" class="mm-txt">Rate</th>
@@ -217,19 +217,19 @@
                                         </tr>
                                     </template>
                                     <tr class="total_row"   >
-                                        <td colspan="5" class="text-right mm-txt">စုစုေပါင္း</td>
+                                        <td colspan="5" class="text-right mm-txt">Total</td>
                                         <td colspan="2">
                                             <input type="text" v-model="form.sub_total" class="form-control num_txt" readonly style="width:150px;" required />
                                         </td>
                                     </tr>
                                     <tr class="total_row">
-                                        <td colspan="5" class="text-right mm-txt">ေလ်ာ့ေင ြ</td>
+                                        <td colspan="5" class="text-right mm-txt">Discount</td>
                                         <td colspan="2">
                                             <input type="text" v-model="form.discount" class="form-control num_txt" style="width:150px;" @keyup="changeDiscount($event.target)" />
                                         </td>
                                     </tr>
                                     <tr class="total_row">
-                                        <td colspan="5" class="text-right mm-txt">လက္ခံရရိွေင ြ</td>
+                                        <td colspan="5" class="text-right mm-txt">Advance</td>
                                         <td colspan="2" v-if="form.payment_type == 'credit'">
                                             <input type="text" v-model="form.pay_amount" class="form-control num_txt" style="width:150px;" @keyup="calBalance($event.target)" />
                                         </td>
@@ -244,7 +244,7 @@
 <!--                                        </td>-->
 <!--                                    </tr>-->
                                     <tr class="total_row">
-                                        <td colspan="5" class="text-right mm-txt">လက္က်န္ေင ြစုစုေပါင္း</td>
+                                        <td colspan="5" class="text-right mm-txt">Balance</td>
                                         <td colspan="2">
                                             <input type="text" v-model="form.balance_amount" class="form-control num_txt" readonly style="width:150px;" required />
                                         </td>
