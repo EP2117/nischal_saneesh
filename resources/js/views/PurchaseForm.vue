@@ -139,7 +139,7 @@
                                         <th scope="col" class="mm-txt">Product Name</th>
                                         <th scope="col" class="mm-txt">WT</th>
                                         <th scope="col" class="mm-txt">QTY</th>
-                                        <th scope="col" >Purchase Unit</th>
+                                        <th scope="col" class="mm-txt">Purchase Unit</th>
 <!--                                        <th scope="col" >Stock Available</th>-->
                                         <th scope="col" class="mm-txt">Rate</th>
                                         <th scope="col" class="mm-txt">Amount </th>

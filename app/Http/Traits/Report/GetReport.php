@@ -284,9 +284,13 @@ trait GetReport{
        
     }
     public function getSaleOutstandingReport($request){
-        $cus=Sale::where('payment_type','credit');
+        // dd($request->all());
+        $cus=Sale::where('payment_type','credit')->whereRaw('(total_amount-(pay_amount + collection_amount)) > 0');
         if($request->customer_id!=null){
             $cus->where('customer_id',$request->customer_id);
+        }
+        if($request->sale_man_id!=null){
+            $cus->where('office_sale_man_id',$request->sale_man_id);
         }
         if($request->invoice_no!=null){
             $cus->where('invoice_no',$request->invoice_no);
@@ -326,6 +330,9 @@ trait GetReport{
                 $invoices=Sale::where('customer_id',$s->customer_id)->where('payment_type','credit');
                 if($request->invoice_no!=null){
                     $invoices->where('invoice_no',$request->invoice_no);
+                }
+                if($request->sale_man_id!=null){
+                    $invoices->where('office_sale_man_id',$request->sale_man_id);
                 }
                 if($request->from_date != '' && $request->to_date != '')
                 {

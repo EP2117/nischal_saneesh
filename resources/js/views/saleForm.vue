@@ -853,7 +853,7 @@
                                 t02.value = product.pivot.wt;
                                 t02.style = "width:100px;";
                                 t02.className ="form-control wt_txt";
-                                $(t02).attr("required", true);
+                                // $(t02).attr("required", true);
                                 // if(app.order_status != 'Draft' && app.order_status != '') {
                                 //     $(t2).attr('readonly', true);
                                 // }

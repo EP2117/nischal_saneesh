@@ -69,6 +69,15 @@
                             <option v-for="c in customers" :value="c.id"  >{{c.cus_name}}</option>
                         </select>
                     </div>
+                     <div class="form-group col-md-4 col-lg-3 mm-txt" >
+                        <label for="sale_man_id">Sale Man</label>
+                        <select id="sale_man_id" class="form-control mm-txt"
+                            name="sale_man_id" v-model="search.sale_man_id" style="width:100%" required
+                        >
+                            <option value="">Select One</option>
+                            <option v-for="sale_man in sale_men" :value="sale_man.id"  >{{sale_man.sale_man}}</option>
+                        </select>
+                    </div>
                     <div class="form-group col-md-4 col-lg-3 mm-txt">
                         <label >State</label>
                         <select id="state_id" class="form-control mm-txt"
@@ -144,13 +153,13 @@
                     <button class="btn btn-primary btn-icon btn-sm" @click="exportExcel()"><i class="fas fa-file-excel"></i> &nbsp;Export to Excel</button>
                 </div>-->
                 <div class="table-responsive" v-if="out_count>0">
-                    <table class="table table-bordered table-striped table_no" id="dataTable" width="100%" cellspacing="0">  <!--kamlesh-->
+                    <table class="table table-bordered " id="dataTable" width="100%" cellspacing="0">  <!--kamlesh-->
                         <thead>
                         <tr>
-                            <th class="text-center">No.</th>
                             <th class="text-center">Invoice No</th>
                             <th class="text-center">Date</th>
                             <th class="text-center">Customer Name</th>
+                            <th class="text-center">Sale Man</th>
                             <th class="text-center">customer Code</th>
                             <th class="text-center">Invoice Amount</th>
                             <th class="text-center">Paid Amount</th>
@@ -162,18 +171,20 @@
                             <template v-for="(po,k) in sale_outstandings">
                                 <template v-for="(c,key) in po.out_list">
                                 <tr v-if="c.type=='paid'">
-                                    <td class="text-center"></td>
+                                    <!-- <td class="text-center"></td> -->
                                     <td class="text-center">{{c.invoice_no}}</td>
                                     <td class="text-center">{{dateFormat(c.invoice_date)}}</td>
                                     <!--                            <td class="text-center">{{c.vochur_no}}</td>-->
                                     <td class="text-center">{{c.customer.cus_name}}</td>
+                                    <td class="text-center" v-if="c.sale_man">{{c.sale_man.sale_man}}</td>
+                                    <td class="text-center" v-else></td>
                                     <td class="text-center" style="right: 4px ">{{c.customer.cus_code}}</td>
                                     <td class="text-center">{{c.total_amount.toLocaleString()}} </td>
                                     <td class="text-center">{{c.t_paid_amount.toLocaleString()}} </td>
                                     <td class="text-center">{{c.t_balance_amount.toLocaleString()}} </td>
                                 </tr>
                                 </template>
-                                <tr class="">
+                                <tr class="" >
                                     <td colspan="5" class="text-right mm-txt"><b>Total</b></td>
                                     <td class="text-center">{{po.total_inv_amt.toLocaleString()}}</td>
                                     <td class="text-center">{{po.total_paid_amt.toLocaleString()}}</td>
@@ -184,7 +195,7 @@
                                 <td></td>
                             </tr>
                              <tr class="">
-                                    <td colspan="5" class="text-right mm-txt"><strong>Total Net</strong></td>
+                                    <td colspan="5" class="text-right mm-txt"><strong><h4>Total Net</h4></strong></td>
                                     <td class="text-center">{{net_inv_amt.toLocaleString()}}</td>
                                     <td class="text-center">{{net_paid_amt.toLocaleString()}}</td>
                                     <td class="text-center">{{net_bal_amt.toLocaleString()}}</td>
@@ -217,6 +228,7 @@ export default {
                 branch_id: '',
                 state_id:'',
                 township_id:'',
+                sale_man_id:'',
             },
             sale_outstandings: [],
             customers:[],
@@ -228,6 +240,7 @@ export default {
             user_year: '',
             user_role: '',
             branches: [],
+            sale_men:[],
             site_path: '',
             storage_path: '',
             net_bal_amt:'',
@@ -350,20 +363,28 @@ export default {
             app.search.township_id = data.id;
 
         });
+         $("#sale_man_id").on("select2:select", function(e) {
+
+            var data = e.params.data;
+            app.search.sale_man_id = data.id;
+        });
         app.initBrands();
+        app.initSaleMen();
         app.initStates();
         app.initTownships();
 
     },
     methods: {
+        initSaleMen() {
+        axios.get("/sale_men").then(({ data }) => (this.sale_men = data.data));              
+        $("#sale_man_id").select2();
+        },
        initCustomers() {
-              axios.get("/customers").then(({ data }) => (this.customers = data.data));
+              axios.get("/customers").then(({ data }) => ( this.customers = data.data ));
               $("#customer_id").select2();
             },
-
-
         initBranches() {
-            axios.get("/branches_byuser").then(({ data }) => (this.branches = data.data));
+            axios.get("/branches_byuser").then(({ data }) => ( this.branches = data.data ));
             $("#branch_id").select2();
         },
         initStates() {
@@ -374,7 +395,11 @@ export default {
             if(this.search.state_id != "") {
                 axios.get("/township_by_state/" + this.search.state_id).then(({ data }) => (this.townships = data.data));
                 $("#township_id").select2();
+            }else{
+                 axios.get("/township").then(({ data }) => (this.townships = data.data));
+                $("#township_id").select2();
             }
+             
         },
 
         initWarehouses() {
@@ -410,6 +435,8 @@ export default {
                 app.search.branch_id +
                 "&state_id=" +
                 app.search.state_id +
+                "&sale_man_id=" +
+                app.search.sale_man_id +
                 "&township_id=" +
                 app.search.township_id; 
             /***axios.get("/daily_sale_product_report?" + search).then(({ data }) => (app.sales = data.data))
