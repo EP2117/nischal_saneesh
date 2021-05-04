@@ -256,7 +256,6 @@ export default {
         this.storage_path = document.querySelector("meta[name='storage-path']").getAttribute('content');
         // this.getsaleOutstanding();
     },
-
     mounted() {
         $("#loading").hide();
         let app = this;
@@ -295,7 +294,6 @@ export default {
                 //console.log(formatedValue);
                 app.search.from_date = formatedValue;
             });
-
         $("#to_date")
             .datetimepicker({
                 icons: {
@@ -332,7 +330,6 @@ export default {
             var data = e.params.data
             app.search.customer_id = data.id;
         });
-
         $("#warehouse_id").on("select2:select", function(e) {
 
             var data = e.params.data;
@@ -348,14 +345,12 @@ export default {
             var data = e.params.data;
             app.search.branch_id = data.id;
         });
-
         $("#state_id").select2();
         $("#state_id").on("select2:select", function(e) {
             app.townships=[];
             var data = e.params.data;
             app.search.state_id = data.id;
             axios.get("/township_by_state/"+ data.id).then(({ data }) => (app.townships = data.data));
-
         });
         $("#township_id").select2();
         $("#township_id").on("select2:select", function(e) {

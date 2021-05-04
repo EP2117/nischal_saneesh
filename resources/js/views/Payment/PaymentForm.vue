@@ -74,11 +74,11 @@
                                           v-model="form.remark"  ></textarea>
                             </div>
                         </div>
-                        <div class="form-group row text-right" v-if="!isEdit">
+                        <div class="form-group row text-right" v-if="isEdit && (user_role=='system' || user_role=='admin' || user_role=='office_user')  " >
                             <label class="col-lg-3 col-form-label form-control-label"></label>
                             <div class="col-lg-6">
-                                <input type="reset" class="btn btn-secondary btn-sm" value="Cancel" v-if="!isEdit">
-                                <input type="button" onClick="location.reload()" class="btn btn-secondary btn-sm" value="Cancel" v-if="isEdit">
+                                <input type="reset" class="btn btn-secondary btn-sm" value="Cancel" v-if="isEdit">
+                                <!-- <input type="button" onClick="location.reload()" class="btn btn-secondary btn-sm" value="Cancel" v-if="isEdit"> -->
                                 <input type="submit" class="btn btn-primary btn-sm" value="Save Changes">
                             </div>
                         </div>

@@ -110,6 +110,9 @@ import InventoryValuation from "./views/Report/InventoryValuationReport";
 import ProfitAndLoss from "./views/Report/ProfitAndLossReport";
 import Ledger from "./views/Ledger/Ledger";
 
+import DailyPurchaseReport from "./views/Report/DailyPurchaseReport";
+
+
 const routes = [
     {
       name: 'home',
@@ -543,7 +546,11 @@ const routes = [
    name:'profit_and_loss',
    path:'/report/profit_and_loss',
    component:ProfitAndLoss,
- }
+ },
+ {
+  path:'/report/daily_purchase',
+  component:DailyPurchaseReport,
+},
 ];
 
 const router = new VueRouter({routes: routes});

@@ -11,8 +11,12 @@ use App\AccountTransition;
 use App\ProductTransition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Exports\DailyPurchaseExport;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Traits\Report\GetReport;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use App\Http\Traits\AccountReport\Ledger;
 use App\Http\Traits\AccountReport\Cashbook;
 
@@ -596,6 +600,51 @@ class PurchaseInvoiceController extends Controller
         $html .= '<tr><td colspan ="10" style="text-align: right;"><strong>Total</strong></td><td class="text-right">'.number_format($total).'</td></tr>';
 
         return response(compact('html'), 200);
+    }
+    public function getDailyPurchaseReport(Request $request){
+        $route_name=Route::currentRouteName();
+        $login_year = Session::get('loginYear');
+        $purchase = PurchaseInvoice::with('supplier','branch','products');
+        
+        if($request->invoice_no != ""){
+            $purchase->where('invoice_no', $request->invoice_no);
+        }
+        if($request->from_date != '' && $request->to_date != '')
+        {
+            $purchase->whereBetween('invoice_date', array($request->from_date, $request->to_date));
+        } else if($request->from_date != '') {
+            $purchase->whereDate('invoice_date', '>=', $request->from_date);
+        }else if($request->to_date != '') {
+             $purchase->whereDate('invoice_date', '<=', $request->to_date);
+        } else {
+            $purchase->whereBetween('invoice_date', array($login_year.'-01-01', $login_year.'-12-31'));
+        }
+
+        if($request->state_id != "") {
+            $purchase->whereHas('supplier',function($q)use($request){
+                $q->where('state_id',$request->state_id);
+            });
+        } 
+        if($request->township_id != "") {
+            $purchase->whereHas('supplier',function($q)use($request){
+                $q->where('township_id',$request->township_id);
+            });
+        } 
+        if($request->supplier_id != "") {
+            $purchase->where('supplier_id', $request->supplier_id);
+        }
+        if($request->brandh_id != "") {
+            $purchase->where('branch_id', $request->branch_id);
+        }
+        $sub_total=$purchase->sum('total_amount');
+        $purchase=$purchase->get();
+        if($route_name=='daily_purchase_export'){
+            // dd('aaaa');
+            $export=new DailyPurchaseExport($purchase);
+            $fileName = 'Daily Purchase Report'.Carbon::now()->format('Ymd').'.xlsx';
+            return Excel::download($export, $fileName);
+        }
+        return compact('purchase','sub_total');
     }
     public function getCreditPaymentReport(Request  $request){
         ini_set('memory_limit','512M');
